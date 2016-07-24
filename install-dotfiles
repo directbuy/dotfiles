@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -e
+if [ "$(basename "$0")" != install-dotfiles ]; then
+    if ! which git >/dev/null; then
+        echo "Please install git first" 1>&2
+        exit 1
+    fi
+    if [ ! -d "$HOME/.dotfiles" ]; then
+        echo "Downloading dotfiles..."
+        git clone "https://bitbucket.org/icecom/dotfiles.git" "$HOME/.dotfiles"
+    fi
+    cd
+
+    exec "$HOME/.dotfiles/install-dotfiles"
+fi
+
+dotfiles="
+    gitconfig
+    gitignore
+    ackrc
+    pylintrc
+    zshrc
+    zprompt
+    zsh.d
+    tmux.conf
+"
+
+dotfiles_dir=".dotfiles"
+
+cd $HOME
+
+for df in $dotfiles; do
+    source="$dotfiles_dir/$df"
+    target=".$df"
+
+    if [ $target != "$(basename $target)" -a ! -e "$(dirname $target)" ]; then
+        echo "Creating directories \"$(dirname $target)\""
+        mkdir -p "$(dirname $target)"
+    fi
+
+    if [ ! -L $target -o "$(readlink $target)" != "$source" ]; then
+        [ -e $target -o -L $target ] && rm $target
+        echo "Linking $source to $target"
+        ln -s $source $target
+    fi
+done

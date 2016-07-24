@@ -1,0 +1,4 @@
+*.elc
+*~
+ssh
+zsh.d/venvs
