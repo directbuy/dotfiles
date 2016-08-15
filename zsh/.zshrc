@@ -56,6 +56,9 @@ PS2='$(prompt2)'
 RPROMPT='$(rprompt)'
 
 # Aliases
+if [ -f ~/.bash_aliases ]; then
+    source ~/.bash_aliases ;
+fi
 alias ls='ls -G'
 alias ll='ls -lFH'
 alias la='ls -lAhS'
