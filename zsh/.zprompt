@@ -103,9 +103,7 @@ first_row_functions+=(promptGit)
 #second_row_functions+=(promptIce)
 
 promptUserHost () {
-    if [[ -n "$SSH_CONNECTION" ]]; then
-        print -P "\e[1m%n\e[0m@\e[32m%m\e[0m"
-    fi
+    print -P "\e[1m%n\e[0m@\e[32m%m\e[0m"
 }
 second_row_functions+=(promptUserHost)
 
