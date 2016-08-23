@@ -59,7 +59,6 @@ RPROMPT='$(rprompt)'
 if [ -f ~/.bash_aliases ]; then
     source ~/.bash_aliases ;
 fi
-alias ls='ls -G'
 alias ll='ls -lFH'
 alias la='ls -lAhS'
 alias grep='grep --color=auto'
