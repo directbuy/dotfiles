@@ -59,6 +59,9 @@ RPROMPT='$(rprompt)'
 if [ -f ~/.bash_aliases ]; then
     source ~/.bash_aliases ;
 fi
+if [ -f ~/.dircolors ]; then
+    eval $(dircolors -b ~/.dircolors) ;
+fi
 alias ll='ls -lFH'
 alias la='ls -lAhS'
 alias grep='grep --color=auto'
