@@ -14,6 +14,11 @@
 
 local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
+local remote=false;
+python -m platform | grep -i centos > /dev/null 2>&1
+if [ $? -eq 0 ] ; then
+    remote=true ;
+fi    
 
 promptTitle () {
     if [[ $INSIDE_EMACS != "" ]]; then
@@ -103,12 +108,18 @@ first_row_functions+=(promptGit)
 #second_row_functions+=(promptIce)
 
 promptUserHost () {
-    print -P "\e[1m%n\e[0m@\e[32m%m\e[0m"
+    if $remote ; then
+        print -P "\e[1m%n\e[0m@\e[32m%m\e[0m" ;
+    fi
 }
 second_row_functions+=(promptUserHost)
 
 promptDate () {
-    date +'%B %e, %I:%M %p'
+    if $remote ; then
+        TZ=PST8PDT date +'%Y.%m.%d %I:%M%p' ;
+    else
+        TZ=PST8PDT date +'%B %e, %I:%M %p' ;
+    fi
 }
 second_row_functions+=(promptDate)
 
@@ -159,6 +170,11 @@ prompt () {
     [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     local first_row="┌── " second_row="│" third_row="└ " current=""
+    if $remote ; then
+        first_row="\e[34m┌──\e[0m " ;
+        second_row="\e[34m│\e[0m" ; 
+        third_row="\e[34m└\e[0m " ;
+    fi
     integer first_row_length second_row_length third_row_length
 
     for func in $aux_functions; do
@@ -168,7 +184,13 @@ prompt () {
     for func in $first_row_functions; do
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
-            [[ $func != $first_row_functions[1] ]] && first_row+="── "
+            if [[ $func != $first_row_functions[1] ]] ; then
+                if $remote ; then
+                    first_row+="\e[34m──\e[0m " ;
+                else
+                    first_row+="── " ;
+                fi
+            fi
             first_row+=$current
             first_row+=" "
         fi
@@ -179,7 +201,11 @@ prompt () {
     for func in $second_row_functions; do
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
-            [[ $func != $second_row_functions[1] ]] && second_row+="── "
+            if $remote ; then
+                second_row+="\e[34m──\e[0m " ;
+            else
+                second_row+="── " ;
+            fi
             second_row+=$current
             second_row+=" "
         fi
@@ -188,16 +214,30 @@ prompt () {
     (( second_row_length -= $perceived_width_of_dash ))
 
     while (( $first_row_length < $second_row_length )); do
-        first_row+="─"
+        if $remote ; then
+            first_row+="\e[34m─\e[0m" ;
+        else
+            first_row+="─" ;
+        fi
         (( first_row_length += $perceived_width_of_dash ))
     done
     while (( $first_row_length > $second_row_length )); do
-        second_row+="─"
+        if $remote ; then
+            second_row+="\e[34m─\e[0m" ;
+        else
+            second_row+="─" ;
+        fi
         (( second_row_length += $perceived_width_of_dash ))
     done
 
-    first_row+="─┐"
-    second_row+="─┘"
+    if $remote ; then
+        first_row+="\e[34m─┐\e[0m" ;
+        second_row+="\e[34m─┘\e[0m" ;
+    else 
+        first_row+="─┐" ;
+        second_row+="─┘" ;
+    fi
+        
 
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
