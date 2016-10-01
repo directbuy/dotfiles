@@ -13,7 +13,7 @@ compinit
 
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
-
+setopt INTERACTIVE_COMMENTS
 setopt EXTENDED_GLOB
 unsetopt NOMATCH
 
