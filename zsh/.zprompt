@@ -169,11 +169,11 @@ perceivedLength () {
 prompt () {
     [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
-    local first_row="┌── " second_row="│" third_row="└ " current=""
+    local first_row="┏━━ " second_row="┃" third_row="┗ " current=""
     if $remote ; then
-        first_row="\e[34m┌──\e[0m " ;
-        second_row="\e[34m│\e[0m" ; 
-        third_row="\e[34m└\e[0m " ;
+        first_row="\e[34m┏━━\e[0m " ;
+        second_row="\e[34m┃\e[0m" ; 
+        third_row="\e[34m┗\e[0m " ;
     fi
     integer first_row_length second_row_length third_row_length
 
@@ -186,9 +186,9 @@ prompt () {
         if [[ -n $current ]]; then
             if [[ $func != $first_row_functions[1] ]] ; then
                 if $remote ; then
-                    first_row+="\e[34m──\e[0m " ;
+                    first_row+="\e[34m━━\e[0m " ;
                 else
-                    first_row+="── " ;
+                    first_row+="━━ " ;
                 fi
             fi
             first_row+=$current
@@ -202,9 +202,9 @@ prompt () {
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
             if $remote ; then
-                second_row+="\e[34m──\e[0m " ;
+                second_row+="\e[34m━━\e[0m " ;
             else
-                second_row+="── " ;
+                second_row+="━━ " ;
             fi
             second_row+=$current
             second_row+=" "
@@ -215,27 +215,27 @@ prompt () {
 
     while (( $first_row_length < $second_row_length )); do
         if $remote ; then
-            first_row+="\e[34m─\e[0m" ;
+            first_row+="\e[34m━\e[0m" ;
         else
-            first_row+="─" ;
+            first_row+="━" ;
         fi
         (( first_row_length += $perceived_width_of_dash ))
     done
     while (( $first_row_length > $second_row_length )); do
         if $remote ; then
-            second_row+="\e[34m─\e[0m" ;
+            second_row+="\e[34m━\e[0m" ;
         else
-            second_row+="─" ;
+            second_row+="━" ;
         fi
         (( second_row_length += $perceived_width_of_dash ))
     done
 
     if $remote ; then
-        first_row+="\e[34m─┐\e[0m" ;
-        second_row+="\e[34m─┘\e[0m" ;
+        first_row+="\e[34m━┓\e[0m" ;
+        second_row+="\e[34m━┛\e[0m" ;
     else 
-        first_row+="─┐" ;
-        second_row+="─┘" ;
+        first_row+="━┓" ;
+        second_row+="━┛" ;
     fi
         
 
