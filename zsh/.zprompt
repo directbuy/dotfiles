@@ -15,7 +15,7 @@
 local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
 local remote=false;
-python -m platform | grep -Ei '(centos|ubuntu)' > /dev/null 2>&1
+python -m platform | grep -Ei '(centos|ubuntu|amzn)' > /dev/null 2>&1
 if [ $? -eq 0 ] ; then
     remote=true ;
 fi    
