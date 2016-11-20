@@ -1,0 +1,5 @@
+alias godj='cd /home/gunicorn/dice'
+alias djact='godj && . bin/activate'
+alias dj='godj && djact && ./manage.py'
+alias djsp='dj shell_plus'
+
