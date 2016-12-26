@@ -77,6 +77,9 @@ alias -g swapouterr='3>&1 1>&2 2>&3 3>&-'
 if [ -f "~/.zsh_aliases" ] ; then
     source ~/.zsh_aliases ;
 fi
+function psgrep() {
+    ps up $(pgrep -f $@) 2>&-;
+}
 
 function tac () {
     awk '1 { last = NR; line[last] = $0; } END { for (i = last; i > 0; i--) { print line[i]; } }'
