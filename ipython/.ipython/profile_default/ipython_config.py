@@ -1,3 +1,4 @@
+c = get_config()
 # Configuration file for ipython.
 
 #------------------------------------------------------------------------------
@@ -21,7 +22,6 @@
 #   - :meth:`init_gui_pylab`
 #   - :meth:`init_extensions`
 #   - :meth:`init_code`
-c = get_config()
 
 # Execute the given command string.
 # c.InteractiveShellApp.code_to_run = ''
@@ -185,7 +185,7 @@ c = get_config()
 # c.InteractiveShell.automagic = True
 
 # The part of the banner to be printed before the profile
-# c.InteractiveShell.banner1 = 'Python 2.7.11 (default, Dec  5 2015, 22:44:43) \nType "copyright", "credits" or "license" for more information.\n\nIPython 5.0.0 -- An enhanced Interactive Python.\n?         -> Introduction and overview of IPython\'s features.\n%quickref -> Quick reference.\nhelp      -> Python\'s own help system.\nobject?   -> Details about \'object\', use \'object??\' for extra details.\n'
+# c.InteractiveShell.banner1 = 'Python 2.7.12 (default, Oct 11 2016, 05:24:00) \nType "copyright", "credits" or "license" for more information.\n\nIPython 5.0.0 -- An enhanced Interactive Python.\n?         -> Introduction and overview of IPython\'s features.\n%quickref -> Quick reference.\nhelp      -> Python\'s own help system.\nobject?   -> Details about \'object\', use \'object??\' for extra details.\n'
 
 # The part of the banner to be printed after the profile
 # c.InteractiveShell.banner2 = ''
