@@ -17,7 +17,7 @@ setopt INTERACTIVE_COMMENTS
 setopt EXTENDED_GLOB
 unsetopt NOMATCH
 export TIME_STYLE=long-iso
-setopt NO_BELL
+unsetopt bell
 
 ## keep background processes at full speed
 #setopt NOBGNICE
