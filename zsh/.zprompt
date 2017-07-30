@@ -15,10 +15,15 @@
 local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
 local remote=false;
-python -m platform | grep -Ei '(centos|ubuntu|amzn)' > /dev/null 2>&1
-if [ $? -eq 0 ] ; then
-    remote=true ;
-fi    
+local wsl=false;
+python -m platform | grep -i 'microsoft' >/dev/null 2>&1
+if [ $? -eq 0 ] ; then wsl=true ; fi
+if [ "$wsl" = "false" ] ; then
+    python -m platform | grep -Ei '(centos|ubuntu|amzn)' > /dev/null 2>&1
+    if [ $? -eq 0 ] ; then
+        remote=true ;
+    fi
+fi
 
 promptTitle () {
     if [[ $INSIDE_EMACS != "" ]]; then
@@ -72,7 +77,7 @@ first_row_functions+=(promptVenv)
 #    if hg status >/dev/null 2>&1; then
 #         local branch=$(hg branch)
 #         local revision=$(hg identify | cut -d' ' -f1)
-#         print -n "[\e[31m$branch $revision\e[0m]"
+#           print -n "[\e[31m$branch $revision\e[0m]"
 #         if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
 #             print " \e[41;37;1m!\e[0m"
 #         else
