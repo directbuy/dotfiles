@@ -22,6 +22,8 @@ function go {
   chmod 0775 /tmp/dotfiles ;
   rsync -rltD /tmp/dotfiles/vim/ $home_dir
   rsync -rltD /tmp/dotfiles/zsh/ $home_dir
+  chmod 0700 $home_dir/.zsh.d
+  chmod 0700 $home_dir/.zsh.d/functions
   rsync -rltD /tmp/dotfiles/git/ $home_dir
   rsync -rltd /tmp/dotfiles/ipython/ $home_dir
   rsync -rltd /tmp/dotfiles/bash/ $home_dir
