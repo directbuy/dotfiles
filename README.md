@@ -8,8 +8,10 @@ One of the many heralds of geekdom is an extremely customized
 environment. This is the history of our journey down that path.
 
 We use vim and [Z-Shell](http://www.zsh.org/) as our primary tools for getting things
-done. We track our code with [Git](http://git-scm.com/).  Much of that code is 
+done. We track our code with [Git](http://git-scm.com/).  Much of that code is
 written in [Python](http://www.python.org/) and [NodeJS](http://www.nodejs.org).
 
 Our many thanks to the wonderful [Nick Meharry](https://github.com/nickmeharry/dotfiles/),
 whose original dotfiles was a guide.
+
+* [chocolatey](chocolatey.md)

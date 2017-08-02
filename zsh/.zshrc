@@ -17,6 +17,7 @@ setopt INTERACTIVE_COMMENTS
 setopt EXTENDED_GLOB
 unsetopt NOMATCH
 export TIME_STYLE=long-iso
+unsetopt beep
 
 ## keep background processes at full speed
 #setopt NOBGNICE
@@ -112,3 +113,4 @@ if [ -d ~/.opam ]; then
     . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
     eval `opam config env`
 fi
+cd ~
