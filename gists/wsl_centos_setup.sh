@@ -14,6 +14,7 @@ yum -y install --enablerepo=city-fan.org curl libcurl-devel
 yum -y install wget
 yum -y install python
 yum -y install python-devel
+yum -y install sqlite-devel
 yum -y install python-pip
 yum -y install htop
 yum -y install vim
@@ -68,7 +69,7 @@ pip install -U pip ansible awscli
 pip install setuptools==33.1.1
 pip install -U ipython
 pip install -U virtualenv
-curl https://packages.microsoft.com/config/rhel/6/prod.repo > /etc/yum.repos.d/mssql-release.repo
+curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo
 ACCEPT_EULA=Y yum install msodbcsql
 ACCEPT_EULA=Y yum install mssql-tools
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.zshrc
