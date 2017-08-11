@@ -74,3 +74,4 @@ ACCEPT_EULA=Y yum install msodbcsql
 ACCEPT_EULA=Y yum install mssql-tools
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.zshrc
 sudo yum install unixODBC-devel
+yum -y install pv
