@@ -46,11 +46,10 @@ if [ ! -d /u/dotfiles ] ; then
 fi
 git-crypt --version
 /usr/local/bin/python2.7 --version
-find /usr/local/lib/python2.7/dist-packages -type f -exec sudo chmod g+w {} \;
-find /usr/local/lib/python2.7/dist-packages -type d -exec sudo chmod g+w {} \;
+sudo usermod -a -G root,staff `whoami`
 pip install -U pip ansible awscli
-pip install -U ipython
-pip install -U virtualenv
+sudo pip install -U ipython
+sudo pip install -U virtualenv
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 sudo wget https://packages.microsoft.com/config/ubuntu/16.04/prod.list -O "/etc/apt/sources.list.d/mssql-release.list"
 sudo apt update
@@ -59,4 +58,4 @@ sudo ACCEPT_EULA=Y apt -y install mssql-tools
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 source ~/.bashrc
-sudo apt install -y unixodbc-dev
+sudo apt install -y unixodbc-dev pv
