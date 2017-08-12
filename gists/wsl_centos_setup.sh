@@ -35,6 +35,7 @@ yum -y install make
 yum -y install automake
 yum -y install autoconf
 yum -y install nfs-utils
+yum -y install openldap-devel
 yum -y install bind-utils
 yum -y install rsync
 yum -y install gnupg
