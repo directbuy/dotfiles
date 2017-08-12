@@ -41,14 +41,13 @@ cd /u/python-2.7.13 && ./configure && make && sudo make altinstall
 rm -rf /u/python-2.7.13
 rm -f /u/downloads/python-2.7.13.tgz
 sudo apt install -y git-crypt
-pushd /u
-if [! -d dotfiles ] ; then
+if [ ! -d /u/dotfiles ] ; then
   git clone https://github.com/2ps/dotfiles ;
 fi
 git-crypt --version
 /usr/local/bin/python2.7 --version
-find /usr/local/lib/python2.7/dist-packages -type f -exec sudo chmod g+w
-find /usr/local/lib/python2.7/dist-packages -type d -exec sudo chmod g+w
+find /usr/local/lib/python2.7/dist-packages -type f -exec sudo chmod g+w {} \;
+find /usr/local/lib/python2.7/dist-packages -type d -exec sudo chmod g+w {} \;
 pip install -U pip ansible awscli
 pip install -U ipython
 pip install -U virtualenv
