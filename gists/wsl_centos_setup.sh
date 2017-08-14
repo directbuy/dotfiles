@@ -4,7 +4,7 @@ sed -i 's,^root\(.*\)$,root\1\n%sudoers ALL=(ALL)    NOPASSWD: ALL,g' /etc/sudoe
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpmrpm -Uvh http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-1-13.rhel7.noarch.rpm
 echo "[mariadb]" > /etc/yum.repos.d/mariadb.repo
 echo "name = MariaDB" >> /etc/yum.repos.d/mariadb.repo
-echo "baseurl = http://yum.mariadb.org/10.2/centos7-amd64" >> /etc/yum.repos.d/mariadb.repo
+echo "baseurl = http://yum.mariadb.org/10.1/centos7-amd64" >> /etc/yum.repos.d/mariadb.repo
 echo "gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB" >> /etc/yum.repos.d/mariadb.repo
 echo "gpgcheck=1" >> /etc/yum.repos.d/mariadb.repo
 yum -y install https://centos7.iuscommunity.org/ius-release.rpm
@@ -73,6 +73,5 @@ pip install -U virtualenv
 curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo
 ACCEPT_EULA=Y yum install msodbcsql
 ACCEPT_EULA=Y yum install mssql-tools
-echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.zshrc
 sudo yum install unixODBC-devel
 yum -y install pv
