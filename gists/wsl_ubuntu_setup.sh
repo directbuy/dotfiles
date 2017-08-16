@@ -3,7 +3,6 @@ sudo apt install software-properties-common
 sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
 sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mirror.jaleco.com/mariadb/repo/10.1/ubuntu xenial main'
 sudo add-apt-repository ppa:git-core/ppa
-sudo add-apt-repository ppa:jonathonf/vim
 sudo apt update
 sudo apt install -y mariadb-client libmariadbclient-dev
 sudo apt install -y wget

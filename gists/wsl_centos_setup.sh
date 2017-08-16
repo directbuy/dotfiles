@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
+echo "nameserver 172.17.0.2" > /etc/resolv.conf.new
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf.new
+echo "nameserver 8.8.4.4" >> /etc/resolv.conf.new
+cat /etc/resolv.conf >> /etc/resolv.conf.new
+mv -f /etc/resolv.conf.new /etc/resolv.conf
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
-sed -i 's,^root\(.*\)$,root\1\n%sudoers ALL=(ALL)    NOPASSWD: ALL,g' /etc/sudoers
-yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpmrpm -Uvh http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-1-13.rhel7.noarch.rpm
+# sed -i 's,^root\(.*\)$,root\1\n%sudoers ALL=(ALL)    NOPASSWD: ALL,g' /etc/sudoers
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum -y install http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-1-13.rhel7.noarch.rpm
 echo "[mariadb]" > /etc/yum.repos.d/mariadb.repo
 echo "name = MariaDB" >> /etc/yum.repos.d/mariadb.repo
 echo "baseurl = http://yum.mariadb.org/10.1/centos7-amd64" >> /etc/yum.repos.d/mariadb.repo
@@ -71,7 +77,18 @@ pip install setuptools==33.1.1
 pip install -U ipython
 pip install -U virtualenv
 curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo
-ACCEPT_EULA=Y yum install msodbcsql
-ACCEPT_EULA=Y yum install mssql-tools
-sudo yum install unixODBC-devel
+ACCEPT_EULA=Y yum -y install msodbcsql
+ACCEPT_EULA=Y yum -y install mssql-tools
+yum -y install unixODBC-devel
 yum -y install pv
+if [ -e /u/to_penguins ] ; then
+  cd /u/to_penguins
+  if [ -d bin ] ; then rm -rf bin ; fi
+  if [ -d lib ] ; then rm -rf lib ; fi
+  if [ -d include ] ; then rm -rf include ; fi
+  virtualenv . -p /usr/local/bin/python2.7
+  source bin/activate
+  pip install six
+  pip install -r requirements.txt
+fi
+
