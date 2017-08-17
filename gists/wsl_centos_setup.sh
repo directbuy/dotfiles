@@ -16,6 +16,7 @@ echo "gpgcheck=1" >> /etc/yum.repos.d/mariadb.repo
 yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 yum clean all
 yum updateinfo
+yum -y install man readline readline-devel ncurses ncurses-devel
 yum -y install --enablerepo=city-fan.org curl libcurl-devel
 yum -y install wget
 yum -y install python
