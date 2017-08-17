@@ -50,13 +50,17 @@ yum -y update
 yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
 yum -y install gettext-devel perl-CPAN perl-devel
-wget https://github.com/git/git/archive/v2.13.3.tar.gz -O /tmp/git.tgz
-mkdir -p /usr/local/src/git
-tar xzf /tmp/git.tgz -C /usr/local/src/git --strip-components=1
-cd /usr/local/src/git && make configure && ./configure --prefix=/usr/local && make && make install
-rm -rf /usr/local/src/git
-rm -rf /tmp/git.tgz
-ln -s /mnt/c/u /u
+if [ ! -e /usr/local/bin/git ] ; then
+    wget https://github.com/git/git/archive/v2.13.3.tar.gz -O /tmp/git.tgz
+    mkdir -p /usr/local/src/git
+    tar xzf /tmp/git.tgz -C /usr/local/src/git --strip-components=1
+    cd /usr/local/src/git && make configure && ./configure --prefix=/usr/local && make && make install
+    rm -rf /usr/local/src/git
+    rm -rf /tmp/git.tgz
+fi
+if [ ! -L /u ] && [ -d /mnt/c/u ] ; then
+    ln -s /mnt/c/u /u ;
+fi
 mkdir -p /u/downloads
 wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz -O /u/downloads/python-2.7.13.tgz
 mkdir -p /u/python-2.7.13 && mkdir -p /u/python
@@ -64,11 +68,18 @@ cd /u/python-2.7.13 && tar xzf /u/downloads/python-2.7.13.tgz --strip-components
 cd /u/python-2.7.13 && ./configure && make && make altinstall
 rm -rf /u/python-2.7.13
 rm -f /u/downloads/python-2.7.13.tgz
-mkdir -p /usr/local/src
-cd /usr/local/src && git clone https://github.com/AGWA/git-crypt
-cd /usr/local/src/git-crypt && make && make install
-rm -rf /usr/local/src/git-crypt
-cd /u && git clone https://github.com/2ps/dotfiles
+if [ ! -e /usr/bin/git-crypt ] ; then
+    mkdir -p /usr/local/src
+    cd /usr/local/src && git clone https://github.com/AGWA/git-crypt
+    cd /usr/local/src/git-crypt && make && make install
+    rm -rf /usr/local/src/git-crypt
+fi
+cd /u
+if [ ! -d dotfiles ] ; then
+    git clone https://github.com/2ps/dotfiles ;
+else
+    cd dotfiles && git pull
+fi
 /u/dotfiles/wsl-install
 /usr/local/bin/git --version
 git-crypt --version
@@ -83,13 +94,23 @@ ACCEPT_EULA=Y yum -y install mssql-tools
 yum -y install unixODBC-devel
 yum -y install pv
 if [ -e /u/to_penguins ] ; then
-  cd /u/to_penguins
-  if [ -d bin ] ; then rm -rf bin ; fi
-  if [ -d lib ] ; then rm -rf lib ; fi
-  if [ -d include ] ; then rm -rf include ; fi
-  virtualenv . -p /usr/local/bin/python2.7
-  source bin/activate
-  pip install six
-  pip install -r requirements.txt
+    cd /u/to_penguins
+    if [ -d bin ] ; then rm -rf bin ; fi
+    if [ -d lib ] ; then rm -rf lib ; fi
+    if [ -d include ] ; then rm -rf include ; fi
+    virtualenv . -p /usr/local/bin/python2.7
+    source bin/activate
+    pip install six
+    pip install -r requirements.txt
+    deactivate
 fi
-
+if [ -e /u/upholstery ] ; then
+    cd /u/upholstery
+    if [ -d bin ] ; then rm -rf bin ; fi
+    if [ -d lib ] ; then rm -rf lib ; fi
+    if [ -d include ] ; then rm -rf include ; fi
+    virtualenv . -p /usr/local/bin/python2.7
+    source bin/activate
+    pip install -r requirements.txt
+    deactivate
+fi
