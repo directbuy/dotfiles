@@ -121,9 +121,9 @@ second_row_functions+=(promptUserHost)
 
 promptDate () {
     if $remote ; then
-        TZ=PST8PDT date +'%Y.%m.%d %I:%M%p' ;
+        date +'%Y.%m.%d %I:%M%p' ;
     else
-        TZ=PST8PDT date +'%B %e, %I:%M %p' ;
+        date +'%B %e, %I:%M %p' ;
     fi
 }
 second_row_functions+=(promptDate)

@@ -56,7 +56,7 @@ setopt PROMPT_SUBST
 PROMPT='$(prompt)'
 PS2='$(prompt2)'
 RPROMPT='$(rprompt)'
-
+TZ=CST6CDT
 # Aliases
 if [ -f ~/.dircolors ]; then
     eval $(dircolors -b ~/.dircolors) ;
