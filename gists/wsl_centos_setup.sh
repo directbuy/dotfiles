@@ -92,7 +92,26 @@ curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/m
 ACCEPT_EULA=Y yum -y install msodbcsql
 ACCEPT_EULA=Y yum -y install mssql-tools
 yum -y install unixODBC-devel
-yum -y install pv
+yum -y install pv man man-pages xz-devel
+
+
+#####
+##  install and setup node
+#####
+if [ ! -e /u/downloads ] ; then
+    mkdir -p /u/downloads ;
+fi
+if [ ! -e /usr/local/bin/node ] ; then
+    cd /u/downloads
+    wget https://nodejs.org/dist/v8.4.0/node-v8.4.0-linux-x64.tar.xz
+    tar xf node-v8.4.0-linux-x64.tar.xz
+    cd node-v8.4.0-linux-x64
+    rsync -a lib /usr/local
+    rsync -a bin /usr/local
+    rsync -a share /usr/local
+    rsync -a include /usr/local
+fi
+
 if [ -e /u/to_penguins ] ; then
     cd /u/to_penguins
     if [ -d bin ] ; then rm -rf bin ; fi
