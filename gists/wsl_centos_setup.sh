@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-echo "nameserver 172.17.0.2" > /etc/resolv.conf.new
-echo "nameserver 8.8.8.8" >> /etc/resolv.conf.new
-echo "nameserver 8.8.4.4" >> /etc/resolv.conf.new
-cat /etc/resolv.conf >> /etc/resolv.conf.new
-mv -f /etc/resolv.conf.new /etc/resolv.conf
+grep '172.17.0.2' /etc/resolv.conf > /tmp/test
+if [ -f /tmp/test ] && [ ! -a /tmp/test ] ; then
+    echo "nameserver 172.17.0.2" > /etc/resolv.conf.new
+    echo "nameserver 8.8.8.8" >> /etc/resolv.conf.new
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf.new
+    cat /etc/resolv.conf >> /etc/resolv.conf.new
+    mv -f /etc/resolv.conf.new /etc/resolv.conf
+fi
+rm -rf /tmp/test
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
-# sed -i 's,^root\(.*\)$,root\1\n%sudoers ALL=(ALL)    NOPASSWD: ALL,g' /etc/sudoers
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 yum -y install http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-1-13.rhel7.noarch.rpm
 echo "[mariadb]" > /etc/yum.repos.d/mariadb.repo
