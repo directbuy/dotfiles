@@ -76,7 +76,7 @@ alias djmigrate='python manage.py migrate --merge --ignore-ghost-migrations'
 alias djact='. bin/activate'
 # Global aliases, can be specified anywhere (not just the beginning of a command)
 alias -g swapouterr='3>&1 1>&2 2>&3 3>&-'
-if [ -f "~/.zsh_aliases" ] ; then
+if [ -e "~/.zsh_aliases" ] ; then
     source ~/.zsh_aliases ;
 fi
 function psgrep() {
