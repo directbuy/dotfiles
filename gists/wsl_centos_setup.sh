@@ -49,6 +49,8 @@ yum -y install openldap-devel
 yum -y install bind-utils
 yum -y install rsync
 yum -y install gnupg
+yum -y install libxml2-devel
+yum -y install libxslt-devel
 yum -y update
 yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
