@@ -56,7 +56,7 @@ yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
 yum -y install gettext-devel perl-CPAN perl-devel
 if [ ! -e /usr/local/bin/git ] ; then
-    wget https://github.com/git/git/archive/v2.13.3.tar.gz -O /tmp/git.tgz
+    wget https://github.com/git/git/archive/v2.14.2.tar.gz -O /tmp/git.tgz
     mkdir -p /usr/local/src/git
     tar xzf /tmp/git.tgz -C /usr/local/src/git --strip-components=1
     cd /usr/local/src/git && make configure && ./configure --prefix=/usr/local && make && make install
@@ -67,12 +67,28 @@ if [ ! -L /u ] && [ -d /mnt/c/u ] ; then
     ln -s /mnt/c/u /u ;
 fi
 mkdir -p /u/downloads
-wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz -O /u/downloads/python-2.7.13.tgz
-mkdir -p /u/python-2.7.13 && mkdir -p /u/python
-cd /u/python-2.7.13 && tar xzf /u/downloads/python-2.7.13.tgz --strip-components=1
-cd /u/python-2.7.13 && ./configure && make && make altinstall
-rm -rf /u/python-2.7.13
-rm -f /u/downloads/python-2.7.13.tgz
+if [ ! -e /usr/local/bin/python2.7 ] ; then
+    version="2.7.14"
+    wget "https://www.python.org/ftp/python/${version}/Python-2.7.13.tgz" -O "/u/downloads/python-${version}.tgz"
+    mkdir -p "/u/python-${version}"
+    cd "/u/python-${version}"
+    tar xzf "/u/downloads/${version}.tgz" --strip-components=1
+    ./configure && make && make altinstall
+    cd /u
+    rm -rf "/u/python-${version}"
+    rm -f "/u/downloads/python-"${version}.tgz"
+fi
+if [ ! -e /usr/local/bin/python3.6 ] ; then
+    version="3.6.3"
+    wget "https://www.python.org/ftp/python/${version}/Python-2.7.13.tgz" -O "/u/downloads/python-${version}.tgz"
+    mkdir -p "/u/python-${version}"
+    cd "/u/python-${version}"
+    tar xzf "/u/downloads/${version}.tgz" --strip-components=1
+    ./configure && make && make altinstall
+    cd /u
+    rm -rf "/u/python-${version}"
+    rm -f "/u/downloads/python-"${version}.tgz"
+fi
 if [ ! -e /usr/bin/git-crypt ] ; then
     mkdir -p /usr/local/src
     cd /usr/local/src && git clone https://github.com/AGWA/git-crypt
@@ -123,6 +139,17 @@ if [ -e /u/to_penguins ] ; then
     if [ -d lib ] ; then rm -rf lib ; fi
     if [ -d include ] ; then rm -rf include ; fi
     virtualenv . -p /usr/local/bin/python2.7
+    source bin/activate
+    pip install six
+    pip install -r requirements.txt
+    deactivate
+fi
+if [ -e /u/for_penguins ] ; then
+    cd /u/for_penguins
+    if [ -d bin ] ; then rm -rf bin ; fi
+    if [ -d lib ] ; then rm -rf lib ; fi
+    if [ -d include ] ; then rm -rf include ; fi
+    virtualenv . -p /usr/local/bin/python3.6
     source bin/activate
     pip install six
     pip install -r requirements.txt

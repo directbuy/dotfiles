@@ -18,9 +18,17 @@ yum -y install automake
 yum -y install autoconf
 yum -y install tkinter tk-devel
 if [ ! -e /u/downloads ] ; then mkdir -p /u/downloads ; fi
-wget https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz -O /u/downloads/python-2.7.13.tgz
-mkdir -p /u/python-2.7.13
-cd /u/python-2.7.13 && tar xzf /u/downloads/python-2.7.13.tgz --strip-components=1
-cd /u/python-2.7.13 && ./configure && make && make altinstall
-rm -rf /u/python-2.7.13
-rm -f /u/downloads/python-2.7.13.tgz
+version="2.7.14"
+cd /u/downloads
+filename="/u/downloads/python-${version}.tgz"
+if [ ! -f "${filename}" ] ; then
+    wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "${filename}" ;
+fi
+pdir="/u/python-${version}"
+if [ ! -d "${pdir}" ] ; then
+    mkdir -p "${pdir}"
+    cd "${pdir}"
+    tar xzf "/u/downloads/python-${version}.tgz" --strip-components=1
+fi
+cd "${pdir}"
+./configure --enable-optimizations && make && make altinstall
