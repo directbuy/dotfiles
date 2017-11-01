@@ -152,7 +152,7 @@ if [ -e /u/for_penguins ] ; then
     virtualenv . -p /usr/local/bin/python3.6
     source bin/activate
     pip install six
-    pip install -r requirements.txt
+    pip install -r py3.requirements.txt
     deactivate
 fi
 if [ -e /u/upholstery ] ; then
