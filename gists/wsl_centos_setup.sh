@@ -51,6 +51,7 @@ yum -y install rsync
 yum -y install gnupg
 yum -y install libxml2-devel
 yum -y install libxslt-devel
+yum -y install tkinter tk-devel
 yum -y update
 yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
@@ -72,7 +73,7 @@ if [ ! -e /usr/local/bin/python2.7 ] ; then
     wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "/u/downloads/python-${version}.tgz"
     mkdir -p "/u/python-${version}"
     cd "/u/python-${version}"
-    tar xzf "/u/downloads/${version}.tgz" --strip-components=1
+    tar xzf "/u/downloads/python-${version}.tgz" --strip-components=1
     ./configure && make && make altinstall
     cd /u
     rm -rf "/u/python-${version}"
@@ -83,7 +84,7 @@ if [ ! -e /usr/local/bin/python3.6 ] ; then
     wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "/u/downloads/python-${version}.tgz"
     mkdir -p "/u/python-${version}"
     cd "/u/python-${version}"
-    tar xzf "/u/downloads/${version}.tgz" --strip-components=1
+    tar xzf "/u/downloads/python-${version}.tgz" --strip-components=1
     ./configure && make && make altinstall
     cd /u
     rm -rf "/u/python-${version}"
