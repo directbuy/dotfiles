@@ -69,7 +69,7 @@ fi
 mkdir -p /u/downloads
 if [ ! -e /usr/local/bin/python2.7 ] ; then
     version="2.7.14"
-    wget "https://www.python.org/ftp/python/${version}/Python-2.7.13.tgz" -O "/u/downloads/python-${version}.tgz"
+    wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "/u/downloads/python-${version}.tgz"
     mkdir -p "/u/python-${version}"
     cd "/u/python-${version}"
     tar xzf "/u/downloads/${version}.tgz" --strip-components=1
@@ -80,7 +80,7 @@ if [ ! -e /usr/local/bin/python2.7 ] ; then
 fi
 if [ ! -e /usr/local/bin/python3.6 ] ; then
     version="3.6.3"
-    wget "https://www.python.org/ftp/python/${version}/Python-2.7.13.tgz" -O "/u/downloads/python-${version}.tgz"
+    wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "/u/downloads/python-${version}.tgz"
     mkdir -p "/u/python-${version}"
     cd "/u/python-${version}"
     tar xzf "/u/downloads/${version}.tgz" --strip-components=1
