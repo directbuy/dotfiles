@@ -77,7 +77,7 @@ if [ ! -e /usr/local/bin/python2.7 ] ; then
     ./configure && make && make altinstall
     cd /u
     rm -rf "/u/python-${version}"
-    rm -f "/u/downloads/python-"${version}.tgz"
+    rm -f "/u/downloads/python-${version}.tgz"
 fi
 if [ ! -e /usr/local/bin/python3.6 ] ; then
     version="3.6.3"
@@ -88,7 +88,7 @@ if [ ! -e /usr/local/bin/python3.6 ] ; then
     ./configure && make && make altinstall
     cd /u
     rm -rf "/u/python-${version}"
-    rm -f "/u/downloads/python-"${version}.tgz"
+    rm -f "/u/downloads/python-${version}.tgz"
 fi
 if [ ! -e /usr/bin/git-crypt ] ; then
     mkdir -p /usr/local/src
