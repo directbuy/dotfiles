@@ -1,0 +1,26 @@
+#!/bin/sh
+function go {
+  local dotfiles_dir='/u/dotfiles'
+  local user="" 
+  local home_dir=""
+  if [ "$1" = "" ] ; then
+    user=`whoami` ;  
+  else
+    user=$1;
+  fi ;
+  echo "Installing dotfiles for $user"
+  if [ "$user" = "root" ] ; then
+    home_dir='/root' ;
+  else
+    home_dir="/home/$user" ;
+  fi 
+  pushd $home_dir > /dev/null
+  rsync -rltD "${dotfiles_dir}/vim/" $home_dir
+  rsync -rltD "${dotfiles_dir}/zsh/" $home_dir
+  rsync -rltD "${dotfiles_dir}/git/" $home_dir
+  rsync -rltd "${dotfiles_dir}/ipython/" $home_dir
+  rsync -rltd "${dotfiles_dir}/bash/" $home_dir
+}
+
+go $1
+
