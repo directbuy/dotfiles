@@ -16,8 +16,11 @@ local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
 local remote=false;
 local wsl=false;
+local cygwin=false;
 python -m platform | grep -i 'microsoft' >/dev/null 2>&1
 if [ $? -eq 0 ] ; then wsl=true ; fi
+python -m platform | grep -i 'cygwin' >/dev/null 2>&1
+if [ $? -eq 0 ] ; then cygwin=true ; fi
 if [ "$wsl" = "false" ] ; then
     python -m platform | grep -Ei '(centos|ubuntu|amzn)' > /dev/null 2>&1
     if [ $? -eq 0 ] ; then
@@ -47,6 +50,9 @@ promptCwd () {
     elif [[ $t == '/' ]]; then
     else
         t="$t/"
+    fi
+    if [ "$cygwin" != "false" ] ; then
+        t="cygwin ${t}" ;
     fi
     if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
         t="\e[33m...\e[0m"
