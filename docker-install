@@ -1,7 +1,7 @@
 #!/bin/sh
 function go {
   pushd `dirname $0` > /dev/null
-  local dotfiles_dir=`pwd -P`
+  local dirname=`pwd -P`
   popd > /dev/null
   local user="" 
   local home_dir=""
