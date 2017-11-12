@@ -17,15 +17,22 @@ local perceived_width_of_dash=1
 local remote=false;
 local wsl=false;
 local cygwin=false;
+local prefix="";
 python -m platform | grep -i 'microsoft' >/dev/null 2>&1
 if [ $? -eq 0 ] ; then wsl=true ; fi
 python -m platform | grep -i 'cygwin' >/dev/null 2>&1
 if [ $? -eq 0 ] ; then cygwin=true ; fi
+if [ -f /etc/docker.conf ] ; then
+    prefix=$(cat /etc/docker.conf) ;
+fi
 if [ "$wsl" = "false" ] ; then
     python -m platform | grep -Ei '(centos|ubuntu|amzn)' > /dev/null 2>&1
     if [ $? -eq 0 ] ; then
         remote=true ;
     fi
+fi
+if [[ "${cygwin}" != "false" ]] ; then
+    prefix="cygwin" ;
 fi
 
 promptTitle () {
@@ -51,8 +58,8 @@ promptCwd () {
     else
         t="$t/"
     fi
-    if [ "$cygwin" != "false" ] ; then
-        t="cygwin ${t}" ;
+    if [[ "$prefix" != "" ]] ; then
+        t="${prefix} ${t}" ;
     fi
     if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
         t="\e[33m...\e[0m"
