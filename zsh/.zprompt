@@ -167,7 +167,7 @@ second_row_functions+=(promptDate)
 promptHistoryNumber () {
     print -P "[\e[36m%!\e[0m]"
 }
-second_row_functions+=(promptHistoryNumber)
+# second_row_functions+=(promptHistoryNumber)
 
 promptPrompt () { # :)
     if [[ $EUID == 0 ]]; then
