@@ -56,6 +56,7 @@ yum -y update
 yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
 yum -y install gettext-devel perl-CPAN perl-devel
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 if [ ! -e /usr/local/bin/git ] ; then
     wget https://github.com/git/git/archive/v2.14.2.tar.gz -O /tmp/git.tgz
     mkdir -p /usr/local/src/git

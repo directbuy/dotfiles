@@ -156,3 +156,4 @@ if [ -e /u/upholstery ] ; then
     pip install -r requirements.txt
     deactivate
 fi
+sed -i -e 's,^\#set bell-style none$,set bell-style none,g' /etc/inputrc

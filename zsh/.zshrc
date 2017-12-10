@@ -7,7 +7,7 @@
 
 fpath=(~/.zsh.d/functions $fpath)
 autoload -U ~/.zsh.d/functions/*(:t)
-
+plugins=(aws django git yum docker docker-compose docker-machine)
 autoload -Uz compinit
 compinit
 
@@ -113,4 +113,3 @@ if [ -d ~/.opam ]; then
     . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
     eval `opam config env`
 fi
-cd ~

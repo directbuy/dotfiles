@@ -12,3 +12,6 @@ set expandtab "insert spaces when hitting TABs
 set softtabstop=4 "insert/delete 4 spaces with TAB/BACKSPACE
 set shiftround "round indect to multiple of shiftwidth
 set autoindent "align new line to indent with previous lin
+set wildmode=longest,list,full
+set wildmenu
+
