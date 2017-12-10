@@ -1,5 +1,5 @@
 # -*- mode: sh -*-
-# Nick's Fancy Prompt
+# Nick's Fancy Prompt --
 #
 # This prompt is modular, meaning that new segments simply need to be
 # functions that print their output and be added to either `firstRow'
@@ -16,22 +16,27 @@ local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
 local remote=false;
 local wsl=false;
-local cygwin=false;
 local prefix="";
-local platform=$(python -m platform)
+border_color=""
 setopt nocasematch
 if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
+    border_color="\e[0m";
 else
-   [[ "${platform}" =~ (amzn|centos|ubuntu) ]] && remote=true ;
-   [[ "${paltform}" =~ cygwin ]] && cygwin=true ;
-fi
-if [[ "${cygwin}" != "false" ]] ; then
-    prefix="cygwin" ;
-else
-    if [ -f /etc/docker.conf ] ; then
-        prefix=$(cat /etc/docker.conf) ;
-    fi
+   if [[ "${platform}" =~ (amzn|centos|ubuntu) ]] ; then
+       remote=true ;
+       border_color="\e[34m";
+   else
+       if [[ "${platform}" =~ cygwin ]] ; then
+           prefix="cygwin";
+           border_color="\e[35m";
+       else
+           if [ -n $docker_image ] ; then
+               prefix="${docker_image}";
+               border_color="\e[31m";
+           fi
+       fi
+   fi
 fi
 
 promptTitle () {
@@ -108,16 +113,16 @@ promptGit () {
         local revision=$(git rev-parse --short --verify HEAD 2>/dev/null || echo "<empty>")
         print -n "[\e[34;1m$branch $revision\e[0m]"
         (( first_row_width += 7 + $#branch + $#revision ))
-        if [[ $(git status --short --untracked-files=no 2>&1 | grep -v 'Permission denied' | wc -l) -ne 0 ]]; then
-            print " \e[44;37;1m!\e[0m"
-        else
-            print ""
+        if [ "$wsl" = "false" && -z $prefix ]; then
+            if [[ $(git status --short --untracked-files=no 2>&1 | grep -v 'Permission denied' | wc -l) -ne 0 ]]; then
+                print " \e[44;37;1m!\e[0m"
+            else
+                print ""
+            fi
         fi
     fi
 }
-if [ "$wsl" = "false" ] ; then
-    first_row_functions+=(promptGit)
-fi
+first_row_functions+=(promptGit)
 
 # promptIce () {
  #   if [[ "$(hostname)" =~ "ice" ]]; then
@@ -189,17 +194,12 @@ prompt () {
     [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     # local first_row="┌── " second_row="│" third_row="└ " current=""
-    local first_row="┏━━ " second_row="┃" third_row="┗ " current=""
-    if $remote ; then
-        first_row="\e[34m┏━━\e[0m " ;
-        # first_row="\e[34m┌──\e[0m "
-        second_row="\e[34m┃\e[0m" ;
-        # second_row="\e[34m│\e[0m"
-        third_row="\e[34m┗\e[0m " ;
-        # third_row="\e[34m└\e[0m "
-    fi
+    local reset_color="\e[0m"
+    local first_row="${border_color}┏━━${reset_color} "
+    local second_row="${border_color}┃${reset_color}"
+    local third_row="${border_color}┗${reset_color} "
+    local current=""
     integer first_row_length second_row_length third_row_length
-
     for func in $aux_functions; do
         $func
     done
@@ -208,72 +208,38 @@ prompt () {
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
             if [[ $func != $first_row_functions[1] ]] ; then
-                if $remote ; then
-                    first_row+="\e[34m━━\e[0m " ;
-                    # first_row+="\e[34m──\e[0m " ;
-                else
-                    first_row+="━━ " ;
-                    # first_row+="── " ;
-                fi
+                first_row+="${border_color}━━${reset_color} " ;
+                # first_row+="\e[34m──\e[0m " ;
             fi
-            first_row+=$current
-            first_row+=" "
+            first_row+="${current} "
         fi
     done
     first_row_length=$(perceivedLength $first_row)
     (( first_row_length -= $perceived_width_of_dash ))
-
     for func in $second_row_functions; do
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
-            if $remote ; then
-                second_row+="\e[34m━━\e[0m " ;
-                # second_row+="\e[34m──\e[0m " ;
-            else
-                second_row+="━━ " ;
-                # second_row+="── " ;
-            fi
-            second_row+=$current
-            second_row+=" "
+            second_row+="${border_color}━━${reset_color} ${current} " ;
         fi
     done
     second_row_length=$(perceivedLength $second_row)
     (( second_row_length -= $perceived_width_of_dash ))
 
     while (( $first_row_length < $second_row_length )); do
-        if $remote ; then
-            first_row+="\e[34m━\e[0m" ;
-            # first_row+="\e[34m─\e[0m" ;
-        else
-            first_row+="━" ;
-            # first_row+="─" ;
-        fi
+        first_row+="${border_color}━${reset_color}" ;
+        # first_row+="${border_color}─${reset_color}" ;
         (( first_row_length += $perceived_width_of_dash ))
     done
     while (( $first_row_length > $second_row_length )); do
-        if $remote ; then
-            second_row+="\e[34m━\e[0m" ;
-            # second_row+="\e[34m─\e[0m" ;
-        else
-            second_row+="━" ;
-            # second_row+="─" ;
-        fi
+        second_row+="${border_color}━${reset_color}" ;
+        # second_row+="${border_color}─${reset_color}" ;
         (( second_row_length += $perceived_width_of_dash ))
     done
 
-    if $remote ; then
-        first_row+="\e[34m━┓\e[0m" ;
-        # first_row+="\e[34m─┐\e[0m" ;
-        second_row+="\e[34m━┛\e[0m" ;
-        # second_row+="\e[34m─┘\e[0m" ;
-    else 
-        first_row+="━┓" ;
-        # first_row+="─┐" ;
-        second_row+="━┛" ;
-        # second_row+="─┘" ;
-    fi
-        
-
+    first_row+="${border_color}━┓${reset_color}" ;
+    # first_row+="${border_color}─┐${reset_color}" ;
+    second_row+="${border_color}━┛${reset_color}" ;
+    # second_row+="${border_color}─┘${reset_color}" ;
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
 

@@ -51,6 +51,7 @@ typeset -ga chpwd_functions
 chpwd_functions+='chpwd_auto_venv'
 
 # Prompt
+export platform=$(python -m platform)
 source ~/.zprompt
 setopt PROMPT_SUBST
 PROMPT='$(prompt)'
@@ -60,6 +61,9 @@ TZ=CST6CDT
 # Aliases
 if [ -f ~/.dircolors ]; then
     eval $(dircolors -b ~/.dircolors) ;
+fi
+if [ -f /etc/docker.conf ] ; then
+    export docker_image=$(cat /etc/docker.conf) ;
 fi
 alias ll='ls -lFH'
 alias la='ls -lAhS'
