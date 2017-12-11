@@ -17,7 +17,9 @@ function go {
     home_dir="/home/$user" ;
   fi 
   pushd $home_dir > /dev/null
-  yum -y install zsh > /dev/null
+  if [ ! -e /bin/zsh ] ; then
+      yum -y install zsh > /dev/null
+  fi
   chsh -s `grep -i zsh /etc/shells` $user;
   rsync -rltD "${dirname}/vim/" "${home_dir}"
   rsync -rltD "${dirname}/zsh/" "${home_dir}"
