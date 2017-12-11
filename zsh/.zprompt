@@ -117,7 +117,7 @@ promptGit () {
         # for anything other than native linux
         if [ "${cygwin}" = "false" ] ; then
             if [[ $(git status --short --untracked-files=no 2>&1 | grep -v 'Permission denied' | wc -l) -ne 0 ]]; then
-                print " \e[44;37;1m!\e[0m" ;
+                print " \e[37;1m*\e[0m" ;
             else
                 print ""
             fi
@@ -186,9 +186,9 @@ promptHistoryNumber () {
 
 promptPrompt () { # :)
     if [[ $EUID == 0 ]]; then
-        print "\e[37;41;1m#\e[0m"
+        print "\e[37;1m➤\e[0m"
     else
-        print "\e[1m$\e[0m"
+        print "\e[1m>\e[0m"
     fi
 }
 
