@@ -183,11 +183,7 @@ promptPrompt () { # :)
 }
 
 perceivedLength () {
-    local noColors
-    [[ -n $2 ]] && echo "before: \"$1\" $#1" >&2
-    noColors=$(print "$1" | python -c "import re, sys; sys.stdout.write(re.sub('\x1b\[.*?m','',sys.stdin.read()))")
-    [[ -n $2 ]] && echo "after:  \"$noColors\" $#noColors" >&2
-    echo $#noColors
+    echo "${#$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")}"
 }
 
 prompt () {
