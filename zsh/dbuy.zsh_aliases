@@ -1,0 +1,5 @@
+alias djact='source bin/activate'
+alias dj='djact && ./manage.py'
+alias djsp='dj shell_plus'
+alias djrs='dj runserver'
+alias start_celery='celery -A topenguins -l info -c 1 worker'
