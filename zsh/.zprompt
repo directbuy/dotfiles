@@ -19,13 +19,14 @@ local wsl=false;
 local cygwin=false;
 local docker=false;
 local prefix="";
-border_color=""
+local border_color=""
 setopt nocasematch
 if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
     border_color="\e[0m";
 else
    if [ -n ${docker_image} ] ; then
+       echo "docker setting prefix to: [${docker_image}]" >> .logfile
        prefix="${docker_image}";
        docker=true;
        border_color="\e[31m";
@@ -65,9 +66,6 @@ promptCwd () {
     elif [[ $t == '/' ]]; then
     else
         t="$t/"
-    fi
-    if [ -n $prefix ] ; then
-        t="${prefix} ${t}" ;
     fi
     if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
         t="\e[33m...\e[0m"
@@ -115,7 +113,9 @@ promptGit () {
         local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
         local revision=$(git rev-parse --short --verify HEAD 2>/dev/null || echo "<empty>")
         print -n "[\e[34;1m$branch $revision\e[0m]"
-        if [ "$wsl" = "false" ] && [[ $prefix != "cygwin" ]]; then
+        # performance is relatively awful
+        # for anything other than native linux
+        if $remote ; then
             if [[ $(git status --short --untracked-files=no 2>&1 | grep -v 'Permission denied' | wc -l) -ne 0 ]]; then
                 print " \e[44;37;1m!\e[0m"
             else
@@ -137,8 +137,12 @@ promptUserHost () {
     if $remote ; then
         print -P "\e[1m%n\e[0m@\e[32m%m\e[0m" ;
     else
-        if $docker ; then
-            print -P "\e[1m${docker_image}\e[0m"
+        if $cygwin ; then
+            print -P "\e[1mcygwin\e[0m"
+        else
+            if $docker ; then
+                print -P "\e[1m${docker_image}\e[0m"
+            fi
         fi
     fi
 }
@@ -188,6 +192,10 @@ promptPrompt () { # :)
     fi
 }
 
+strip_ansi () {
+    echo "$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")"
+}
+
 perceivedLength () {
     echo "${#$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")}"
 }
@@ -201,41 +209,44 @@ prompt () {
     local second_row="${border_color}┃${reset_color}"
     local third_row="${border_color}┗${reset_color} "
     local current=""
-    integer first_row_length second_row_length third_row_length
+    integer flength slength
     for func in $aux_functions; do
         $func
     done
 
+    integer fdashes=3
     for func in $first_row_functions; do
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
             if [[ $func != $first_row_functions[1] ]] ; then
                 first_row+="${border_color}━━${reset_color} " ;
                 # first_row+="\e[34m──\e[0m " ;
+                (( fdashes += 2 ))
             fi
             first_row+="${current} "
         fi
     done
-    first_row_length=$(perceivedLength $first_row)
-    (( first_row_length -= $perceived_width_of_dash ))
+    flength=$(perceivedLength $first_row)
+    (( flength -= 2 * fdashes ))
+    integer sdashes=1
     for func in $second_row_functions; do
         current=$($func | tr -d '\n')
         if [[ -n $current ]]; then
             second_row+="${border_color}━━${reset_color} ${current} " ;
+            (( sdashes += 2 ))
         fi
     done
-    second_row_length=$(perceivedLength $second_row)
-    (( second_row_length -= $perceived_width_of_dash ))
-
-    while (( $first_row_length < $second_row_length )); do
+    slength=$(perceivedLength $second_row)
+    (( slength -= 2 * sdashes ))
+    while (( flength < slength )); do
         first_row+="${border_color}━${reset_color}" ;
         # first_row+="${border_color}─${reset_color}" ;
-        (( first_row_length += $perceived_width_of_dash ))
+        (( flength += 1 ))
     done
-    while (( $first_row_length > $second_row_length )); do
+    while (( $flength > $slength )); do
         second_row+="${border_color}━${reset_color}" ;
         # second_row+="${border_color}─${reset_color}" ;
-        (( second_row_length += $perceived_width_of_dash ))
+        (( slength += 1 ))
     done
 
     first_row+="${border_color}━┓${reset_color}" ;

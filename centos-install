@@ -17,7 +17,9 @@ function go {
     home_dir="/home/$user" ;
   fi 
   pushd $home_dir > /dev/null
-  sudo yum -y install zsh > /dev/null
+  if [ ! -f /bin/zsh ] ; then
+      sudo yum -y install zsh > /dev/null
+  fi
   sudo chsh -s `grep -i zsh /etc/shells` $user;
   ln -f -s $dotfiles_dir /tmp/dotfiles ;
   chmod 0775 /tmp/dotfiles ;
