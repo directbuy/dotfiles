@@ -106,7 +106,7 @@ first_row_functions+=(promptVenv)
 # first_row_functions+=(promptHg)
 
 promptGit () {
-    if ! which git 2>&1 >/dev/null; then;
+    if ! which git 2>&1 >/dev/null; then
         return
     fi
     if git rev-parse --git-dir >/dev/null 2>&1; then
@@ -115,9 +115,9 @@ promptGit () {
         print -n "[\e[34;1m$branch $revision\e[0m]"
         # performance is relatively awful
         # for anything other than native linux
-        if $remote ; then
+        if [ "${cygwin}" = "false" ] ; then
             if [[ $(git status --short --untracked-files=no 2>&1 | grep -v 'Permission denied' | wc -l) -ne 0 ]]; then
-                print " \e[44;37;1m!\e[0m"
+                print " \e[44;37;1m!\e[0m" ;
             else
                 print ""
             fi
@@ -203,6 +203,8 @@ perceivedLength () {
 prompt () {
     [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
+    local dash='─'
+    local dash_length=$#dash
     # local first_row="┌── " second_row="│" third_row="└ " current=""
     local reset_color="\e[0m"
     local first_row="${border_color}┏━━${reset_color} "
@@ -227,7 +229,7 @@ prompt () {
         fi
     done
     flength=$(perceivedLength $first_row)
-    (( flength -= 2 * fdashes ))
+    (( flength -= (dash_length - 1)  * fdashes ))
     integer sdashes=1
     for func in $second_row_functions; do
         current=$($func | tr -d '\n')
@@ -237,7 +239,7 @@ prompt () {
         fi
     done
     slength=$(perceivedLength $second_row)
-    (( slength -= 2 * sdashes ))
+    (( slength -= (dash_length - 1) * sdashes ))
     while (( flength < slength )); do
         first_row+="${border_color}━${reset_color}" ;
         # first_row+="${border_color}─${reset_color}" ;
