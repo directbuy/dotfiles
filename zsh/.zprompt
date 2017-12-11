@@ -16,6 +16,8 @@ local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
 local remote=false;
 local wsl=false;
+local cygwin=false;
+local docker=false;
 local prefix="";
 border_color=""
 setopt nocasematch
@@ -23,17 +25,19 @@ if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
     border_color="\e[0m";
 else
-   if [[ "${platform}" =~ (amzn|centos|ubuntu) ]] ; then
-       remote=true ;
-       border_color="\e[34m";
+   if [ -n ${docker_image} ] ; then
+       prefix="${docker_image}";
+       docker=true;
+       border_color="\e[31m";
    else
-       if [[ "${platform}" =~ cygwin ]] ; then
-           prefix="cygwin";
-           border_color="\e[35m";
+       if [[ "${platform}" =~ (amzn|centos|ubuntu) ]] ; then
+           remote=true ;
+           border_color="\e[34m";
        else
-           if [ -n $docker_image ] ; then
-               prefix="${docker_image}";
-               border_color="\e[31m";
+           if [[ "${platform}" =~ cygwin ]] ; then
+               prefix="cygwin";
+               border_color="\e[35m";
+               cygwin=true;
            fi
        fi
    fi
@@ -62,7 +66,7 @@ promptCwd () {
     else
         t="$t/"
     fi
-    if [[ "$prefix" != "" ]] ; then
+    if [ -n $prefix ] ; then
         t="${prefix} ${t}" ;
     fi
     if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
@@ -132,6 +136,10 @@ first_row_functions+=(promptGit)
 promptUserHost () {
     if $remote ; then
         print -P "\e[1m%n\e[0m@\e[32m%m\e[0m" ;
+    else
+        if $docker ; then
+            print -P "\e[1m${docker_image}\e[0m"
+        fi
     fi
 }
 second_row_functions+=(promptUserHost)
