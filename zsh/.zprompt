@@ -75,7 +75,6 @@ promptCwd () {
         else
             h=""
         fi
-        (( first_row_width -= 11 ))
     fi
     print "\e[0m$t\e[1m$h\e[0m"
 }
@@ -112,8 +111,7 @@ promptGit () {
         local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
         local revision=$(git rev-parse --short --verify HEAD 2>/dev/null || echo "<empty>")
         print -n "[\e[34;1m$branch $revision\e[0m]"
-        (( first_row_width += 7 + $#branch + $#revision ))
-        if [ "$wsl" = "false" && -z $prefix ]; then
+        if [ "$wsl" = "false" ] && [[ $prefix != "cygwin" ]]; then
             if [[ $(git status --short --untracked-files=no 2>&1 | grep -v 'Permission denied' | wc -l) -ne 0 ]]; then
                 print " \e[44;37;1m!\e[0m"
             else
