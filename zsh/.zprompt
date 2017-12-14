@@ -25,8 +25,8 @@ if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
     border_color="\e[0m";
 else
-   if [ -n ${docker_image} ] ; then
-       echo "docker setting prefix to: [${docker_image}]" >> .logfile
+   if [ -n "${docker_image}" ] ; then
+       # echo "docker setting prefix to: [${docker_image}]" >> .logfile
        prefix="${docker_image}";
        docker=true;
        border_color="\e[31m";
