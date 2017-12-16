@@ -188,7 +188,7 @@ promptPrompt () { # :)
     if [[ $EUID == 0 ]]; then
         print "\e[37;1m➤\e[0m"
     else
-        print "\e[1m>\e[0m"
+        print "\e[1m➤\e[0m"
     fi
 }
 

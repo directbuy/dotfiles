@@ -117,3 +117,9 @@ if [ -d ~/.opam ]; then
     . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
     eval `opam config env`
 fi
+
+if [ -f /usr/bin/aws_zsh_completer.sh ] ; then
+    source /usr/bin/aws_zsh_completer.sh
+fi
+export LESS='-i -R --silent'
+export MORE='-d'
