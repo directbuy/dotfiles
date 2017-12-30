@@ -123,3 +123,29 @@ if [ -f /usr/bin/aws_zsh_completer.sh ] ; then
 fi
 export LESS='-i -R --silent'
 export MORE='-d'
+
+if [[ "${terminfo[khome]}" != "" ]]; then
+  bindkey "${terminfo[khome]}" beginning-of-line      # [Home] - Go to beginning of line
+fi
+if [[ "${terminfo[kend]}" != "" ]]; then
+  bindkey "${terminfo[kend]}"  end-of-line            # [End] - Go to end of line
+fi
+bindkey '^[[1;5C' forward-word                        # [Ctrl-RightArrow] - move forward one word
+bindkey '^[[1;5D' backward-word                       # [Ctrl-LeftArrow] - move backward one word
+
+if [[ "${terminfo[kcbt]}" != "" ]]; then
+  bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
+fi
+
+bindkey '^?' backward-delete-char                     # [Backspace] - delete backward
+if [[ "${terminfo[kdch1]}" != "" ]]; then
+  bindkey "${terminfo[kdch1]}" delete-char            # [Delete] - delete forward
+else
+  bindkey "^[[3~" delete-char
+  bindkey "^[3;5~" delete-char
+  bindkey "\e[3~" delete-char
+fi
+if [ -e ~/.vault-pass.txt ] ; then
+    export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault-pass.txt
+fi
+
