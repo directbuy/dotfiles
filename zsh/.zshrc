@@ -16,6 +16,7 @@ setopt COMPLETE_IN_WORD
 setopt INTERACTIVE_COMMENTS
 setopt EXTENDED_GLOB
 unsetopt NOMATCH
+setopt nocasematch
 export TIME_STYLE=long-iso
 unsetopt beep
 
@@ -148,4 +149,3 @@ fi
 if [ -e ~/.vault-pass.txt ] ; then
     export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault-pass.txt
 fi
-

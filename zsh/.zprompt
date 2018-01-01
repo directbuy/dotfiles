@@ -20,7 +20,6 @@ local cygwin=false;
 local docker=false;
 local prefix="";
 local border_color=""
-setopt nocasematch
 if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
     border_color="\e[0m";
@@ -57,28 +56,28 @@ promptTitle () {
 aux_functions+=(promptTitle)
 
 promptCwd () {
-    local pwd="$(pwd)"
-    local cwd="$(print -P '%~')"
-    local h="$(basename "$cwd")"
-    local t="$(dirname "$cwd")"
-    if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
-        t=''
-    elif [[ $t == '/' ]]; then
-    else
-        t="$t/"
-    fi
-    if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
-        t="\e[33m...\e[0m"
-        if [[ $pwd != $VIRTUAL_ENV ]]; then
-            t+=$(dirname $(echo $pwd | sed "s#$VIRTUAL_ENV##"))
-            if [[ ! $t == */ ]]; then
-                t+="/"
-            fi
-        else
-            h=""
-        fi
-    fi
-    print "\e[0m$t\e[1m$h\e[0m"
+    # local pwd="$(pwd)"
+    # local cwd="$(print -P '%~')"
+    # local h="$(basename "$cwd")"
+    # local t="$(dirname "$cwd")"
+    # if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
+    #     t=''
+    # elif [[ $t == '/' ]]; then
+    # else
+    #     t="$t/"
+    # fi
+    # if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
+    #     t="\e[33m...\e[0m"
+    #     if [[ $pwd != $VIRTUAL_ENV ]]; then
+    #         t+=$(dirname $(echo $pwd | sed "s#$VIRTUAL_ENV##"))
+    #         if [[ ! $t == */ ]]; then
+    #             t+="/"
+    #         fi
+    #     else
+    #         h=""
+    #     fi
+    # fi
+    print "\e[0m$(pwd)"
 }
 first_row_functions+=(promptCwd)
 
@@ -116,8 +115,7 @@ promptGit () {
         # performance is relatively awful
         # for anything other than native linux
         if [ "${cygwin}" = "false" ] ; then
-            git diff-index --quiet HEAD
-            if [[ $? -ne 0 ]]; then
+            if [[ -n "$(git ls-files -m)" ]]; then
                 print " \e[37;1m*\e[0m" ;
             else
                 print ""
@@ -150,11 +148,7 @@ promptUserHost () {
 second_row_functions+=(promptUserHost)
 
 promptDate () {
-    if $remote ; then
-        date +'%Y.%m.%d %I:%M%p' ;
-    else
-        date +'%B %e, %I:%M %p' ;
-    fi
+    date +'%Y.%m.%d %I:%M%p' ;
 }
 second_row_functions+=(promptDate)
 
@@ -202,6 +196,7 @@ perceivedLength () {
 }
 
 prompt () {
+    start=$(date +%s%N | cut -b1-13)
     [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     local dash='─'
@@ -256,6 +251,10 @@ prompt () {
     # first_row+="${border_color}─┐${reset_color}" ;
     second_row+="${border_color}━┛${reset_color}" ;
     # second_row+="${border_color}─┘${reset_color}" ;
+    end=$(date +%s%N | cut -b1-13)
+    if [[ -n "${PROFILE_PROMPT}" ]] ; then
+        third_row+="$((end-start))"
+    fi
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
 
