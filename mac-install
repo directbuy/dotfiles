@@ -1,0 +1,14 @@
+#!/bin/bash
+function go {
+  pushd `dirname $0` > /dev/null
+  local dotfiles_dir=`pwd -P`
+  popd > /dev/null
+  local home_dir=$(eval echo "~")
+  pushd $home_dir >/dev/null
+  rsync -rltD "${dotfiles_dir}/vim/" $home_dir
+  rsync -rltD "${dotfiles_dir}/zsh/" $home_dir
+  rsync -rltD "${dotfiles_dir}/git/" $home_dir
+  rsync -rltd "${dotfiles_dir}/ipython/" $home_dir
+}
+
+go 

@@ -19,6 +19,7 @@ local wsl=false;
 local cygwin=false;
 local docker=false;
 local prefix="";
+local stupid_mac=false
 local border_color=""
 if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
@@ -38,6 +39,10 @@ else
                prefix="cygwin";
                border_color="\e[35m";
                cygwin=true;
+           else
+               if [[ "${platform}" =~ darwin ]] ; then
+                   stupid_mac=true
+               fi
            fi
        fi
    fi
@@ -188,11 +193,15 @@ promptPrompt () { # :)
 }
 
 strip_ansi () {
-    echo "$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")"
+    echo "$(echo "${1}" | sed $sed_options "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")"
 }
 
 perceivedLength () {
-    echo "${#$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")}"
+    if [ ! $stupid_mac ] ; then
+        echo "${#$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")}"
+    else
+        echo "${#$(echo "${1}" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g')}"
+    fi
 }
 
 prompt () {

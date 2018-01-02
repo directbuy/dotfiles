@@ -60,7 +60,8 @@ PS2='$(prompt2)'
 RPROMPT='$(rprompt)'
 TZ=CST6CDT
 # Aliases
-if [ -f ~/.dircolors ]; then
+which dircolors >/dev/null
+if [ -f ~/.dircolors ] && [ ! $? ]; then
     eval $(dircolors -b ~/.dircolors) ;
 fi
 if [ -f /etc/docker.conf ] ; then
@@ -149,3 +150,7 @@ fi
 if [ -e ~/.vault-pass.txt ] ; then
     export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault-pass.txt
 fi
+if [ -e ~/.local_zsh ] ; then
+    source ~/.local_zsh
+fi
+
