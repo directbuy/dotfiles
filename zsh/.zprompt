@@ -262,7 +262,7 @@ prompt () {
     # second_row+="${border_color}─┘${reset_color}" ;
     end=$(date +%s%N | cut -b1-13)
     if [[ -n "${PROFILE_PROMPT}" ]] ; then
-        third_row+="$((end-start))"
+        third_row+="$((end-start))ms "
     fi
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
