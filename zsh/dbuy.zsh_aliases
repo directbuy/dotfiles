@@ -1,5 +1,16 @@
 alias djact='source bin/activate'
 alias dj='djact && ./manage.py'
-alias djsp='dj shell_plus'
 alias djrs='dj runserver'
-alias start_celery='celery -A topenguins -l info -c 1 worker'
+alias ll='ls -lFH'
+alias la='ls -lAhS'
+alias grep='grep --color=auto'
+alias nano='nano -w'
+alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
+alias visudo='sudo -E visudo'
+alias pycheck="python -m py_compile"
+alias djsp='python manage.py shell_plus --quiet-load'
+alias djmigrate='python manage.py migrate --merge --ignore-ghost-migrations'
+alias djact='. bin/activate'
+alias promote_dev='git checkout dev ; git pull ; git checkout staging ; git pull ; git merge origin/dev ; git push origin staging'
+alias promote_staging='git checkout staging ; git pull ; git checkout master ; git pull ; git merge origin/staging ; git push origin master'
+alias start_celery='C_FORCE_ROOT=1 celery worker -A topenguins -l info -c 1'
