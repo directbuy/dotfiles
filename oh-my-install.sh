@@ -7,7 +7,7 @@ cp zsh/dbuy.zsh-theme ~/.oh-my-zsh/custom/themes/
 source ~/.zshrc
 export ZSH_CUSTOM=~/.oh-my-zsh/custom
 dirname="${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
-if [ ! -e  "${dirname}"] ; then
+if [ ! -e  "${dirname}" ] ; then
     git clone https://github.com/zsh-users/zsh-autosuggestions.git "${dirname}"
 else
     pushd "${dirname}" >/dev/null

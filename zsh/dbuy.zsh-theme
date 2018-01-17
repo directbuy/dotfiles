@@ -86,7 +86,7 @@ function actual_length {
 }
 
 function rpad {
-    local st="${1}";
+    local st="$(print -P ${1})"
     local len=$(actual_length "${st}")
     local pad_length="${2}";
     printf '%s' "${st}"
@@ -97,7 +97,7 @@ function rpad {
 
 function dbuy_prompt {
     start=$(date +%s%N | cut -b1-13)
-    prompt1=$(print -P "${border_color}┏━━\e[0m %~ ${border_color}━━\e[0m $(git_prompt_info)")
+    prompt1=$(print -P "${border_color}┏━━\e[0m %d ${border_color}━━\e[0m $(git_prompt_info)")
     end=$(date +%s%N | cut -b1-13)
     prompt2=$(print -P "${border_color}┃━━\e[37m ${user_host} ${border_color}━━\e[0m ${curr_date}")
     local m=$(actual_length "${prompt1}")
