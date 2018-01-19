@@ -92,7 +92,7 @@ export VIRTUAL_ENV_DISABLE_PROMPT=yes
 promptVenv () {
     if [[ -n $VIRTUAL_ENV ]]; then
         local venv=$(basename $VIRTUAL_ENV)
-        print "[\e[34;1m$venv\e[0m]"
+        print "[\e[34m$venv\e[0m]"
     fi
 }
 first_row_functions+=(promptVenv)
@@ -121,7 +121,7 @@ promptGit () {
     if git rev-parse --git-dir >/dev/null 2>&1; then
         local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
         local revision=$(git rev-parse --short --verify HEAD 2>/dev/null || echo "<empty>")
-        print -n "[\e[34;1m$branch $revision\e[0m]"
+        print -n "[\e[34m$branch $revision\e[0m]"
         # performance is relatively awful
         # for anything other than native linux
         if [[ -n "$(git ls-files -m)" ]]; then
@@ -211,7 +211,7 @@ prompt () {
     # local first_row="┌── " second_row="│" third_row="└ " current=""
     local reset_color="\e[0m"
     local first_row="${border_color}┏━━${reset_color} "
-    local second_row="${border_color}┃${reset_color}"
+    local second_row="${border_color}┣${reset_color}"
     local third_row="${border_color}┗${reset_color} "
     local current=""
     integer flength slength
@@ -243,20 +243,20 @@ prompt () {
     done
     slength=$(perceivedLength $second_row)
     (( slength -= (dash_length - 1) * sdashes ))
-    # while (( flength < slength )); do
-    #     first_row+="${border_color}━${reset_color}" ;
-    #     # first_row+="${border_color}─${reset_color}" ;
-    #     (( flength += 1 ))
-    # done
-    # while (( $flength > $slength )); do
-    #     second_row+="${border_color}━${reset_color}" ;
-    #     # second_row+="${border_color}─${reset_color}" ;
-    #     (( slength += 1 ))
-    # done
+    while (( flength < slength )); do
+        first_row+="${border_color}━${reset_color}" ;
+        # first_row+="${border_color}─${reset_color}" ;
+        (( flength += 1 ))
+    done
+    while (( $flength > $slength )); do
+        second_row+="${border_color}━${reset_color}" ;
+        # second_row+="${border_color}─${reset_color}" ;
+        (( slength += 1 ))
+    done
 
-    # first_row+="${border_color}━┓${reset_color}" ;
+    first_row+="${border_color}━┓${reset_color}" ;
     # first_row+="${border_color}─┐${reset_color}" ;
-    # second_row+="${border_color}━┛${reset_color}" ;
+    second_row+="${border_color}━┛${reset_color}" ;
     # second_row+="${border_color}─┘${reset_color}" ;
     # end=$(date +%s%N | cut -b1-13)
     # if [[ -n "${PROFILE_PROMPT}" ]] ; then

@@ -58,13 +58,13 @@ ZSH_THEME_GIT_PROMPT_PREFIX="[\e[34m"
 ZSH_THEME_GIT_PROMPT_SUFFIX="\e[0m]"
 
 local ret_status="%(?:%{$fg[white]%}➤ :%{$fg[red]%}➤ )"
-PROMPT='%{$border_color%}┏━━%{$reset_color%} %d $(virtualenv_prompt_info) $(git_prompt_info)
-%{$border_color%}┃━━%{$fg_bold[white]%} %{$prefix%} %{$reset_color%}%{$border_color%}━━%{$reset_color%} %{$fg[cyan]%}%n@%m%{$reset_color%} %{$border_color%}━━%{$reset_color%} $(date +"%Y.%m.%d %I:%M%p")
-%{$border_color%}┗━ %{$reset_color%}${ret_status}%{$reset_color%} '
+PROMPT='%{$border_color%}┏━━%{$reset_color%} %d $(virtualenv_prompt_info)$(git_prompt_info)
+%{$border_color%}┣━━%{$fg_bold[white]%} %{$prefix%} %{$reset_color%}%{$border_color%}━━%{$reset_color%} %{$fg[cyan]%}%n@%m%{$reset_color%} %{$border_color%}━━%{$reset_color%} $(date +"%Y.%m.%d %I:%M%p")
+%{$border_color%}┗━ %{$reset_color%}${ret_status}%{$reset_color%}'
 
-ZSH_THEME_GIT_PROMPT_PREFIX="%{$border_color%}━━%{$reset_color%} [%{$fg_bold[blue]%}"
-ZSH_THEME_GIT_PROMPT_SUFFIX=""
-ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[white]%}*%{$reset_color%}]"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$reset_color%}]"
-ZSH_THEME_VIRTUALENV_PREFIX="%{$border_color%}━━%{$reset_color%} [%{$fg_bold[blue]%}"
-ZSH_THEME_VIRTUALENV_SUFFIX="%{$reset_color%}]"
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$border_color%}━━┫%{$reset_color%} %{$fg_bold[blue]%}"
+ZSH_THEME_GIT_PROMPT_SUFFIX=" ┃"
+ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[white]%}*%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$reset_color%}"
+ZSH_THEME_VIRTUALENV_PREFIX="%{$border_color%}━━┫%{$reset_color%} %{$fg_bold[blue]%}"
+ZSH_THEME_VIRTUALENV_SUFFIX=" %{$reset_color%}┣"
