@@ -23,6 +23,7 @@ local stupid_mac=false
 local border_color=""
 if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
+    prefix="wsl"
     border_color="\e[0m";
 else
    if [ -n "${docker_image}" ] ; then
@@ -42,6 +43,7 @@ else
            else
                if [[ "${platform}" =~ darwin ]] ; then
                    stupid_mac=true
+                   prefix="mac"
                fi
            fi
        fi
@@ -90,7 +92,7 @@ export VIRTUAL_ENV_DISABLE_PROMPT=yes
 promptVenv () {
     if [[ -n $VIRTUAL_ENV ]]; then
         local venv=$(basename $VIRTUAL_ENV)
-        print "\e[33m($venv)\e[0m"
+        print "[\e[34;1m$venv\e[0m]"
     fi
 }
 first_row_functions+=(promptVenv)
@@ -110,6 +112,9 @@ first_row_functions+=(promptVenv)
 # first_row_functions+=(promptHg)
 
 promptGit () {
+    if [ "${cygwin}" = "true" ] ; then
+        return
+    fi
     if ! which git 2>&1 >/dev/null; then
         return
     fi
@@ -119,12 +124,10 @@ promptGit () {
         print -n "[\e[34;1m$branch $revision\e[0m]"
         # performance is relatively awful
         # for anything other than native linux
-        if [ "${cygwin}" = "false" ] ; then
-            if [[ -n "$(git ls-files -m)" ]]; then
-                print " \e[37;1m*\e[0m" ;
-            else
-                print ""
-            fi
+        if [[ -n "$(git ls-files -m)" ]]; then
+            print " \e[37;1m*\e[0m" ;
+        else
+            print ""
         fi
     fi
 }
@@ -137,18 +140,13 @@ first_row_functions+=(promptGit)
 # }
 #second_row_functions+=(promptIce)
 
+function promptEnv {
+    print "${prefix}"
+}
+second_row_functions+=(promptEnv)
+
 promptUserHost () {
-    if $remote ; then
-        print -P "\e[1m%n\e[0m@\e[32m%m\e[0m" ;
-    else
-        if $cygwin ; then
-            print -P "\e[1mcygwin\e[0m"
-        else
-            if $docker ; then
-                print -P "\e[1m${docker_image}\e[0m"
-            fi
-        fi
-    fi
+    print -P "\e[36m%n@%m\e[0m" ;
 }
 second_row_functions+=(promptUserHost)
 
@@ -205,7 +203,7 @@ perceivedLength () {
 }
 
 prompt () {
-    start=$(date +%s%N | cut -b1-13)
+    # start=$(date +%s%N | cut -b1-13)
     [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     local dash='─'
@@ -245,25 +243,25 @@ prompt () {
     done
     slength=$(perceivedLength $second_row)
     (( slength -= (dash_length - 1) * sdashes ))
-    while (( flength < slength )); do
-        first_row+="${border_color}━${reset_color}" ;
-        # first_row+="${border_color}─${reset_color}" ;
-        (( flength += 1 ))
-    done
-    while (( $flength > $slength )); do
-        second_row+="${border_color}━${reset_color}" ;
-        # second_row+="${border_color}─${reset_color}" ;
-        (( slength += 1 ))
-    done
+    # while (( flength < slength )); do
+    #     first_row+="${border_color}━${reset_color}" ;
+    #     # first_row+="${border_color}─${reset_color}" ;
+    #     (( flength += 1 ))
+    # done
+    # while (( $flength > $slength )); do
+    #     second_row+="${border_color}━${reset_color}" ;
+    #     # second_row+="${border_color}─${reset_color}" ;
+    #     (( slength += 1 ))
+    # done
 
-    first_row+="${border_color}━┓${reset_color}" ;
+    # first_row+="${border_color}━┓${reset_color}" ;
     # first_row+="${border_color}─┐${reset_color}" ;
-    second_row+="${border_color}━┛${reset_color}" ;
+    # second_row+="${border_color}━┛${reset_color}" ;
     # second_row+="${border_color}─┘${reset_color}" ;
-    end=$(date +%s%N | cut -b1-13)
-    if [[ -n "${PROFILE_PROMPT}" ]] ; then
-        third_row+="$((end-start))ms "
-    fi
+    # end=$(date +%s%N | cut -b1-13)
+    # if [[ -n "${PROFILE_PROMPT}" ]] ; then
+    #     third_row+="$((end-start))ms "
+    # fi
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
 

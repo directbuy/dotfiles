@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 function go {
   local dotfiles_dir='/u/dotfiles'
   local user="" 
@@ -9,11 +9,7 @@ function go {
     user=$1;
   fi ;
   echo "Installing dotfiles for $user"
-  if [ "$user" = "root" ] ; then
-    home_dir='/root' ;
-  else
-    home_dir="/home/$user" ;
-  fi 
+  home_dir=$(eval echo "~${user}")
   pushd $home_dir > /dev/null
   rsync -rltD "${dotfiles_dir}/vim/" $home_dir
   rsync -rltD "${dotfiles_dir}/zsh/" $home_dir
