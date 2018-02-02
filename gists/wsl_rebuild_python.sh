@@ -1,34 +1,29 @@
 #!/usr/bin/env bash
 yum clean metadata
 yum updateinfo
-yum -y install python
-yum -y install python-devel
-yum -y install sqlite-devel
-yum -y install python-pip
-yum -y install openssl-devel
-yum -y install libffi-devel
-yum -y install libjpeg-turbo-devel
-yum -y install freetype-devel
-yum -y install zlib-devel
-yum -y install bzip2-devel
-yum -y install gcc
-yum -y install gcc-c++
-yum -y install make
-yum -y install automake
-yum -y install autoconf
-yum -y install tkinter tk-devel
+yum -y install python python-devel sqlite-devel python-pip openssl-devel \
+    libffi-devel libjpeg-turbo-devel freetype-devel zlib-devel \
+    bzip2-devel gcc gcc-c++ make automake autoconf tkinter tk-devel \
+    ncurses-devel
 if [ ! -e /u/downloads ] ; then mkdir -p /u/downloads ; fi
-version="2.7.14"
-cd /u/downloads
+version=${1:-"2.7.14"}
+printf "\e[36mBuilding python %s\e[0m\n" "${version}"
+pushd /u/downloads
 filename="/u/downloads/python-${version}.tgz"
 if [ ! -f "${filename}" ] ; then
+    printf "\e[32mdownloading source bundle\e[0m\n"
     wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "${filename}" ;
 fi
 pdir="/u/python-${version}"
 if [ ! -d "${pdir}" ] ; then
     mkdir -p "${pdir}"
-    cd "${pdir}"
+    pushd "${pdir}"
+    printf "\e[32muntarring bundle\e[0m\n"
     tar xzf "/u/downloads/python-${version}.tgz" --strip-components=1
+else
+    pushd "${pdir}"
 fi
-cd "${pdir}"
-./configure --enable-optimizations && make && make altinstall
+printf "\e[32mbuilding!\e[0m\n"
+./configure && make && make altinstall
+popd
+popd

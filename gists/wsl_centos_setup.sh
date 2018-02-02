@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-# add the aws dns resolver to the environment
-grep '172.17.0.2' /etc/resolv.conf > /tmp/test
-if [ -f /tmp/test ] && [ ! -a /tmp/test ] ; then
-    echo "nameserver 172.17.0.2" > /etc/resolv.conf.new
-    echo "nameserver 8.8.8.8" >> /etc/resolv.conf.new
-    echo "nameserver 8.8.4.4" >> /etc/resolv.conf.new
-    cat /etc/resolv.conf >> /etc/resolv.conf.new
-    mv -f /etc/resolv.conf.new /etc/resolv.conf
-fi
 # allow yum to install documentation like man
 sed -i -e 's,^tsflags=nodocs$,\# tsflags=nodocs,g' /etc/yum.conf
 rm -rf /tmp/test
