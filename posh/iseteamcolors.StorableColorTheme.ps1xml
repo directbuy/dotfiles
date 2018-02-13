@@ -78,13 +78,13 @@
   <Values>
     <Color>
       <A>255</A>
-      <R>255</R>
-      <G>0</G>
-      <B>0</B>
+      <R>250</R>
+      <G>170</G>
+      <B>175</B>
       <ScA>1</ScA>
-      <ScR>1</ScR>
-      <ScG>0</ScG>
-      <ScB>0</ScB>
+      <ScR>0.9559733</ScR>
+      <ScG>0.4019778</ScG>
+      <ScB>0.428690523</ScB>
     </Color>
     <Color>
       <A>0</A>
@@ -449,11 +449,11 @@
     <Color>
       <A>255</A>
       <R>252</R>
-      <G>111</G>
+      <G>110</G>
       <B>225</B>
       <ScA>1</ScA>
       <ScR>0.9734453</ScR>
-      <ScG>0.158960834</ScG>
+      <ScG>0.155926466</ScG>
       <ScB>0.7529422</ScB>
     </Color>
     <Color>
@@ -469,11 +469,11 @@
     <Color>
       <A>255</A>
       <R>242</R>
-      <G>237</G>
+      <G>235</G>
       <B>225</B>
       <ScA>1</ScA>
       <ScR>0.8879231</ScR>
-      <ScG>0.8468732</ScG>
+      <ScG>0.8307699</ScG>
       <ScB>0.7529422</ScB>
     </Color>
     <Color>
@@ -488,11 +488,11 @@
     </Color>
     <Color>
       <A>255</A>
-      <R>245</R>
+      <R>242</R>
       <G>235</G>
       <B>225</B>
       <ScA>1</ScA>
-      <ScR>0.913098633</ScR>
+      <ScR>0.8879231</ScR>
       <ScG>0.8307699</ScG>
       <ScB>0.7529422</ScB>
     </Color>
