@@ -1,4 +1,22 @@
 #!/usr/bin/env bash
+function build_python {
+    version="${1}"
+    cd /u/downloads
+    filename="/u/downloads/python-${version}.tgz"
+    if [ ! -f "${filename}" ] ; then
+        wget "https://www.python.org/ftp/python/${version}/Python-${version}.tgz" -O "${filename}" ;
+    fi
+    pdir="/u/python-${version}"
+    if [ ! -d "${pdir}" ] ; then
+        mkdir -p "${pdir}"
+        cd "${pdir}"
+        tar xzf "/u/downloads/python-${version}.tgz" --strip-components=1
+    fi
+    cd "${pdir}"
+    ./configure && make && make altinstall
+    rm -rf "${pdir}"
+}
+
 # allow yum to install documentation like man
 sed -i -e 's,^tsflags=nodocs$,\# tsflags=nodocs,g' /etc/yum.conf
 rm -rf /tmp/test
@@ -46,7 +64,7 @@ yum -y install gnupg
 yum -y install libxml2-devel
 yum -y install libxslt-devel
 yum -y install tkinter tk-devel
-yum -y install python36u python27u git2u
+yum -y install python36u git2u
 yum -y update
 yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
@@ -99,13 +117,13 @@ if [ ! -e /usr/local/bin/node ] ; then
     rsync -a share /usr/local
     rsync -a include /usr/local
 fi
-
+build_python "2.7.14"
 if [ -e /u/to_penguins ] ; then
     cd /u/to_penguins
     if [ -d bin ] ; then rm -rf bin ; fi
     if [ -d lib ] ; then rm -rf lib ; fi
     if [ -d include ] ; then rm -rf include ; fi
-    virtualenv . -p /usr/bin/python2.7
+    virtualenv . -p /usr/local/bin/python2.7
     source bin/activate
     pip install six
     pip install -r requirements.txt
