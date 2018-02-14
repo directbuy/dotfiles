@@ -90,9 +90,10 @@ if [ ! -e /u/downloads ] ; then
 fi
 if [ ! -e /usr/local/bin/node ] ; then
     cd /u/downloads
-    wget https://nodejs.org/dist/v8.4.0/node-v8.4.0-linux-x64.tar.xz
-    tar xf node-v8.4.0-linux-x64.tar.xz
-    cd node-v8.4.0-linux-x64
+    node_version="8.4.0"
+    wget "https://nodejs.org/dist/${node_version}/node-v${node_version}-linux-x64.tar.xz"
+    tar xf "node-${node_version}-linux-x64.tar.xz"
+    cd "node-${node_version}-linux-x64"
     rsync -a lib /usr/local
     rsync -a bin /usr/local
     rsync -a share /usr/local
