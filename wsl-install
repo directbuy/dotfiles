@@ -3,5 +3,5 @@ rsync -rltD /u/dotfiles/vim/ ~
 rsync -rltD /u/dotfiles/zsh/ ~
 # rsync -rltD /u/dotfiles/git/ ~
 rsync -rltd /u/dotfiles/ipython/ ~
-# rsync -rltd /u/dotfiles/bash/ ~
+rsync -rltd /u/dotfiles/bash/ ~
 source ~/.zshrc
