@@ -37,12 +37,12 @@ yum clean all
 yum updateinfo
 yum -y install man readline readline-devel ncurses ncurses-devel
 yum -y install --enablerepo=city-fan.org curl libcurl-devel
-yum -y install wget python python-devel sqlite-devel
+yum -y install wget python python-devel sqlite-devel libsodium-devel
 yum -y install python-pip htop vim screen openssl openssl-devel
 yum -y install libffi-devel zsh zip unzip libjpeg-turbo-devel freetype-devel
 yum -y install zlib-devel bzip2-devel gcc gcc-c++ make automake autoconf net-utils
 yum -y install nfs-utils openldap-devel bind-utils rsync lsof gnupg libxml2-devel
-yum -y install libxslt-devel tkinter tk-devel python36u git2u traceroute
+yum -y install libxslt-devel tkinter tk-devel python36u git2u traceroute python36u-devel
 yum -y update
 yum -y upgrade
 yum -y install MariaDB-devel MariaDB-client MariaDB-shared
