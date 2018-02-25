@@ -151,7 +151,17 @@ fi
 if [ -e ~/.vault-pass.txt ] ; then
     export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault-pass.txt
 fi
+if [ -e /usr/bin/virtualenvwrapper.sh ] ; then
+    export WORKON_HOME=/u/envs
+    source /usr/bin/virtualenvwrapper.sh
+fi
 if [ -e ~/.local_zsh ] ; then
     source ~/.local_zsh
 fi
 
+function update_dns() {
+    comment=$(head -1 /etc/resolv.conf)
+    local_dns=$(head -2 /etc/resolv.conf | tail -1)
+    aws_dns=$(tail -2 /etc/resolv.conf)
+    printf "${comment}\n${aws_dns}\n${local_dns}\n" | sudo tee /etc/resolv.conf
+}
