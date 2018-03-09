@@ -1,0 +1,17 @@
+shell /bin/zsh
+defscrollback 10000
+startup_message off
+hardstatus on
+hardstatus alwayslastline
+hardstatus string '%{= kG}[%{G}%H%? %1`%?%{g}][%= %{= kw}%-w%{+b yk} %n*%t%?(%u)%? %{-}%+w %=%{g}][%{B}%m/%d %{W}%C%A%{g}]'
+screen -t 2ps 1 zsh
+screen -t gunicorn 2 zsh
+select 0
+bind c screen 1
+bind 0 select 10
+select 1
+split -v
+focus right
+select 2
+focus left
+
