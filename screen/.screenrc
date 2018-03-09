@@ -1,1 +1,2 @@
-multiuser on
+source .screen_layout
+layout save def

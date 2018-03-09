@@ -6,16 +6,12 @@ function go {
   local user="" 
   local home_dir=""
   if [ "$1" = "" ] ; then
-    user=`whoami` ;  
+    user=`whoami` ;
   else
     user=$1;
   fi ;
   echo "Installing dotfiles for $user"
-  if [ "$user" = "root" ] ; then
-    home_dir='/root' ;
-  else
-    home_dir="/home/$user" ;
-  fi 
+  home_dir=$(eval echo "~${user}")
   pushd $home_dir > /dev/null
   if [ ! -e /bin/zsh ] ; then
       yum -y install zsh > /dev/null
@@ -23,7 +19,8 @@ function go {
   chsh -s `grep -i zsh /etc/shells` $user;
   rsync -rltD "${dirname}/vim/" "${home_dir}"
   rsync -rltD "${dirname}/zsh/" "${home_dir}"
-  rsync -rltd "${dirname}/ipython" "${home_dir}"
+  rsync -rltd "${dirname}/ipython/" "${home_dir}"
+  rsync -rltd "${dirname}/screen/" "${home_dir}"
   chown -R "${user}:${user}" "${home_dir}"
   find "${home_dir}" -mindepth 1 -maxdepth 1 -type d -exec chmod 0700 {} \;
 }

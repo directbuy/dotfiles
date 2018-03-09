@@ -4,4 +4,6 @@ rsync -rltD /u/dotfiles/zsh/ ~
 # rsync -rltD /u/dotfiles/git/ ~
 rsync -rltd /u/dotfiles/ipython/ ~
 rsync -rltd /u/dotfiles/bash/ ~
+rsync -rltd /u/dotfiles/screen/ ~
+find "${home_dir}" -mindepth 1 -maxdepth 1 -type d -exec chmod 0700 {} \;
 source ~/.zshrc

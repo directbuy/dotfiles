@@ -3,23 +3,20 @@ function go {
   pushd `dirname $0` > /dev/null
   local dotfiles_dir=`pwd -P`
   popd > /dev/null
-  local user="" 
-  local home_dir=""
-  user=`whoami` ;  
+  local user=`whoami`;
+  local home_dir=$(eval echo "~${user}")
   echo "Installing dotfiles for $user"
-  if [ "$user" = "root" ] ; then
-    home_dir='/root' ;
-  else
-    home_dir="/home/$user" ;
-  fi 
   pushd $home_dir > /dev/null
-  sudo apt -y install zsh > /dev/null
+  sudo apt-get -y install zsh > /dev/null
   sudo chsh -s `which zsh` $user;
   ln -f -s $dotfiles_dir /tmp/dotfiles ;
   chmod 0775 /tmp/dotfiles ;
   rsync -rltD /tmp/dotfiles/vim/ $home_dir
   rsync -rltD /tmp/dotfiles/zsh/ $home_dir
+  rsync -rltD /tmp/dotfiles/ipython/ $home_dir
+  rsync -rltD /tmp/dotfiles/screen/ $home_dir
   rm /tmp/dotfiles ;
+  sudo find ${home_dir} -type d -exec sudo chmod 0700 {} \;
 }
 
 go $1

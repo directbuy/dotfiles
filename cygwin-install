@@ -16,6 +16,7 @@ function go {
   rsync -rltD "${dotfiles_dir}/git/" $home_dir
   rsync -rltd "${dotfiles_dir}/ipython/" $home_dir
   rsync -rltd "${dotfiles_dir}/bash/" $home_dir
+  rsync -rltd "${dotfiles_dir}/screen/" $home_dir
 }
 
 go $1
