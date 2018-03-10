@@ -16,12 +16,15 @@ function go {
       sudo yum -y install zsh > /dev/null
   fi
   sudo chsh -s `grep -i zsh /etc/shells` $user;
+  ln -f -s $dotfiles_dir /tmp/dotfiles ;
+  chmod 0775 /tmp/dotfiles ;
   sudo -u $user rsync -rltD /tmp/dotfiles/vim/ $home_dir
   sudo -u $user rsync -rltD /tmp/dotfiles/zsh/ $home_dir
   sudo -u $user rsync -rltD /tmp/dotfiles/git/ $home_dir
   sudo -u $user rsync -rltd /tmp/dotfiles/ipython/ $home_dir
   sudo -u $user rsync -rltd /tmp/dotfiles/screen/ $home_dir
-  find "${home_dir}" -mindepth 1 -maxdepth 1 -type d -exec sudo chmod 0700 {} \;
+  rm /tmp/dotfiles ;
+  find "${home_dir}" -mindepth 1 -type d -exec sudo chmod 0700 {} \;
 }
 
 go $1
