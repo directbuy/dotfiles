@@ -2,3 +2,7 @@ alias build_djenga='rm -rf dist/* ; python setup.py sdist ; python setup.py bdis
 alias promote_dev='git fetch ; git checkout dev ; git pull --no-rebase ; git checkout staging ; git pull --no-rebase ; git merge origin/dev --no-ff ; git push origin staging'
 alias promote_staging='git fetch ; git checkout staging ; git pull --no-rebase ; git checkout master ; git pull --no-rebase ; git merge origin/staging --no-ff ; git push origin master'
 
+alias kpyc="find . -name '*.pyc' -delete"
+alias tf='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TF.exe'
+alias tfs_build='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TFSBuild.exe'
+alias charm='/mnt/c/Program\ Files\ \(x86\)/JetBrains/PyCharm\ 2017.3.3/bin/pycharm64.exe'
