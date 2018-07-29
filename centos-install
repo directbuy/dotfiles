@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 function go {
   pushd `dirname $0` > /dev/null
   local dotfiles_dir=`pwd -P`
@@ -23,6 +23,9 @@ function go {
   sudo -u $user rsync -rltD /tmp/dotfiles/git/ $home_dir
   sudo -u $user rsync -rltd /tmp/dotfiles/ipython/ $home_dir
   sudo -u $user rsync -rltd /tmp/dotfiles/screen/ $home_dir
+  if [[ -f /tmp/dotfiles/zsh/$user.zsh_aliases ]]; then
+    sudo -u $user cp /tmp/dotfiles/$user.zsh_aliases $home_dir/.zsh_aliases
+  fi
   rm /tmp/dotfiles ;
   find "${home_dir}" -mindepth 1 -type d -exec sudo chmod 0700 {} \;
 }

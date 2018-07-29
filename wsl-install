@@ -5,5 +5,7 @@ rsync -rltD /u/dotfiles/zsh/ ~
 rsync -rltd /u/dotfiles/ipython/ ~
 rsync -rltd /u/dotfiles/bash/ ~
 rsync -rltd /u/dotfiles/screen/ ~
+if [[ -f /u/dotfiles/$USER.zsh_aliases ]] ; then
+  cp /u/dotfiles/zsh/$USER.zsh_aliases ~/.zsh_aliases
 find "${home_dir}" -mindepth 1 -maxdepth 1 -type d -exec chmod 0700 {} \;
 source ~/.zshrc
