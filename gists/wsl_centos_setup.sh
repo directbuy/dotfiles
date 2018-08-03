@@ -25,12 +25,8 @@ yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarc
 if [ ! -e /etc/yum.repos.d/city-fan.repo ]; then
     rpm -Uvh http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-2-1.rhel7.noarch.rpm
 fi
-if [ ! -e /etc/yum.repos.d/mariadb.repo ]; then
-    echo "[mariadb]" > /etc/yum.repos.d/mariadb.repo
-    echo "name = MariaDB" >> /etc/yum.repos.d/mariadb.repo
-    echo "baseurl = http://yum.mariadb.org/10.2/centos7-amd64" >> /etc/yum.repos.d/mariadb.repo
-    echo "gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB" >> /etc/yum.repos.d/mariadb.repo
-    echo "gpgcheck=1" >> /etc/yum.repos.d/mariadb.repo
+if [ ! -e /etc/yum.repos.d/mysql-community.repo ]; then
+    rpm -Uvh https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
 fi
 yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 yum clean all
@@ -42,10 +38,10 @@ yum -y install python-pip htop vim screen openssl openssl-devel
 yum -y install libffi-devel zsh zip unzip libjpeg-turbo-devel freetype-devel
 yum -y install zlib-devel bzip2-devel gcc gcc-c++ make automake autoconf net-utils
 yum -y install nfs-utils openldap-devel bind-utils rsync lsof gnupg libxml2-devel
-yum -y install libxslt-devel tkinter tk-devel python36u git2u traceroute python36u-devel
+yum -y install libxslt-devel tkinter tk-devel git2u traceroute
 yum -y update
 yum -y upgrade
-yum -y install MariaDB-devel MariaDB-client MariaDB-shared
+yum -y install mysql-community-devel mysql-community-client mysql-community-shared
 yum -y install gettext-devel perl-CPAN perl-devel
 # sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 if [ ! -L /u ] && [ -d /mnt/c/u ] ; then
@@ -58,7 +54,10 @@ if [ ! -e /usr/local/bin/git-crypt ] ; then
     rm -rf /usr/local/src/git-crypt
 fi
 if [ ! -f /usr/local/bin/python2.7 ] ; then
-    build_python "2.7.14"
+    build_python "2.7.15"
+fi
+if [ ! -f /usr/local/bin/python3.6 ] ; then
+    build_python "3.6.6"
 fi
 cd /u
 if [ ! -d dotfiles ] ; then
@@ -103,7 +102,7 @@ if [ -e /u/to_penguins ] ; then
     if [ -d bin ] ; then rm -rf bin ; fi
     if [ -d lib ] ; then rm -rf lib ; fi
     if [ -d include ] ; then rm -rf include ; fi
-    virtualenv . -p /usr/local/bin/python2.7
+    virtualenv . -p /usr/local/bin/python3.6
     source bin/activate
     pip install six
     pip install -r requirements.txt
@@ -114,10 +113,10 @@ if [ -e /u/for_penguins ] ; then
     if [ -d bin ] ; then rm -rf bin ; fi
     if [ -d lib ] ; then rm -rf lib ; fi
     if [ -d include ] ; then rm -rf include ; fi
-    virtualenv . -p /usr/bin/python3.6
+    virtualenv . -p /usr/local/bin/python3.6
     source bin/activate
     pip install six
-    pip install -r py3.requirements.txt
+    pip install -r requirements.txt
     deactivate
 fi
 if [ -e /u/upholstery ] ; then
