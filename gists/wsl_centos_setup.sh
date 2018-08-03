@@ -26,7 +26,7 @@ if [ ! -e /etc/yum.repos.d/city-fan.repo ]; then
     rpm -Uvh http://www.city-fan.org/ftp/contrib/yum-repo/city-fan.org-release-2-1.rhel7.noarch.rpm
 fi
 if [ ! -e /etc/yum.repos.d/mysql-community.repo ]; then
-    rpm -Uvh https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
+    yum -y install https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
 fi
 yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 yum clean all
