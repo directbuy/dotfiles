@@ -1,33 +1,23 @@
 #!/bin/bash
-function go {
-  pushd `dirname $0` > /dev/null
-  local dotfiles_dir=`pwd -P`
-  popd > /dev/null
-  local user="" 
-  if [ "$1" = "" ] ; then
-    user=`whoami` ;  
-  else
-    user=$1;
-  fi ;
-  local home_dir=$(eval echo "~${user}")
-  echo "Installing dotfiles for $user"
-  pushd $home_dir > /dev/null
-  if [ ! -f /bin/zsh ] ; then
-      sudo yum -y install zsh > /dev/null
-  fi
-  sudo chsh -s `grep -i zsh /etc/shells` $user;
-  ln -f -s $dotfiles_dir /tmp/dotfiles ;
-  chmod 0775 /tmp/dotfiles ;
-  sudo -u $user rsync -rltD /tmp/dotfiles/vim/ $home_dir
-  sudo -u $user rsync -rltD /tmp/dotfiles/zsh/ $home_dir
-  sudo -u $user rsync -rltD /tmp/dotfiles/git/ $home_dir
-  sudo -u $user rsync -rltd /tmp/dotfiles/ipython/ $home_dir
-  sudo -u $user rsync -rltd /tmp/dotfiles/screen/ $home_dir
-  if [[ -f /tmp/dotfiles/zsh/$user.zsh_aliases ]]; then
-    sudo -u $user cp /tmp/dotfiles/$user.zsh_aliases $home_dir/.zsh_aliases
-  fi
-  rm /tmp/dotfiles ;
-  find "${home_dir}" -mindepth 1 -type d -exec sudo chmod 0700 {} \;
-}
-
-go $1
+pushd `dirname $0` > /dev/null
+dotfiles_dir=`pwd -P`
+popd > /dev/null
+user="${1:-`whoami`}"
+home_dir=$(eval echo "~${user}")
+echo "Installing dotfiles for $user"
+pushd $home_dir > /dev/null
+if [[ ! -f /bin/zsh ]] ; then
+  sudo yum -y install zsh > /dev/null
+fi
+sudo chsh -s `grep -i zsh /etc/shells` $user;
+ln -f -s $dotfiles_dir /tmp/dotfiles ;
+chmod 0775 /tmp/dotfiles ;
+sudo -u $user rsync -rltD /tmp/dotfiles/vim/ $home_dir
+sudo -u $user rsync -rltD /tmp/dotfiles/zsh/ $home_dir
+sudo -u $user rsync -rltD /tmp/dotfiles/git/ $home_dir
+sudo -u $user rsync -rltd /tmp/dotfiles/ipython/ $home_dir
+if [[ -f /tmp/dotfiles/zsh/$user.zsh_aliases ]]; then
+sudo -u $user cp /tmp/dotfiles/$user.zsh_aliases $home_dir/.zsh_aliases
+fi
+rm /tmp/dotfiles ;
+find "${home_dir}" -mindepth 1 -type d -exec sudo chmod 0700 {} \;
