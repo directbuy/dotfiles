@@ -45,7 +45,7 @@ yum -y install mysql-community-devel mysql-community-client mysql-community-shar
 yum -y install gettext-devel perl-CPAN perl-devel
 # sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 if [ ! -L /u ] && [ -d /mnt/c/u ] ; then
-    ln -s /mnt/c/u /u ;
+    ln -s /mnt/c/u / ;
 fi
 if [ ! -e /usr/local/bin/git-crypt ] ; then
     mkdir -p /usr/local/src

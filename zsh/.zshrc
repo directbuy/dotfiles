@@ -129,16 +129,14 @@ fi
 export LESS='-i -R --silent'
 export MORE='-d'
 
-if [[ "${terminfo[khome]}" != "" ]]; then
-  bindkey "${terminfo[khome]}" beginning-of-line      # [Home] - Go to beginning of line
-fi
-if [[ "${terminfo[kend]}" != "" ]]; then
-  bindkey "${terminfo[kend]}"  end-of-line            # [End] - Go to end of line
-fi
+# these are wsl- conemu- specific
+bindkey '^[[H' beginning-of-line      # [Home] - Go to beginning of line
+bindkey '^[[F'  end-of-line            # [End] - Go to end of line
 bindkey '^[[1;5C' forward-word                        # [Ctrl-RightArrow] - move forward one word
 bindkey '^[[1;5D' backward-word                       # [Ctrl-LeftArrow] - move backward one word
 bindkey '^Z' undo
 bindkey '^_' backward-kill-word
+bindkey '^[[3;5~' kill-word
 if [[ "${terminfo[kcbt]}" != "" ]]; then
   bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
 fi
