@@ -16,10 +16,8 @@ alias promote_staging='git checkout staging ; git pull ; git checkout master ; g
 alias start_celery='C_FORCE_ROOT=1 celery worker -A topenguins -l info -c 1'
 alias check_restore_status='sqlcmd -U sa -S localhost -Q "select command, percent_complete from sys.dm_exec_requests where command like '"'"'restore database%'"'"'"'
 alias kpyc="find . -name '*.pyc' -delete"
-alias kpyc="find . -name '*.pyc' -delete"
 alias tf='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TF.exe'
 alias tfs_build='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TFSBuild.exe'
-alias charm='/mnt/c/Program\ Files\ \(x86\)/JetBrains/PyCharm\ 2017.3.3/bin/pycharm64.exe'
+alias charm='/mnt/c/Program\ Files\ \(x86\)/JetBrains/PyCharm\ 2018.2/bin/pycharm64.exe'
 alias find_mail_errors="for x in `sudo tail -50000 /var/log/maillog | grep -Ei '(quota|perm|fail|error)' | cut -d':' -f4` ; do sudo grep $x /var/log/maillog | grep -i from | sed -E 's,^(.{15}).*from=<(.*)>.*$,\1     \2,'; done"
-alias devenv='/mnt/c/vs2017/Common7/IDE/devenv.exe'
 alias djt='dj run_integration_tests -t'
