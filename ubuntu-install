@@ -6,7 +6,6 @@ user=${1:-`whoami`};
 home_dir=$(eval echo "~${user}")
 echo "Installing dotfiles for $user"
 pushd $home_dir > /dev/null
-sudo apt-get -y install zsh > /dev/null
 sudo chsh -s `which zsh` $user;
 ln -f -s $dotfiles_dir /tmp/dotfiles ;
 chmod 0775 /tmp/dotfiles ;
