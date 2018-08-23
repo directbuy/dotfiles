@@ -19,5 +19,9 @@ alias kpyc="find . -name '*.pyc' -delete"
 alias tf='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TF.exe'
 alias tfs_build='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TFSBuild.exe'
 alias charm='/mnt/c/Program\ Files\ \(x86\)/JetBrains/PyCharm\ 2018.2/bin/pycharm64.exe'
-alias find_mail_errors="for x in `sudo tail -50000 /var/log/maillog | grep -Ei '(quota|perm|fail|error)' | cut -d':' -f4` ; do sudo grep $x /var/log/maillog | grep -i from | sed -E 's,^(.{15}).*from=<(.*)>.*$,\1     \2,'; done"
+function find_mail_errors() {
+    for x in `sudo tail -50000 /var/log/maillog | grep -Ei '(quota|perm|fail|error)' | cut -d':' -f4` ; do
+        sudo grep $x /var/log/maillog | grep -i from | sed -E 's,^(.{15}).*from=<(.*)>.*$,\1     \2,';
+    done
+}
 alias djt='dj run_integration_tests -t'
