@@ -12,7 +12,8 @@ chmod 0775 /tmp/dotfiles ;
 sudo -u $user rsync -rltD /tmp/dotfiles/vim/ $home_dir
 sudo -u $user rsync -rltD /tmp/dotfiles/zsh/ $home_dir
 sudo -u $user rsync -rltD /tmp/dotfiles/ipython/ $home_dir
-sudo -u $user rsync -rltD /tmp/dotfiles/screen/ $home_dir
+if [[ -f /tmp/dotfiles/zsh/$user.zsh_aliases ]]; then
+  sudo -u $user cp /tmp/dotfiles/zsh/$user.zsh_aliases $home_dir/.zsh_aliases  
+fi
 rm /tmp/dotfiles ;
-sudo find ${home_dir} -mindepth 1 -type d -exec sudo chmod 0700 {} \;
-
+sudo find ${home_dir} -mindepth 1 -type d -\! -name '.cache' -prune -\! -name 'pip' -prune -\! -name '.npm' -prune -exec sudo chmod 0700 {} \;

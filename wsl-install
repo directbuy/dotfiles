@@ -1,10 +1,8 @@
 #!/bin/bash
 rsync -rltD /u/dotfiles/vim/ ~
 rsync -rltD /u/dotfiles/zsh/ ~
-# rsync -rltD /u/dotfiles/git/ ~
 rsync -rltd /u/dotfiles/ipython/ ~
 rsync -rltd /u/dotfiles/bash/ ~
-rsync -rltd /u/dotfiles/screen/ ~
 if [[ -f /u/dotfiles/zsh/$USER.zsh_aliases ]] ; then
   rm -f ~/.zsh_aliases
   cp /u/dotfiles/zsh/dbuy.zsh_aliases ~/.zsh_aliases
@@ -14,6 +12,6 @@ else
   cp /u/dotfiles/zsh/dbuy.zsh_aliases ~/.zsh_aliases
 fi
 pushd ~
-find . -mindepth 1 -type d -exec chmod 0700 {} \;
+find . -mindepth 1 -type d -\! -name '.cache' -prune -\! -name 'pip' -prune -\! -name '.npm' -prune -exec sudo chmod 0700 {} \;
 popd
 source ~/.zshrc || true

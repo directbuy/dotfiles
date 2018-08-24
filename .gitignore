@@ -4,3 +4,4 @@ ssh
 zsh.d/venvs
 pycharm
 .idea
+/.vs/

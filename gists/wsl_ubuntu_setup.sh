@@ -18,7 +18,7 @@ function build_python {
     rm -rf "${pdir}"
 }
 apt update
-apt install sudo
+apt install -y sudo
 sudo apt install -y software-properties-common
 sudo apt update
 echo "America/Chicago" >/etc/timezone
@@ -40,7 +40,7 @@ if [ ! -d /u/dotfiles ] ; then
   git clone https://github.com/2ps/dotfiles ;
 fi
 sudo usermod -a -G root,staff `whoami`
-pip3 install -U pip ansible awscli ipython
+pip install -U pip ansible awscli ipython
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 sudo wget https://packages.microsoft.com/config/ubuntu/18.04/prod.list -O "/etc/apt/sources.list.d/mssql-release.list"
 sudo apt update
