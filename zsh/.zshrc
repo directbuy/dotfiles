@@ -164,6 +164,10 @@ fi
 if [ -e ~/.local_zsh ] ; then
     source ~/.local_zsh
 fi
+if [ -d ~/.nvm ]; then
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+fi
 
 function update_dns() {
     comment=$(head -1 /etc/resolv.conf)
