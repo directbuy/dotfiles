@@ -52,10 +52,9 @@ typeset -ga chpwd_functions
 chpwd_functions+='chpwd_auto_venv'
 
 # Prompt
-dummy=$(which python)
-if which python ; then
+if which python >/dev/null; then
     export platform=$(python -m platform)
-elif which python3.6 ; then
+elif which python3.6 >/dev/null; then
     export platform=$(python3.6 -m platform)
 fi ;
 if [ -f /etc/docker.conf ] ; then
