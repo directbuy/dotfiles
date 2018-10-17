@@ -136,6 +136,8 @@ export MORE='-d'
 # these are wsl- conemu- specific
 bindkey '^[[H' beginning-of-line      # [Home] - Go to beginning of line
 bindkey '^[[F'  end-of-line            # [End] - Go to end of line
+bindkey '^[[1' beginning-of-line      # [Home] - Go to beginning of line
+bindkey '^[[4'  end-of-line            # [End] - Go to end of line
 bindkey '^[[1;5C' forward-word                        # [Ctrl-RightArrow] - move forward one word
 bindkey '^[[1;5D' backward-word                       # [Ctrl-LeftArrow] - move backward one word
 bindkey '^Z' undo

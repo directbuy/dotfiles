@@ -15,3 +15,4 @@ pushd ~
 find . -mindepth 1 -type d -\! -name '.cache' -prune -\! -name 'pip' -prune -\! -name '.npm' -prune -exec sudo chmod 0700 {} \;
 popd
 source ~/.zshrc || true
+
