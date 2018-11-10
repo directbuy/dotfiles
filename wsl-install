@@ -3,9 +3,9 @@ pushd $(dirname "$0") >/dev/null
 dotfiles_dir=`pwd -P`
 popd
 rsync -rltD "${dotfiles_dir}/vim/" ~
-rsync -rltD "${dotfiles_dir}/zsh/ ~
-rsync -rltd "${dotfiles_dir}/ipython/ ~
-rsync -rltd "${dotfiles_dir}/bash/ ~
+rsync -rltD "${dotfiles_dir}/zsh/" ~
+rsync -rltd "${dotfiles_dir}/ipython/" ~
+rsync -rltd "${dotfiles_dir}/bash/" ~
 if [[ -f zsh/$USER.zsh_aliases ]] ; then
   rm -f ~/.zsh_aliases
   cp ${dotifles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
@@ -15,7 +15,7 @@ else
   cp ${dotfiles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
 fi
 pushd ~
-find . -mindepth 1 -type d -\! -name '.cache' -prune -\! -name 'pip' -prune -\! -name '.npm' -prune -exec sudo chmod 0700 {} \;
+find . -mindepth 1 -type d -\! -name '.cache' -prune -\! -name 'pip' -prune -\! -name '.npm' -prune -exec chmod 0700 {} \;
 popd
 source ~/.zshrc || true
 

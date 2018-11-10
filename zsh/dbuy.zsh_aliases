@@ -26,3 +26,4 @@ function find_mail_errors() {
 }
 alias djt='dj run_integration_tests -t'
 alias bonton_redshift='psql postgresql://awsuser@redshift-cluster-1.cdcvef269gao.us-east-2.redshift.amazonaws.com:5439/dev?sslmode=require'
+alias greet='echo "hello, Ron"'
