@@ -10,6 +10,14 @@ function go {
   rsync -rltD "${dotfiles_dir}/git/" $home_dir
   rsync -rltd "${dotfiles_dir}/ipython/" $home_dir
   rsync -rltd "${dotfiles_dir}/screen/" $home_dir
+    if [[ -f ${dotfiles_dir}/zsh/$USER.zsh_aliases ]] ; then
+      rm -f ~/.zsh_aliases
+      cp ${dotifles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
+      cat ${dotfiles_dir}/zsh/$USER.zsh_aliases >>~/.zsh_aliases
+    else
+      rm -f ~/.zsh_aliases
+      cp ${dotfiles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
+    fi
 }
 
 go 
