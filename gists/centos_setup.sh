@@ -88,7 +88,7 @@ if [ ! -e /usr/bin/git-crypt ] ; then
 fi
 cd /u
 if [ ! -d dotfiles ] ; then
-    git clone https://github.com/2ps/dotfiles ;
+    git clone https://github.com/directbuy/dotfiles ;
 else
     cd dotfiles && git pull
 fi

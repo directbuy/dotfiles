@@ -37,7 +37,7 @@ build_python "2.7.15"
 build_python "3.6.6"
 if [ ! -d /u/dotfiles ] ; then
   cd /u ;
-  git clone https://github.com/2ps/dotfiles ;
+  git clone https://github.com/directbuy/dotfiles ;
 fi
 sudo usermod -a -G root,staff `whoami`
 pip install -U pip ansible awscli ipython
