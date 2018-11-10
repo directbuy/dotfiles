@@ -12,7 +12,7 @@ function go {
   rsync -rltd "${dotfiles_dir}/screen/" $home_dir
     if [[ -f ${dotfiles_dir}/zsh/$USER.zsh_aliases ]] ; then
       rm -f ~/.zsh_aliases
-      cp ${dotifles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
+      cp ${dotfiles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
       cat ${dotfiles_dir}/zsh/$USER.zsh_aliases >>~/.zsh_aliases
     else
       rm -f ~/.zsh_aliases
