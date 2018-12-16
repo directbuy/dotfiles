@@ -23,7 +23,7 @@ sudo apt install -y software-properties-common
 sudo apt update
 echo "America/Chicago" >/etc/timezone
 sudo apt install -y libmysqlclient-dev wget git redis curl libcurl4-openssl-dev \
-    sqlite3 libsqlite3-dev htop vim tmux \
+    sqlite3 libsqlite3-dev htop vim tmux libbz2-dev \
     openssl libssl-dev libffi6 libffi-dev zsh zip unzip \
     libjpeg-dev libjpeg-turbo8-dev libfreetype6-dev libncurses5-dev \
     libreadline-dev libz3-dev gcc gcc-5 g++ g++-5 less \
@@ -34,7 +34,7 @@ sudo apt install -y libmysqlclient-dev wget git redis curl libcurl4-openssl-dev 
 if [[ ! -e /u ]] ; then sudo ln -s /mnt/c/u / ; fi
 mkdir -p /u/downloads
 build_python "2.7.15"
-build_python "3.6.6"
+build_python "3.6.7"
 if [ ! -d /u/dotfiles ] ; then
   cd /u ;
   git clone https://github.com/directbuy/dotfiles ;
