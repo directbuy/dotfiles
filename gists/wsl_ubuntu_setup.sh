@@ -57,3 +57,4 @@ fi
 source ~/.bashrc
 sudo apt install -y unixodbc-dev pv
 sudo chsh -s /bin/zsh
+sudo update-alternatives --set editor /usr/bin/vim.basic
