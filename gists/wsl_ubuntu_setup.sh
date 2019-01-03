@@ -58,3 +58,4 @@ source ~/.bashrc
 sudo apt install -y unixodbc-dev pv
 sudo chsh -s /bin/zsh
 sudo update-alternatives --set editor /usr/bin/vim.basic
+sudo sed -Ei 's,HashKnownHosts\s+yes,HashKnownHosts no,g' /etc/ssh/ssh_config
