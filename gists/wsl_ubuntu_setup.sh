@@ -35,7 +35,7 @@ if [[ ! -e /u ]] ; then sudo ln -s /mnt/c/u / ; fi
 mkdir -p /u/downloads
 build_python "2.7.15"
 build_python "3.6.7"
-if [ ! -d /u/dotfiles ] ; then
+if [[ ! -d /u/dotfiles ]] ; then
   cd /u ;
   git clone https://github.com/directbuy/dotfiles ;
 fi
