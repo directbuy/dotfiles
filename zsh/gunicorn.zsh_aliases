@@ -1,4 +1,4 @@
-alias godj='[[ -d /u/to_penguins]] && cd /u/to_penguins || [[ -d /u/for_penguins ]] && cd /u/for_penguins'
+alias godj='[[ -d /u/to_penguins ]] && cd /u/to_penguins'
 alias djact='godj && . bin/activate'
 alias dj='godj && djact && ./manage.py'
 alias djsp='dj shell_plus'
