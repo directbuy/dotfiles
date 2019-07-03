@@ -30,7 +30,7 @@ sudo apt install -y libmysqlclient-dev wget git redis curl libcurl4-openssl-dev 
     make automake autoconf nfs-common bind9utils rsync gnupg \
     libldap2-dev libsasl2-dev build-essential checkinstall \
     libreadline7 libreadline-dev libncursesw5-dev tk-dev libgdbm-dev libc6-dev \
-    git-crypt traceroute dnsutils net-tools mysql-client-5.7
+    git-crypt traceroute dnsutils net-tools mysql-client-5.7 python3-dev
 if [[ ! -e /u ]] ; then sudo ln -s /mnt/c/u / ; fi
 mkdir -p /u/downloads
 build_python "2.7.15"
@@ -40,7 +40,7 @@ if [[ ! -d /u/dotfiles ]] ; then
   git clone https://github.com/directbuy/dotfiles ;
 fi
 sudo usermod -a -G root,staff `whoami`
-pip install -U pip ansible awscli ipython
+pip install -U pip ansible awscli ipython wheel
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 sudo wget https://packages.microsoft.com/config/ubuntu/18.04/prod.list -O "/etc/apt/sources.list.d/mssql-release.list"
 sudo apt update
