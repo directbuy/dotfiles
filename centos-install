@@ -6,7 +6,7 @@ user="${1:-`whoami`}"
 home_dir=$(eval echo "~${user}")
 echo "Installing dotfiles for $user"
 pushd $home_dir > /dev/null
-sudo chsh -s `grep -i zsh /etc/shells` $user;
+sudo chsh -s `grep -i zsh /etc/shells | head -1` $user;
 for x in vim zsh ipython ; do
     sudo -u $user rsync -rlvtD --no-p --chmod=D0700,F600 "${dotfiles_dir}/${x}/" $home_dir
 done
