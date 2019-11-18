@@ -2,10 +2,10 @@
 pushd $(dirname "$0") >/dev/null
 dotfiles_dir=`pwd -P`
 popd
-rsync --no-p --chmod=D0700,F600 "${dotfiles_dir}/vim/" ~
-rsync --no-p --chmod=D0700,F600 "${dotfiles_dir}/zsh/" ~
-rsync --no-p --chmod=D0700,F600 "${dotfiles_dir}/ipython/" ~
-rsync --no-p --chmod=D0700,F600 "${dotfiles_dir}/bash/" ~
+rsync -rv --no-p --chmod=D0700,F600 "${dotfiles_dir}/vim/" ~
+rsync -rv --no-p --chmod=D0700,F600 "${dotfiles_dir}/zsh/" ~
+rsync -rv --no-p --chmod=D0700,F600 "${dotfiles_dir}/ipython/" ~
+rsync -rv --no-p --chmod=D0700,F600 "${dotfiles_dir}/bash/" ~
 if [[ -f zsh/$USER.zsh_aliases ]] ; then
   rm -f ~/.zsh_aliases
   cp ${dotifles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
