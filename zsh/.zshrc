@@ -7,7 +7,8 @@
 
 fpath=(~/.zsh.d/functions $fpath)
 autoload -U ~/.zsh.d/functions/*(:t)
-plugins=(aws django git yum docker docker-compose docker-machine)
+plugins=(aws django fabric git yum docker docker-compose docker-machine)
+source ~/.zsh.d/functions/history-substring-search.zsh
 autoload -Uz compinit
 compinit
 
@@ -130,6 +131,9 @@ fi
 if [ -f /usr/bin/aws_zsh_completer.sh ] ; then
     source /usr/bin/aws_zsh_completer.sh
 fi
+if [ -f /usr/local/bin/aws_zsh_completer.sh ] ; then
+    source /usr/local/bin/aws_zsh_completer.sh
+fi
 export LESS='-i -R --silent'
 export MORE='-d'
 
@@ -140,9 +144,13 @@ bindkey '^[[1~' beginning-of-line      # [Home] - Go to beginning of line
 bindkey '^[[4~'  end-of-line            # [End] - Go to end of line
 bindkey '^[[1;5C' forward-word                        # [Ctrl-RightArrow] - move forward one word
 bindkey '^[[1;5D' backward-word                       # [Ctrl-LeftArrow] - move backward one word
+# bindkey '^[OC' forward-word                        # [Ctrl-RightArrow in tmux] - move forward one word
+# bindkey '^[OD' backward-word                       # [Ctrl-LeftArrow in tmux] - move backward one word
 bindkey '^Z' undo
 bindkey '^_' backward-kill-word
 bindkey '^[[3;5~' kill-word
+bindkey "^[[A" history-substring-search-up
+bindkey "^[[B" history-substring-search-down
 if [[ "${terminfo[kcbt]}" != "" ]]; then
   bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
 fi
@@ -176,3 +184,7 @@ function update_dns() {
     aws_dns=$(tail -2 /etc/resolv.conf)
     printf "${comment}\n${aws_dns}\n${local_dns}\n" | sudo tee /etc/resolv.conf
 }
+if [[ -f "/etc/profile.d/rvm.sh" ]] ; then
+    source "/etc/profile.d/rvm.sh"
+fi
+
