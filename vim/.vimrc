@@ -14,4 +14,4 @@ set softtabstop=4 "insert/delete 4 spaces with TAB/BACKSPACE
 set autoindent "align new line to indent with previous lin
 set wildmode=longest,list,full
 set wildmenu
-
+set encoding=utf-8
