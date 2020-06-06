@@ -69,7 +69,7 @@ RPROMPT='$(rprompt)'
 TZ=CST6CDT
 # Aliases
 which dircolors >/dev/null
-if [ -f ~/.dircolors ] && [ ! $? ]; then
+if [[ -f ~/.dircolors ]] && [[ $? ]]; then
     eval $(dircolors -b ~/.dircolors) ;
 fi
 alias ls='ls --color=auto'
@@ -145,6 +145,7 @@ bindkey '^[[1;5D' backward-word                       # [Ctrl-LeftArrow] - move 
 # bindkey '^[OD' backward-word                       # [Ctrl-LeftArrow in tmux] - move backward one word
 bindkey '^Z' undo
 bindkey '^_' backward-kill-word
+bindkey '^H' backward-kill-word
 bindkey '^[[3;5~' kill-word
 bindkey "^[[A" history-substring-search-up
 bindkey "^[[B" history-substring-search-down
