@@ -21,24 +21,27 @@ local docker=false;
 local prefix="";
 local stupid_mac=false
 local border_color=""
+local blue="%{\e[34m%}"
+local white="%{\e[37;1m%}"
+local magenta="%{\e[36m%}"
 if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
     prefix="wsl"
-    border_color="\e[0m";
+    border_color="%{\e[0m%}";
 else
    if [ -n "${docker_image}" ] ; then
        # echo "docker setting prefix to: [${docker_image}]" >> .logfile
        prefix="${docker_image}";
        docker=true;
-       border_color="\e[31m";
+       border_color="%{\e[31m%}";
    else
        if [[ "${platform}" =~ (amzn|centos|ubuntu) ]] ; then
            remote=true ;
-           border_color="\e[34m";
+           border_color="%{\e[34m%}";
        else
            if [[ "${platform}" =~ cygwin ]] ; then
                prefix="cygwin";
-               border_color="\e[35m";
+               border_color="%{\e[35m%}";
                cygwin=true;
            else
                if [[ "${platform}" =~ darwin ]] ; then
@@ -63,28 +66,7 @@ promptTitle () {
 aux_functions+=(promptTitle)
 
 promptCwd () {
-    # local pwd="$(pwd)"
-    # local cwd="$(print -P '%~')"
-    # local h="$(basename "$cwd")"
-    # local t="$(dirname "$cwd")"
-    # if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
-    #     t=''
-    # elif [[ $t == '/' ]]; then
-    # else
-    #     t="$t/"
-    # fi
-    # if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
-    #     t="\e[33m...\e[0m"
-    #     if [[ $pwd != $VIRTUAL_ENV ]]; then
-    #         t+=$(dirname $(echo $pwd | sed "s#$VIRTUAL_ENV##"))
-    #         if [[ ! $t == */ ]]; then
-    #             t+="/"
-    #         fi
-    #     else
-    #         h=""
-    #     fi
-    # fi
-    print "\e[0m$(pwd)"
+    print "$(pwd)"
 }
 first_row_functions+=(promptCwd)
 
@@ -92,24 +74,10 @@ export VIRTUAL_ENV_DISABLE_PROMPT=yes
 promptVenv () {
     if [[ -n $VIRTUAL_ENV ]]; then
         local venv=$(basename $VIRTUAL_ENV)
-        print "[\e[34m$venv\e[0m]"
+        print "$venv"
     fi
 }
 first_row_functions+=(promptVenv)
-
-# promptHg () {
-#    if hg status >/dev/null 2>&1; then
-#         local branch=$(hg branch)
-#         local revision=$(hg identify | cut -d' ' -f1)
-#           print -n "[\e[31m$branch $revision\e[0m]"
-#         if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
-#             print " \e[41;37;1m!\e[0m"
-#         else
-#             print ""
-#         fi
-#     fi
-# }
-# first_row_functions+=(promptHg)
 
 promptGit () {
     if [ "${cygwin}" = "true" ] ; then
@@ -121,24 +89,28 @@ promptGit () {
     if git rev-parse --git-dir >/dev/null 2>&1; then
         local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
         local revision=$(git rev-parse --short --verify HEAD 2>/dev/null || echo "<empty>")
-        print -n "[\e[34m$branch $revision\e[0m]"
+        print -n "$branch $revision"
         # performance is relatively awful
         # for anything other than native linux
-        if [[ -n "$(git ls-files -m)" ]]; then
-            print " \e[37;1m*\e[0m" ;
+    fi
+}
+
+promptDirty() {
+    if [ "${cygwin}" = "true" ] ; then
+        return
+    fi
+    if ! which git 2>&1 >/dev/null; then
+        return
+    fi
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        if ! git diff-index --quiet --ignore-submodules HEAD -- ; then
+            print -n "*" ;
         else
-            print ""
+            print -n ""
         fi
     fi
 }
 first_row_functions+=(promptGit)
-
-# promptIce () {
- #   if [[ "$(hostname)" =~ "ice" ]]; then
- #       print "\e[42;37;1mice\e[0m"
- #   fi
-# }
-#second_row_functions+=(promptIce)
 
 function promptEnv {
     print "${prefix}"
@@ -146,7 +118,7 @@ function promptEnv {
 second_row_functions+=(promptEnv)
 
 promptUserHost () {
-    print -P "\e[36m%n@%m\e[0m" ;
+    print -P "%n@%m" ;
 }
 second_row_functions+=(promptUserHost)
 
@@ -155,113 +127,111 @@ promptDate () {
 }
 second_row_functions+=(promptDate)
 
-# promptMail () {
-#     if ! which mail 2>&1 >/dev/null; then
-#        return
-#    fi
-#    if ! command mail -e; then
-#        return
-#    fi
-#    count=$(command mail -H | wc -l | awk '{print $1}')
-#    print "[\e[35;1mmail\e[0m:\e[35;1m$count\e[0m]"
-#}
-#second_row_functions+=(promptMail)
-
-#promptTodoDotTxt () {
-#    if [[ -f $HOME/Documents/todo.txt ]]; then
-#        local tasks="$(wc -l ~/Documents/todo.txt | awk '{print $1}')"
-#        if [[ $tasks -gt 0 ]]; then
-#            print "[\e[33mtodo\e[0m: \e[33;1m$tasks\e[0m]"
-#        fi
-#    fi
-#}
-#second_row_functions+=(promptTodoDotTxt)
-
 promptHistoryNumber () {
     print -P "[\e[36m%!\e[0m]"
 }
 # second_row_functions+=(promptHistoryNumber)
 
 promptPrompt () { # :)
-    print "➤"
-}
-
-strip_ansi () {
-    echo "$(echo "${1}" | sed $sed_options "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")"
-}
-
-perceivedLength () {
-    if [ ! $stupid_mac ] ; then
-        echo "${#$(echo "${1}" | sed -r "s/\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]//g")}"
+    if [[ $EUID == 0 ]]; then
+        print "➤"
     else
-        echo "${#$(echo "${1}" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g')}"
+        print "➤"
     fi
 }
 
 prompt () {
     # start=$(date +%s%N | cut -b1-13)
     [[ $TERM == eterm* ]] && export TERM=xterm
-    [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
+    # [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     local dash='─'
     local dash_length=$#dash
     # local first_row="┌── " second_row="│" third_row="└ " current=""
-    local reset_color="\e[0m"
+    local reset_color="%{\e[0m%}"
     local first_row="${border_color}┏━━${reset_color} "
     local second_row="${border_color}┣${reset_color}"
     local third_row="${border_color}┗${reset_color} "
     local current=""
-    integer flength slength
     for func in $aux_functions; do
         $func
     done
 
-    integer fdashes=3
-    for func in $first_row_functions; do
-        current=$($func | tr -d '\n')
-        if [[ -n $current ]]; then
-            if [[ $func != $first_row_functions[1] ]] ; then
-                first_row+="${border_color}━━${reset_color} " ;
-                # first_row+="\e[34m──\e[0m " ;
-                (( fdashes += 2 ))
-            fi
-            first_row+="${current} "
+    integer flen=3
+    current="$(promptCwd)"
+    first_row+="${current} "
+    (( flen += 1 + ${#current} ))
+    first_row+="${border_color}━━${reset_color}"
+    (( flen += 2 ))
+    current="$(promptVenv)"
+    if [[ -n $current ]] ; then
+        first_row+=" [${blue}$current${reset_color}] "
+        (( flen += 4))
+        (( flen += ${#current} ))
+        first_row+="${border_color}━━${reset_color}"
+        (( flen += 2 ))
+    fi 
+    current="$(promptGit)"
+    if [[ -n $current ]] ; then
+        first_row+=" [${blue}$current${reset_color}] "
+        (( flen += 4 ))
+        (( flen += ${#current} ))
+        current="$(promptDirty)"
+        if [[ -n $current ]] ; then
+            first_row+="${white}$current${reset_color} "
+            (( flen += 1 ))
+            (( flen += ${#current} ))
         fi
-    done
-    flength=$(perceivedLength $first_row)
-    (( flength -= (dash_length - 1)  * fdashes ))
+    fi
+    
     integer sdashes=1
-    for func in $second_row_functions; do
-        current=$($func | tr -d '\n')
-        if [[ -n $current ]]; then
-            second_row+="${border_color}━━${reset_color} ${current} " ;
-            (( sdashes += 2 ))
-        fi
-    done
-    slength=$(perceivedLength $second_row)
-    (( slength -= (dash_length - 1) * sdashes ))
-    while (( flength < slength )); do
+    integer slen=1
+    current="$(promptEnv)"
+    if [[ -n $current ]] ; then
+        second_row+="${border_color}━━${reset_color}"
+        (( slen += 2 ))
+        second_row+=" ${current} "
+        (( slen += 2 ))
+        (( slen += ${#current} ))
+    fi
+    current="$(promptUserHost)"
+    if [[ -n $current ]] ; then
+        second_row+="${border_color}━━${reset_color}"
+        (( slen += 2 ))
+        second_row+=" ${magenta}${current}${reset_color} "
+        (( slen += 2 ))
+        (( slen += ${#current} ))
+    fi
+    current="$(promptDate)"
+    if [[ -n $current ]] ; then
+        second_row+="${border_color}━━${reset_color}"
+        (( slen += 2 ))
+        second_row+=" ${current} "
+        (( slen += 2 ))
+        (( slen += ${#current} ))
+    fi
+
+    while (( flen < slen )); do
         first_row+="${border_color}━${reset_color}" ;
         # first_row+="${border_color}─${reset_color}" ;
-        (( flength += 1 ))
+        (( flen += 1 ))
     done
-    while (( $flength > $slength )); do
+    while (( $flen > $slen )); do
         second_row+="${border_color}━${reset_color}" ;
         # second_row+="${border_color}─${reset_color}" ;
-        (( slength += 1 ))
+        (( slen += 1 ))
     done
 
     first_row+="${border_color}━┓${reset_color}" ;
     # first_row+="${border_color}─┐${reset_color}" ;
-    second_row+="${border_color}━┛${reset_color}" ;
+    second_row+="${border_color}━━┛${reset_color}" ;
     # second_row+="${border_color}─┘${reset_color}" ;
     # end=$(date +%s%N | cut -b1-13)
     # if [[ -n "${PROFILE_PROMPT}" ]] ; then
     #     third_row+="$((end-start))ms "
     # fi
-    third_row+=$(promptPrompt | tr -d '\n')
-    third_row+="%$(perceivedLength $third_row)G%} "
+    current=$(promptPrompt | tr -d '\n')
+    third_row+="${white}$current${reset_color} "
 
-    print -n "%{"
     print $first_row
     print $second_row
     print $third_row
@@ -272,22 +242,22 @@ prompt2 () {
 }
 
 rprompt () {
-    last_status=($pipestatus)
-    typeset -U uniqs
-    uniqs=($last_status)
+#     last_status=($pipestatus)
+#     typeset -U uniqs
+#     uniqs=($last_status)
 
-    if [[ "$uniqs" == "0" ]]; then
-        return
-    fi
-
-    if [[ $#last_status > 1 ]]; then
-        local plural="es"
-    else
-        local plural=""
-    fi
-    if [[ $last_status != 0 ]]; then
-        local current='%!'
-        integer last=${(%)current}-1
-        print "%F{cyan}$last%F{red} failed with status$plural %B${last_status}%b"
-    fi
+#     if [[ "$uniqs" == "0" ]]; then
+#         return
+#     fi
+# 
+#     if [[ $#last_status > 1 ]]; then
+#         local plural="es"
+#     else
+#         local plural=""
+#     fi
+#     if [[ $last_status != 0 ]]; then
+#         local current='%!'
+#         integer last=${(%)current}-1
+#         print "%F{cyan}$last%F{red} failed with status$plural %B${last_status}%b"
+#     fi
 }

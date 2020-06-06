@@ -109,10 +109,6 @@ if which colordiff > /dev/null 2>/dev/null; then
 fi
 
 
-if [ -f ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-    source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-
 if [ -e ~/.zshenv ]; then
     # Machine local config
     source ~/.zshenv

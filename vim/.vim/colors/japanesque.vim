@@ -57,7 +57,8 @@ call s:hi('DiffAdd',    { 'guifg': 'fg', 'guibg': s:green})
 call s:hi('DiffDelete', { 'guifg': 'fg', 'guibg': s:red})
 call s:hi('DiffChange', { 'guifg': 'fg', 'guibg': s:yellow})
 call s:hi('DiffText',   { 'gui': 'reverse', 'guifg': 'fg', 'guibg': s:yellow})
-call s:hi('MatchParen', { 'guibg': s:yellow})
+hi clear MatchParen
+call s:hi('MatchParen', { 'gui': 'bold', 'cterm': 'underline', 'ctermfg': 'blue' })
 
 if version >= 700
   call s:hi('Cursor', { 'gui': 'reverse', 'guifg': 'NONE', 'guibg': 'NONE' })
@@ -81,6 +82,10 @@ call s:hi('Function',   { 'guifg': s:green })
 call s:hi('Conceal',    { 'guifg': s:dark_gray })
 call s:hi('Special',    { 'guifg': s:yellow })
 call s:hi('Title',      { 'guifg': s:purple })
+hi clear SpellBad
+" hi SpellBad cterm=underline
+call s:hi('SpellBad',      { 'gui': 'underline', 'ctermfg': 'red', 'cterm': 'underline' })
+
 
 highlight default link Noise Conceal
 
