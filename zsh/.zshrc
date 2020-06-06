@@ -72,6 +72,7 @@ which dircolors >/dev/null
 if [ -f ~/.dircolors ] && [ ! $? ]; then
     eval $(dircolors -b ~/.dircolors) ;
 fi
+alias ls='ls --color=auto'
 alias ll='ls -lFH'
 alias la='ls -lAhS'
 alias grep='grep --color=auto'
