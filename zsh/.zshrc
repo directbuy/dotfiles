@@ -8,6 +8,7 @@
 fpath=(~/.zsh.d/functions $fpath)
 autoload -U ~/.zsh.d/functions/*(:t)
 plugins=(aws django fabric git yum docker docker-compose docker-machine)
+source ~/.zsh.d/functions/zsh-syntax-highlighting.zsh
 source ~/.zsh.d/functions/history-substring-search.zsh
 autoload -Uz compinit
 compinit
