@@ -1,4 +1,5 @@
 set number
+set t_u7=
 colorscheme japanesque
 syntax on
 "Turn off the stupid bell in zsh/centos
