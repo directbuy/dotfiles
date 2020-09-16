@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2018-08-07 21:00:57" build="180626">
-			<value name="StartType" type="hex" data="01"/>
+		<key name=".Vanilla" modified="2020-09-13 18:10:12" build="200713">
+			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>
 			<value name="StartTasksFile" type="string" data=""/>
-			<value name="StartTasksName" type="string" data=""/>
+			<value name="StartTasksName" type="string" data="{posh7}"/>
 			<value name="StartFarFolders" type="hex" data="00"/>
 			<value name="StartFarEditors" type="hex" data="00"/>
 			<value name="StartCreateDelay" type="ulong" data="100"/>
@@ -97,18 +97,19 @@
 			<value name="JumpListAutoUpdate" type="hex" data="01"/>
 			<value name="SaveCmdHistory" type="hex" data="01"/>
 			<value name="CmdLineHistory" type="multi">
+				<line data="{posh7}"/>
+				<line data="{poshadmin}"/>
+				<line data="{cmdadmin}"/>
+				<line data="{ubuntu}"/>
 				<line data="{cygwin}"/>
 				<line data="{centos}"/>
 				<line data="{Bash::bash}"/>
-				<line data="{cmdadmin}"/>
-				<line data="{poshadmin}"/>
 				<line data="{git}"/>
 				<line data="{posh}"/>
 				<line data="{Shells::cmd}"/>
 				<line data="{psadmin}"/>
 				<line data="{Bash::CygWin bash}"/>
 				<line data="{Shells::PowerShell (Admin)}"/>
-				<line data="{ubuntu}"/>
 				<line data="{Bash::Git bash}"/>
 				<line data="{Shells::PowerShell}"/>
 			</value>
@@ -134,11 +135,11 @@
 			<value name="Multi.SplitWidth" type="hex" data="04"/>
 			<value name="Multi.SplitHeight" type="hex" data="04"/>
 			<value name="KeyboardHooks" type="hex" data="01"/>
-			<value name="FontName" type="string" data="Apercu for Powerline"/>
+			<value name="FontName" type="string" data="Consolas"/>
 			<value name="FontName2" type="string" data="Consolas"/>
 			<value name="FontAutoSize" type="hex" data="00"/>
-			<value name="FontSize" type="ulong" data="18"/>
-			<value name="FontSizeX" type="ulong" data="10"/>
+			<value name="FontSize" type="ulong" data="17"/>
+			<value name="FontSizeX" type="ulong" data="9"/>
 			<value name="FontUseDpi" type="hex" data="01"/>
 			<value name="FontUseUnits" type="hex" data="01"/>
 			<value name="FontSizeX2" type="ulong" data="0"/>
@@ -165,12 +166,12 @@
 			<value name="AutoSaveSizePos" type="hex" data="01"/>
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
-			<value name="WindowMode" type="dword" data="00000520"/>
-			<value name="ConWnd X" type="long" data="704"/>
+			<value name="WindowMode" type="dword" data="00000521"/>
+			<value name="ConWnd X" type="long" data="0"/>
 			<value name="ConWnd Y" type="long" data="0"/>
-			<value name="LastMonitor" type="string" data="0,0,1600,840"/>
-			<value name="ConWnd Width" type="dword" data="0000003b"/>
-			<value name="ConWnd Height" type="dword" data="00000009"/>
+			<value name="LastMonitor" type="string" data="0,0,1920,1200"/>
+			<value name="ConWnd Width" type="dword" data="00000044"/>
+			<value name="ConWnd Height" type="dword" data="0000000e"/>
 			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="QuakeStyle" type="hex" data="00"/>
 			<value name="Restore2ActiveMon" type="hex" data="00"/>
@@ -415,7 +416,7 @@
 			<value name="Update.DownloadPath" type="string" data="%TEMP%\ConEmu"/>
 			<value name="Update.LeavePackages" type="hex" data="00"/>
 			<value name="Update.PostUpdateCmd" type="string" data="echo Last successful update&gt;ConEmuUpdate.info &amp;&amp; date /t&gt;&gt;ConEmuUpdate.info &amp;&amp; time /t&gt;&gt;ConEmuUpdate.info"/>
-			<key name="HotKeys" modified="2018-05-29 15:06:18" build="180528">
+			<key name="HotKeys" modified="2018-12-19 20:14:39" build="180626">
 				<value name="KeyMacroVersion" type="hex" data="02"/>
 				<value name="Multi.Modifier" type="dword" data="00000011"/>
 				<value name="Multi.ArrowsModifier" type="dword" data="000000a2"/>
@@ -529,8 +530,8 @@
 				<value name="Key.BufPrDn" type="dword" data="00121122"/>
 				<value name="Key.BufCursor" type="dword" data="00005d08"/>
 				<value name="Key.ResetTerm" type="dword" data="00000000"/>
-				<value name="FontLargerKey" type="dword" data="000011d0"/>
-				<value name="FontSmallerKey" type="dword" data="000011d1"/>
+				<value name="FontLargerKey" type="dword" data="0000116b"/>
+				<value name="FontSmallerKey" type="dword" data="0000116d"/>
 				<value name="FontOriginalKey" type="dword" data="00001104"/>
 				<value name="PasteFileKey" type="dword" data="00101146"/>
 				<value name="PastePathKey" type="dword" data="00101144"/>
@@ -612,8 +613,8 @@
 				<value name="CheckUpdates" type="dword" data="00105b55"/>
 				<value name="Multi.NewWndConfirm" type="dword" data="00000000"/>
 			</key>
-			<key name="Tasks" modified="2018-08-07 21:00:57" build="180626">
-				<value name="Count" type="long" data="5"/>
+			<key name="Tasks" modified="2020-09-13 01:10:33" build="191012">
+				<value name="Count" type="long" data="8"/>
 				<key name="Task1" modified="2018-07-28 21:19:56" build="180626">
 					<value name="Name" type="string" data="{cmdadmin}"/>
 					<value name="Flags" type="dword" data="00000004"/>
@@ -623,21 +624,21 @@
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task2" modified="2018-07-28 21:19:56" build="180626">
+				<key name="Task2" modified="2020-09-13 18:10:12" build="200713">
 					<value name="Name" type="string" data="{poshadmin}"/>
-					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Flags" type="dword" data="00000005"/>
 					<value name="Hotkey" type="dword" data="00121150"/>
 					<value name="GuiArgs" type="string" data=""/>
 					<value name="Cmd1" type="string" data="powershell.exe -new_console:a"/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task3" modified="2018-07-28 21:19:56" build="180626">
-					<value name="Name" type="string" data="{centos}"/>
-					<value name="Flags" type="dword" data="00000007"/>
+				<key name="Task3" modified="2020-09-13 18:10:12" build="200713">
+					<value name="Name" type="string" data="{ubuntu}"/>
+					<value name="Flags" type="dword" data="00000006"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data='-icon "%USERPROFILE%\AppData\Local\lxss\bash.ico"'/>
-					<value name="Cmd1" type="string" data='set "PATH=%ConEmuBaseDirShort%\wsl;%PATH%" &amp; %ConEmuBaseDirShort%\conemu-cyg-64.exe --wsl -cur_console:pm:/mnt'/>
+					<value name="Cmd1" type="string" data='set "PATH=%ConEmuBaseDirShort%\wsl;%PATH%" &amp; %ConEmuBaseDirShort%\conemu-cyg-64.exe %ConEmuBaseDirShort%\wsl\wslbridge2.exe -cur_console:pm:/mnt'/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
@@ -658,6 +659,33 @@
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data='set CHERE_INVOKING=1 &amp; set "PATH=%ConEmuDrive%\cygwin64\bin;%PATH%" &amp; %ConEmuBaseDirShort%\conemu-cyg-64.exe -new_console:p %ConEmuDrive%\cygwin64\bin\bash.exe --login -i -new_console:C:"%ConEmuDrive%\cygwin64\Cygwin.ico"'/>
+				</key>
+				<key name="Task6" modified="2020-09-13 18:10:12" build="200713">
+					<value name="Name" type="string" data="{posh7}"/>
+					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Hotkey" type="dword" data="00121137"/>
+					<value name="GuiArgs" type="string" data=""/>
+					<value name="Active" type="long" data="0"/>
+					<value name="Count" type="long" data="1"/>
+					<value name="Cmd1" type="string" data="pwsh.exe -new_console:a"/>
+				</key>
+				<key name="Task7" modified="2020-09-13 01:10:33" build="191012">
+					<value name="Name" type="string" data="{Helper::Show ANSI colors}"/>
+					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Hotkey" type="dword" data="00000000"/>
+					<value name="GuiArgs" type="string" data=""/>
+					<value name="Active" type="long" data="0"/>
+					<value name="Count" type="long" data="1"/>
+					<value name="Cmd1" type="string" data='cmd.exe /k type "%ConEmuBaseDir%\Addons\AnsiColors16t.ans" -cur_console:n'/>
+				</key>
+				<key name="Task8" modified="2020-09-13 01:10:33" build="191012">
+					<value name="Name" type="string" data="{Tools::Chocolatey (Admin)}"/>
+					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Hotkey" type="dword" data="00000000"/>
+					<value name="GuiArgs" type="string" data=""/>
+					<value name="Active" type="long" data="0"/>
+					<value name="Count" type="long" data="1"/>
+					<value name="Cmd1" type="string" data='*cmd.exe /k Title Chocolatey &amp; "%ConEmuBaseDir%\Addons\ChocolateyAbout.cmd"'/>
 				</key>
 			</key>
 			<key name="Apps" modified="2017-12-14 08:50:18" build="170819">
@@ -859,6 +887,10 @@
 			<value name="StatusBar.Hide.WMode" type="hex" data="01"/>
 			<value name="Language" type="string" data="en"/>
 			<value name="RestoreInactive" type="hex" data="00"/>
+			<value name="AnsiLogCodes" type="hex" data="00"/>
+			<value name="AutoReloadEnvironment" type="hex" data="01"/>
+			<value name="AutoTrimSingleLine" type="hex" data="00"/>
+			<value name="StatusBar.Hide.InputGrouping" type="hex" data="00"/>
 		</key>
 	</key>
 </key>

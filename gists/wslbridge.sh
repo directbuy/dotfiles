@@ -7,7 +7,7 @@ url="https://cygwin.com/snapshots/x86_64/cygwin1-20200909.dll.xz"
 /usr/bin/wget "${url}" -O /u/downloads/cygwin1.dll.xz
 cd /u/downloads
 /usr/bin/xz --decompress cygwin1.dll.xz
-/usr/bin/7z x wslbridge2_cygwin_x86_64.7z
+/usr/bin/7z x wslbridge2.7z
 # at this point, the necessary files will be in c:\u\downloads on the windows side
 cd "/mnt/c/Program Files/ConEmu/ConEmu/wsl"
 mv cygwin1.dll cygwin1.dll.old
