@@ -7,7 +7,11 @@ cd /u/downloads
 url=https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 filename=/u/downloads/aws-cfn-bootstrap.tar.gz
 wget $url -O $filename
-pip2.7 install $filename
+if [[ -e /usr/bin/pip2.7 ]] || [[ -e /usr/local/bin/pip2.7 ]] ; then
+    pip2.7 install $filename
+else 
+    pip install $filename
+fi
 mkdir -p /opt/aws/bin
 ln -s /usr/init/redhat/cfn-hup /etc/init.d/cfn-hup
 chmod 775 /usr/init/redhat/cfn-hup
