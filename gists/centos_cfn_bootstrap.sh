@@ -15,7 +15,6 @@ ln -s /usr/bin/cfn-hup /opt/aws/bin/cfn-hup
 ln -s /usr/bin/cfn-signal /opt/aws/bin/cfn-signal
 ln -s /usr/bin/cfn-init /opt/aws/bin/cfn-init
 ln -s /usr/bin/cfn-get-metadata /opt/aws/bin/cfn-get-metadata
-ln -s /usr/bin/cfn-signal /opt/aws/bin/cfn-signal
 ln -s /usr/bin/cfn-send-cmd-event /opt/aws/bin/cfn-send-cmd-event
 ln -s /usr/bin/cfn-send-cmd-result /opt/aws/bin/cfn-send-cmd-result
 
