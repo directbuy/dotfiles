@@ -74,7 +74,7 @@ RPROMPT='$(rprompt)'
 TZ=CST6CDT
 # Aliases
 which dircolors >/dev/null
-if [[ -f ~/.dircolors ]] && [[ $? ]]; then
+if [ -f $HOME/.dircolors ] && [ $? ]; then
     eval $(dircolors -b ~/.dircolors) ;
 fi
 alias ls='ls --color=auto'
