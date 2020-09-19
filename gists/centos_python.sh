@@ -13,7 +13,9 @@ tar xzf $filename --strip-components=1
 ./configure
 make altinstall
 cd /u/downloads
-wget https://bootstrap.pypa.io/get-pip.py
+if [[ ! -f get-pip.py ]] ; then
+    wget https://bootstrap.pypa.io/get-pip.py
+fi
 suffix=${version%.*}
 "python${suffix}" get-pip.py
 
