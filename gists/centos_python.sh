@@ -6,7 +6,7 @@ url="https://www.python.org/ftp/python/$version/Python-$version.tgz"
 filename="/u/downloads/python_$version.tgz"
 if [[ ! -f $filename ]] ; then
     wget $url -O $filename
-]]
+fi
 mkdir -p /u/python_$version
 cd /u/python_$version
 tar xzf $filename --strip-components=1
