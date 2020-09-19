@@ -7,10 +7,7 @@ filename="/u/downloads/python_$version.tgz"
 wget $url -O $filename
 mkdir -p /u/python_$version
 cd /u/python_$version
-tar xzf $filename
-/u/python_$version
-cd /u/python_$version
-tar xzf $filename
+tar xzf $filename --strip-components=1
 ./configure
 make altinstall
 
