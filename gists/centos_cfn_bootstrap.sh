@@ -1,5 +1,6 @@
 #!/bin/bash
 # should be run as root
+
 yum -y install python27 python27-devel wget
 mkdir -p /u/downloads
 cd /u/downloads
