@@ -10,4 +10,8 @@ cd /u/python_$version
 tar xzf $filename --strip-components=1
 ./configure
 make altinstall
+cd /u/downloads
+wget https://bootstrap.pypa.io/get-pip.py
+python2.7 get-pip.py
+
 
