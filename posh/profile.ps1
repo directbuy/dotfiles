@@ -106,7 +106,11 @@ function global:prompt {
     $z = $pieces1.Add(($dir, [ConsoleColor]::Gray))
     $length1 += 2 + $dir.Length
     if (($virtualenv) -and ($virtualenv.Length -gt 0)) {
-        $virtualenv = Split-Path $virtualenv -Leaf
+        $venv_name = Split-Path $virtualenv -Leaf
+        if ($venv_name -eq ".wenv") {
+            $venv_name = Split-path -Leaf (Split-Path $virtualenv -Parent)
+        }
+        $virtualenv = $venv_name
         $z = $pieces1.Add(("($virtualenv)", [ConsoleColor]::DarkCyan))
         $length1 += 6 + $virtualenv.Length
     }
@@ -186,8 +190,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/iRuRjfEbQvzIjo+4FbaBhUp
-# e8OgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUISbjNkZnbPJ7s957PdT0h4Sb
+# /N2gggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -252,11 +256,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
 # IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU7Aiwn2uYAI2Q
-# gOGtzVPlm4x4jWswDQYJKoZIhvcNAQEBBQAEggEAYGvtxBNFeA6xSEvZC3EAtxRX
-# ILF5GG9ogr7f81sywTycjibQLEEHM6Zkmro9rDTSGnOL65FlSJAfIGnwGhayo4wE
-# lYsJX5ulM1k5ws4RNK17xr58oan0PmMnpy481KJ+PQQ2fwJDD0r29G7wBUPeBNTM
-# 36ORh05YYrU8zfFKa4ANOaNA2SCQf2uDIQCwqVDrXIJaSdCJ1TzR02eYNS01YmIn
-# lTlzoyPvLbAomxaRgj2sWRx9tjO4VQlW5XDUWH9logib2/0hoO6gVmd4CFWEY6Bk
-# piZ6IXV8AKiIIJZUw2NecfxOATyN9hKne/BWgUHsIU5Yi1u04WO9Ko/gn7bMeg==
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUUFkSusnWH8Vx
+# wjpsgVSbAW+ZYUEwDQYJKoZIhvcNAQEBBQAEggEAa6r8R91mJKhOnQcKpymZoDe0
+# 4ShQVdbHtYyrgDxy4gzBIusljbDKd7cEScaGQEHqFb1/2C51MCLecR2DLMWr7NST
+# P5zbDL0GMNAp/SitWo/VyMszdpwm+Xob3pzUCxcpDc8sQ9djtxr2lN0GdRcTguHX
+# 5v8litP2tJwPp64zGtg2QdXw5PxnDQDflZOF/bTphZr3irwwuL3nEaB1Zic14keQ
+# BQ7dMxGCCi25RqLNVuqr4yOf8NCriypNPDnmglH7KYtj6cjSQIGB0Y9avJI9q1rP
+# 0E/AzhmqazKHxWEdpQDk7lts8CyrnS8rzdofO/9rZ7/hwBRsYdwdqPgsakEnzA==
 # SIG # End signature block
