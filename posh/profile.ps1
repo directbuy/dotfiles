@@ -97,7 +97,7 @@ function venv($name="") {
 
 function djact() {
     if ((Test-Path ".wenv") -and (Test-Path ".wenv\scripts\activate.ps1")) {
-        . .wenv\scripts\activate.ps1
+        Import-Module -Scope global .wenv\scripts\activate.ps1
     }
     else {
         $name = ([io.fileinfo]"$pwd").basename
@@ -231,8 +231,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUi5nyw7Sfu03TkHB1zsJX0oXC
-# xmWgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBNKL2xOYsiS13byEFnMdgj3g
+# ORqgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -297,11 +297,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
 # IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU7Wfbt4+KYHQ5
-# QINvpjSrkOOmP/MwDQYJKoZIhvcNAQEBBQAEggEAMrOaOK7zuTkT9gotqHLeT9re
-# zmBF6tWWEpXuKK5Cmps/mdWZH+beXtRagobrljeFr+iW+ao8+3GTHQfY0GtJd3EW
-# 6nz9gXaXqM2j4YQX4gi0gehQultNdlqpOuOJ+zSr4cE7ZFc5MooG5dSJOPhH+edS
-# wx4goTmjDEeIhIDeEgiWnsr7uyHy3t3A44bC01OUpxwl3t8DKis2jjsdXU7FqtAR
-# slcdvj7sZvzQ5EksAAkF5N0NyHeV+Qm18/gBYYyiDw1NYszw+neyiL20oyIkBMTV
-# 3nC4HQMOziKFBESMJ+SAQsxxGTJ5887MfFVqgniECRUhIHral/DNgicGSQA60Q==
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUBMzr8S7EnnV4
+# MfHFCmgkp6kYpw4wDQYJKoZIhvcNAQEBBQAEggEAAvey+AOihNd16ag3UK0pO/Lb
+# 7EL1VFEIK5UqnW+ao276sNOalEZwGV0WXXsN+Y4gP8VMuX3azcPGCbrDylPu7851
+# xUl/YWVlr4L8Dtt40tqfgNQAbW6GANOUMWpYkSoP7Jn9aW6lJrwXIZyJuWdRYFEt
+# SOXi/QyStQ/Fh6LMm4rgDrf76VBowTg+auTfpJ1kkRL7bE0/JypcBrX/bdPDCq+F
+# xqFHgWvM2j5nEzoEx0qtj8gT9j4HTJxFZb97QxIqSBD7fbn9LICIEu2NHkp9Mji8
+# 8o1OZw4KyehLxL/YDXQTBUcbaeVobxf7KBKG3ICI0CCn94GVMR4pLXi+hpzDkQ==
 # SIG # End signature block
