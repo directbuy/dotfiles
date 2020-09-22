@@ -51,8 +51,8 @@ function venv($name="") {
 
 
 function djact() {
-    if ((Test-Path ".wenv") -and (Test-Path ".wenv\scripts\activate.ps1")) {
-        Import-Module -Scope global .wenv\scripts\activate.ps1
+    if ((Test-Path ".wenv") -and (Test-Path ".\.wenv\scripts\activate.ps1")) {
+        Import-Module ".\.wenv\scripts\activate.ps1" -Scope global
     }
     else {
         $name = ([io.fileinfo]"$pwd").basename
@@ -186,8 +186,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqaQT0sLkPgff78Sl9hMV32uo
-# 7jugggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/iRuRjfEbQvzIjo+4FbaBhUp
+# e8OgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -252,11 +252,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
 # IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUlaodHIArKU1B
-# vBJ/qmpxkPRUcR4wDQYJKoZIhvcNAQEBBQAEggEAWPVICgOQNvyYBfeyr8zEslit
-# gK+U1VEA8mBTgXp0AaGSJu8mQ6wLX4QHDmvzB/ujiO8fdPzzvogeDf6/QuDpkGXM
-# mi8r3GlJ6be8AirPV2LTC+3cYyoRTr/E+nEKALLA+2TmBncyx31f5HrBeOfF3qh5
-# iLuEtYn5m6DTaULdx3fsmKhwAaBIVjPGtfGI7rZVykw3UK6CnwN3p79LlfL3Za1T
-# jpsFLXE08rWZZvPvKx7+vw1luhtVKvRWgovKRAW6k2FTWuTjdXKbSHl7ZwLvRmqE
-# wF6nek7IwQ7+XbqWnoB5NW9oMUsZMuLV9p73Wqpzkx6ZojrSrwM6/VmiOBBZcQ==
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU7Aiwn2uYAI2Q
+# gOGtzVPlm4x4jWswDQYJKoZIhvcNAQEBBQAEggEAYGvtxBNFeA6xSEvZC3EAtxRX
+# ILF5GG9ogr7f81sywTycjibQLEEHM6Zkmro9rDTSGnOL65FlSJAfIGnwGhayo4wE
+# lYsJX5ulM1k5ws4RNK17xr58oan0PmMnpy481KJ+PQQ2fwJDD0r29G7wBUPeBNTM
+# 36ORh05YYrU8zfFKa4ANOaNA2SCQf2uDIQCwqVDrXIJaSdCJ1TzR02eYNS01YmIn
+# lTlzoyPvLbAomxaRgj2sWRx9tjO4VQlW5XDUWH9logib2/0hoO6gVmd4CFWEY6Bk
+# piZ6IXV8AKiIIJZUw2NecfxOATyN9hKne/BWgUHsIU5Yi1u04WO9Ko/gn7bMeg==
 # SIG # End signature block
