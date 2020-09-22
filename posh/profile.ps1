@@ -74,7 +74,7 @@ function djsp() {
 
 function weather($city="Chicago") {
     $weather = (Invoke-WebRequest "https://wttr.in/${city}" -UserAgent "curl").content
-    $weather = $weather -split "`r`n"
+    $weather = $weather -split "`n"
     for ($x = 0; $x -lt 17; ++$x) {
         Write-Host $weather[$x]
     }
@@ -186,8 +186,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUF4XdNXy1w6Ba/CD00BChMOvB
-# VCGgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqaQT0sLkPgff78Sl9hMV32uo
+# 7jugggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -252,11 +252,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
 # IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU+r84cdFIkFck
-# ouVyAgZfzefC+vswDQYJKoZIhvcNAQEBBQAEggEAHjkyC5Ik6m9DIRG3GKUsHFJf
-# jNSeHIoksrhQEDbORH7EMaR1ZVjbzoWu30NDeod9/Pe3LtOOjEVIJ14zPzt+SK9M
-# Tk8kiTn1KoNWBge1M7fu5nmYDjDqteOaZK9MIToAMVd2eAoQiyLGJMq8u8Q0zIpM
-# pnoDEq6INLCMBThIcrcBpvqhwbWcUH4YcEsRDQ+IDibNSXqd58vt6muLG+MfhlVv
-# DpcBMae3NC/ALWyRKcmVOMMaopqHCKNeb3jzFBDSrb2xZBup+kxzQE3ElplP6yfm
-# loQpgxWOU6WbxWAVlO3HzsR0qb4CzWXcqwGij7T6Zq0QYGNKsIhJXU4eqHErkQ==
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUlaodHIArKU1B
+# vBJ/qmpxkPRUcR4wDQYJKoZIhvcNAQEBBQAEggEAWPVICgOQNvyYBfeyr8zEslit
+# gK+U1VEA8mBTgXp0AaGSJu8mQ6wLX4QHDmvzB/ujiO8fdPzzvogeDf6/QuDpkGXM
+# mi8r3GlJ6be8AirPV2LTC+3cYyoRTr/E+nEKALLA+2TmBncyx31f5HrBeOfF3qh5
+# iLuEtYn5m6DTaULdx3fsmKhwAaBIVjPGtfGI7rZVykw3UK6CnwN3p79LlfL3Za1T
+# jpsFLXE08rWZZvPvKx7+vw1luhtVKvRWgovKRAW6k2FTWuTjdXKbSHl7ZwLvRmqE
+# wF6nek7IwQ7+XbqWnoB5NW9oMUsZMuLV9p73Wqpzkx6ZojrSrwM6/VmiOBBZcQ==
 # SIG # End signature block
