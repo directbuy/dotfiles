@@ -10,7 +10,7 @@ function connect($pshost) {
 
 function setup_dircolors() {
     $dircolors = "C:\u\dotfiles\zsh\.dircolors"
-    if (Test-Path $dircolors -and (!Test-Path "${env:HOMEDRIVE}${env:HOMEPATH}\.dircolors")) {
+    if (Test-Path $dircolors -and (!(Test-Path "${env:HOMEDRIVE}${env:HOMEPATH}\.dircolors"))) {
         copy $dircolors "${env:HOMEDRIVE}${env:HOMEPATH}"
         Update-DirColors $dircolors
     }
@@ -26,7 +26,7 @@ function venv($name="") {
         foreach ($x in $pythons.keys) {
             $python = $pythons[$x]
             if (Test-Path $python) {
-                $python -m venv .wenv
+                &$python -m venv .wenv
                 break
             }
         }
