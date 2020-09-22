@@ -73,7 +73,7 @@ function djsp() {
 }
 
 function weather($city="Chicago") {
-    $weather = (curl "https://wttr.in/${city}").ParsedHtml.body.outerText
+    $weather = (Invoke-WebRequest "https://wttr.in/${city}" -UserAgent "curl").content
     $weather = $weather -split "`r`n"
     for ($x = 0; $x -lt 17; ++$x) {
         Write-Host $weather[$x]
@@ -186,8 +186,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULiW0ovfOKzCu7aAXFGltHfQ0
-# ljGgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUF4XdNXy1w6Ba/CD00BChMOvB
+# VCGgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -252,11 +252,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
 # IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUhSr2G9gfe5Vh
-# XkkVKdsodmLxfwcwDQYJKoZIhvcNAQEBBQAEggEAYtHTCJT2H+emlQYZsApCxtnP
-# 7aTf1wffxlbyuWENFir9pkxKlec7DYqUzH+v2khDy5K3sLXmddCpfeLT3iGichCH
-# aVboiZJgsIFN4AFhBKCRfR2aeHS96lMgX6B2reRihP5kgyhb+ZCUCbbbEPVbuloz
-# BF45o4Ba/+0Q4vybQW8lDg7CeZ4CJMWETe+18w1dueiEkWbel+W06uGVMgq1NCa3
-# qp81ya/mnOkNSD+TYOZedlDPZOEQJbIRHPw0O4oUZOY85R3WlIFGQkChEepiUvAe
-# ANrAFRibY7e9+38ZBywOg9BYJG/1281I7RV3FoJZe/EqxCgX46LK3fK4mk3wOA==
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU+r84cdFIkFck
+# ouVyAgZfzefC+vswDQYJKoZIhvcNAQEBBQAEggEAHjkyC5Ik6m9DIRG3GKUsHFJf
+# jNSeHIoksrhQEDbORH7EMaR1ZVjbzoWu30NDeod9/Pe3LtOOjEVIJ14zPzt+SK9M
+# Tk8kiTn1KoNWBge1M7fu5nmYDjDqteOaZK9MIToAMVd2eAoQiyLGJMq8u8Q0zIpM
+# pnoDEq6INLCMBThIcrcBpvqhwbWcUH4YcEsRDQ+IDibNSXqd58vt6muLG+MfhlVv
+# DpcBMae3NC/ALWyRKcmVOMMaopqHCKNeb3jzFBDSrb2xZBup+kxzQE3ElplP6yfm
+# loQpgxWOU6WbxWAVlO3HzsR0qb4CzWXcqwGij7T6Zq0QYGNKsIhJXU4eqHErkQ==
 # SIG # End signature block
