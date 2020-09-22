@@ -52,7 +52,7 @@ function venv($name="") {
 
 function djact() {
     if ((Test-Path ".wenv") -and (Test-Path ".\.wenv\scripts\activate.ps1")) {
-        Import-Module ".\.wenv\scripts\activate.ps1" -Scope global
+        . ".\.wenv\scripts\activate.ps1" 
     }
     else {
         $name = ([io.fileinfo]"$pwd").basename
@@ -190,8 +190,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUISbjNkZnbPJ7s957PdT0h4Sb
-# /N2gggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbTBFN+joz7b2LA5aAHRttFn6
+# YLmgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -256,11 +256,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
 # IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUUFkSusnWH8Vx
-# wjpsgVSbAW+ZYUEwDQYJKoZIhvcNAQEBBQAEggEAa6r8R91mJKhOnQcKpymZoDe0
-# 4ShQVdbHtYyrgDxy4gzBIusljbDKd7cEScaGQEHqFb1/2C51MCLecR2DLMWr7NST
-# P5zbDL0GMNAp/SitWo/VyMszdpwm+Xob3pzUCxcpDc8sQ9djtxr2lN0GdRcTguHX
-# 5v8litP2tJwPp64zGtg2QdXw5PxnDQDflZOF/bTphZr3irwwuL3nEaB1Zic14keQ
-# BQ7dMxGCCi25RqLNVuqr4yOf8NCriypNPDnmglH7KYtj6cjSQIGB0Y9avJI9q1rP
-# 0E/AzhmqazKHxWEdpQDk7lts8CyrnS8rzdofO/9rZ7/hwBRsYdwdqPgsakEnzA==
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUJnUx3y6LdJQS
+# 8Uq9HLFybXEVdkQwDQYJKoZIhvcNAQEBBQAEggEAqI8zvp1P70RdM2VeRBZI0o1B
+# mmq6go0eK0U0+q4AMbKnhfPo9a124vI/qVmQPEma3hxlM+k2OMOti7+OFdzYB5pj
+# Reknb58YmlsZlz6hwozUvER8/Eb+1k64P/FILZA2BPHkhzvkKh8MJ3z+EQ3u+CLp
+# yGlLqOy1i2CfG1JCcwQeJuzoX3wWXzxegUF2QA06TLfvITyc8LiB+VanyzXw49ud
+# /yaT8j6mTGijnI8Yj+Y6XT7qCGZdRUeVvxG02yyP6cp6UxNzoYberMFt+Mv86O7r
+# OJyqe6+jCi+qUD0AhmakQDYPAfF/WXE727iwF7G7Ihy0ko1FrjMVW5fxLq69Cg==
 # SIG # End signature block
