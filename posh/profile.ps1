@@ -203,6 +203,8 @@ Function touch {
     }
 }
 
+Set-Alias vi vim
+
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 Import-Module DirColors
 ipmo DockerCompletion
