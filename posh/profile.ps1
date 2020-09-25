@@ -180,6 +180,30 @@ function global:prompt {
     return " "
 }
 
+Function touch {
+    $help = "Usage: touch [f1, f2, ... fN]";
+    if ($args.Count -eq 0) {
+        throw $help;
+    }
+    foreach($file in $args) {
+        if ($file -ilike "-h*" -or $file -ilike "--h*") {
+            echo $help;
+            return;
+        }
+    }
+
+    #update access time or create file
+    foreach($file in $args) {
+        if(Test-Path -LiteralPath $file) {
+            (Get-ChildItem -LiteralPath $file).LastWriteTime = Get-Date
+        }
+        else {
+            echo $null | Out-File -Encoding ascii -LiteralPath $file
+        }
+    }
+}
+
+Set-Alias vi vim
 
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 Import-Module DirColors
