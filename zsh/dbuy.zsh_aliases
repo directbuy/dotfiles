@@ -26,3 +26,92 @@ function find_mail_errors() {
 }
 alias djt='dj run_integration_tests -t'
 alias bonton_redshift='psql postgresql://awsuser@redshift-cluster-1.cdcvef269gao.us-east-2.redshift.amazonaws.com:5439/dev?sslmode=require'
+
+function git_made_easy(){
+    local CURRENT_BRANCH
+    local COMMIT_MESSAGE
+    local -A ARGERROR
+    local -A ARGDETAIL
+    local -A RESTRICTED
+    ARGDETAIL=(c "Commit all files to current branch" r "Rebase all local changes" b "Checkout to a local branch" R "Rebase current branch with dev")
+    ARGERROR=(c "Commit Message" b "Branch Name")
+    RESTRICTED=('dev' 1 'staging' 1 'production' 1 'master' 1)
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    function commit_all() {
+        if [[ -n "$RESTRICTED[$CURRENT_BRANCH]" ]]; then
+            echo "You are on not on a feature branch. ABORTING COMMIT!"
+        else
+            COMMIT_MESSAGE="$1"
+            git add .
+            git commit -m "[$CURRENT_BRANCH] $COMMIT_MESSAGE"
+        fi
+    }
+    function checkout_existing() {
+        git checkout $1
+    }
+    function rebase_branch() {
+        if [[ -n "$RESTRICTED[$CURRENT_BRANCH]" ]]; then
+            echo "You are not on a feature branch. ABORTING REBASE!"
+        else
+            local NUM
+            NUM=$(git log --oneline dev.. | wc -l)
+            echo "Rebasing $NUM commits on $CURRENT_BRANCH"
+            git rebase -i HEAD~${NUM}
+        fi
+    }
+    function rebase_dev() {
+        if [[ -n "$RESTRICTED[$CURRENT_BRANCH]" ]]; then
+            echo "On a restricted branch. ABORTING!!"
+        else
+            echo "Rebasing $CURRENT_BRANCH with dev"
+            checkout_existing dev
+            git pull
+            checkout_existing $CURRENT_BRANCH
+            git rebase origin/dev
+        fi
+    }
+    function help() {
+        echo "Usage: gme [-h] [-c] [-b] [-r] [-R]"
+        echo "Only one option allowed at a time(for now)"
+        echo "Restricted branches are dev, staging, master and production."
+        echo "-h: displays this help"
+        echo "-c [<arg>]: commits all files of current branch with given commit message prefixed by [BRANCHNAME]"
+        echo "-b [<arg>]: switch to an existing branch"
+        echo "-r: rebases all commits of current branch (only works if branched off of dev)"
+        echo "-R: rebases current branch with dev"
+    }
+    while getopts ":c:rRb:h" opt; do
+        case $opt in
+            c)
+                commit_all $OPTARG
+                return
+                ;;
+            r)
+                rebase_branch
+                return
+                ;;
+            R)
+                rebase_dev
+                return
+                ;;
+            b)
+                checkout_existing $OPTARG
+                return
+                ;;
+            \?)
+                echo "Unknown option: -$OPTARG"
+                help
+                return
+                ;;
+            :)
+                echo "Option -$OPTARG ($ARGDETAIL[$OPTARG]) requires an argument: $ARGERROR[$OPTARG]"
+                return
+                ;;
+            h)
+                help
+                return
+                ;;
+        esac
+    done
+}
+alias gme='git_made_easy'
