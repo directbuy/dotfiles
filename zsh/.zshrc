@@ -192,4 +192,10 @@ function update_dns() {
 if [[ -f "/etc/profile.d/rvm.sh" ]] ; then
     source "/etc/profile.d/rvm.sh"
 fi
+if [ ! -e ~/.rman_history ] ; then
+    touch ~/.rman_history ;
+fi
+if [ ! -e ~/.sqlplus_history ] ; then
+    touch ~/.sqlplus_history
+fi
 

@@ -115,3 +115,5 @@ function git_made_easy(){
     done
 }
 alias gme='git_made_easy'
+alias sqlplus="rlwrap -i -f ~/.sqlplus_history -H ~/.sqlplus_history -s 30000 sqlplus"
+alias rman="rlwrap -i -f ~/.rman_history -H ~/.rman_history -s 30000 rman"
