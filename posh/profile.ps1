@@ -1,4 +1,124 @@
 ﻿
+###> I like Bash. Give me more bash ###
+$bashCommands = "awk", "emacs", "grep", "head", "less", "ls", "man", "sed", "seq", "ssh", "tail", "touch"
+
+$bashCommands | ForEach-Object { Invoke-Expression @"
+Remove-Item Alias:$_ -Force -ErrorAction:Ignore
+function global:$_() {
+    for (`$i = 0; `$i -lt `$args.Count; `$i++) {
+
+        if (Split-Path `$args[`$i] -IsAbsolute -ErrorAction Ignore) {
+            `$args[`$i] = Format_WslArgument (wsl.exe wslpath (`$args[`$i] -replace "\\", "/"))
+
+        } elseif (Test-Path `$args[`$i] -ErrorAction Ignore) {
+            `$args[`$i] = Format_WslArgument (`$args[`$i] -replace "\\", "/")
+        }
+    }
+
+    if (`$input.MoveNext()) {
+        `$input.Reset()
+        `$input | wsl.exe $_ (`$args -split ' ')
+    } else {
+        wsl.exe $_ (`$args -split ' ')
+    }
+}
+"@
+}
+
+Register-ArgumentCompleter -CommandName $bashCommands -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+
+    $F = switch ($commandAst.CommandElements[0].Value) {
+        {$_ -in "awk", "grep", "head", "less", "ls", "sed", "seq", "tail"} {
+            "_longopt"
+            break
+        }
+
+        "man" {
+            "_man"
+            break
+        }
+
+        "ssh" {
+            "_ssh"
+            break
+        }
+
+        Default {
+            "_minimal"
+            break
+        }
+    }
+
+    $COMP_LINE = "`"$commandAst`""
+    $COMP_WORDS = "('$($commandAst.CommandElements.Extent.Text -join "' '")')" -replace "''", "'"
+    for ($i = 1; $i -lt $commandAst.CommandElements.Count; $i++) {
+        $extent = $commandAst.CommandElements[$i].Extent
+        if ($cursorPosition -lt $extent.EndColumnNumber) {
+            $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
+            $COMP_CWORD = $i
+            break
+        } elseif ($cursorPosition -eq $extent.EndColumnNumber) {
+            $previousWord = $extent.Text
+            $COMP_CWORD = $i + 1
+            break
+        } elseif ($cursorPosition -lt $extent.StartColumnNumber) {
+            $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
+            $COMP_CWORD = $i
+            break
+        } elseif ($i -eq $commandAst.CommandElements.Count - 1 -and $cursorPosition -gt $extent.EndColumnNumber) {
+            $previousWord = $extent.Text
+            $COMP_CWORD = $i + 1
+            break
+        }
+    }
+
+    $currentExtent = $commandAst.CommandElements[$COMP_CWORD].Extent
+    $previousExtent = $commandAst.CommandElements[$COMP_CWORD - 1].Extent
+    if ($currentExtent.Text -like "/*" -and $currentExtent.StartColumnNumber -eq $previousExtent.EndColumnNumber) {
+        $COMP_LINE = $COMP_LINE -replace "$($previousExtent.Text)$($currentExtent.Text)", $wordToComplete
+        $COMP_WORDS = $COMP_WORDS -replace "$($previousExtent.Text) '$($currentExtent.Text)'", $wordToComplete
+        $previousWord = $commandAst.CommandElements[$COMP_CWORD - 2].Extent.Text
+        $COMP_CWORD -= 1
+    }
+
+    $command = $commandAst.CommandElements[0].Value
+    $bashCompletion = ". /usr/share/bash-completion/bash_completion 2> /dev/null"
+    $commandCompletion = ". /usr/share/bash-completion/completions/$command 2> /dev/null"
+    $COMPINPUT = "COMP_LINE=$COMP_LINE; COMP_WORDS=$COMP_WORDS; COMP_CWORD=$COMP_CWORD; COMP_POINT=$cursorPosition"
+    $COMPGEN = "bind `"set completion-ignore-case on`" 2> /dev/null; $F `"$command`" `"$wordToComplete`" `"$previousWord`" 2> /dev/null"
+    $COMPREPLY = "IFS=`$'\n'; echo `"`${COMPREPLY[*]}`""
+    $commandLine = "$bashCompletion; $commandCompletion; $COMPINPUT; $COMPGEN; $COMPREPLY" -split ' '
+
+    $previousCompletionText = ""
+    (wsl.exe $commandLine) -split '\n' |
+            Sort-Object -Unique -CaseSensitive |
+            ForEach-Object {
+                if ($wordToComplete -match "(.*=).*") {
+                    $completionText = Format_WslArgument ($Matches[1] + $_) $true
+                    $listItemText = $_
+                } else {
+                    $completionText = Format_WslArgument $_ $true
+                    $listItemText = $completionText
+                }
+
+                if ($completionText -eq $previousCompletionText) {
+                    $listItemText += ' '
+                }
+
+                $previousCompletionText = $completionText
+                [System.Management.Automation.CompletionResult]::new($completionText, $listItemText, 'ParameterName', $completionText)
+            }
+}
+
+function global:Format_WslArgument([string]$arg, [bool]$interactive) {
+    if ($interactive -and $arg.Contains(" ")) {
+        return "'$arg'"
+    } else {
+        return ($arg -replace " ", "\ ") -replace "([()|])", ('\$1', '`$1')[$interactive]
+    }
+}
+###< I now have some bash. ###
 
 function connect($pshost) {
     $credential = Get-Credential
@@ -178,29 +298,6 @@ function global:prompt {
     Write-Host "┗ " -nonewline -ForegroundColor DarkGreen
     Write-Host "➤" -foregroundcolor white -nonewline
     return " "
-}
-
-Function touch {
-    $help = "Usage: touch [f1, f2, ... fN]";
-    if ($args.Count -eq 0) {
-        throw $help;
-    }
-    foreach($file in $args) {
-        if ($file -ilike "-h*" -or $file -ilike "--h*") {
-            echo $help;
-            return;
-        }
-    }
-
-    #update access time or create file
-    foreach($file in $args) {
-        if(Test-Path -LiteralPath $file) {
-            (Get-ChildItem -LiteralPath $file).LastWriteTime = Get-Date
-        }
-        else {
-            echo $null | Out-File -Encoding ascii -LiteralPath $file
-        }
-    }
 }
 
 Set-Alias vi vim

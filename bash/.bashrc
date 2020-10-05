@@ -98,3 +98,7 @@ fi
 #if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 #    . /etc/bash_completion
 #fi
+
+export TUNDRA_ENV=local_docker
+
+fix_resolv_conf
