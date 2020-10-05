@@ -201,23 +201,23 @@ fi
 
 #previous behavior
 if [[ -f /mnt/c/Program\ Files/Docker/Docker/resources/docker.exe ]] ; then
-    export PATH=$PATH:/mnt/c/Program\\ Files/Docker/Docker/resources
+    export PATH=$PATH:/mnt/c/Program\ Files/Docker/Docker/resources
     alias docker="/mnt/c/Program\\ Files/Docker/Docker/resources/docker.exe"
 fi
 
 if [[ -f /mnt/c/Program\ Files/Docker/Docker/resources/bin/docker-compose.exe ]] ; then
-    export PATH=$PATH:/mnt/c/Program\\ Files/Docker/Docker/resources/bin
+    export PATH=$PATH:/mnt/c/Program\ Files/Docker/Docker/resources/bin
     alias docker-compose="/mnt/c/Program\\ Files/Docker/Docker/resources/bin/docker-compose.exe"
 fi
 
 #behavior as of 2020/10/05
 if [[ -f /c/Program\ Files/Docker/Docker/resources/docker.exe ]] ; then
-    export PATH=$PATH:/c/Program\\ Files/Docker/Docker/resources
+    export PATH=$PATH:/c/Program\ Files/Docker/Docker/resources
     alias docker="/c/Program\\ Files/Docker/Docker/resources/docker.exe"
 fi
 
 if [[ -f /c/Program\ Files/Docker/Docker/resources/bin/docker-compose.exe ]] ; then
-    export PATH=$PATH:/c/Program\\ Files/Docker/Docker/resources/bin
+    export PATH=$PATH:/c/Program\ Files/Docker/Docker/resources/bin
     alias docker-compose="/c/Program\\ Files/Docker/Docker/resources/bin/docker-compose.exe"
 fi
 
