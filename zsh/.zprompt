@@ -35,7 +35,7 @@ else
        docker=true;
        border_color="%{\e[31m%}";
    else
-       if [[ "${platform}" =~ (amzn|centos|ubuntu|el8|el7) ]] ; then
+       if [[ "${platform}" =~ (amzn|centos|ubuntu|el8|el7|amazon) ]] ; then
            remote=true ;
            border_color="%{\e[34m%}";
        else
