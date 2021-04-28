@@ -302,6 +302,12 @@ function global:prompt {
 
 Set-Alias vi vim
 
+# uncomment line for fleeting_fling if you have copied fleeting_fling.psm1 module into path:
+# C:\Users\wthompson\Documents\WindowsPowerShell\Modules\fleeting_fling\fleeting_fling.psm1
+# see README in Moduless dir of dotfiles
+#
+# Import-Module fleeting_fling
+
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 Import-Module DirColors
 ipmo DockerCompletion
