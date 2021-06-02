@@ -234,3 +234,9 @@ function __fix_resolv_conf() {
 function fix_resolv_conf() {
     sudo zsh -c "$(functions __fix_resolv_conf); __fix_resolv_conf"
 }
+
+
+# Mac conditionals - required to run upholstery commands on mac
+if [ "$(uname 2> /dev/null)" = "Darwin" ]; then
+    export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+fi
