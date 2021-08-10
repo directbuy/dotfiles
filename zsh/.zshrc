@@ -10,6 +10,7 @@ autoload -U ~/.zsh.d/functions/*(:t)
 plugins=(aws django fabric git yum docker docker-compose docker-machine)
 source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh.d/functions/history-substring-search.zsh
+source ~/.zsh.d/functions/_convoke
 autoload -Uz compinit
 compinit
 
