@@ -11,7 +11,7 @@ We use vim and [Z-Shell](http://www.zsh.org/) as our primary tools for getting t
 done. We track our code with [Git](http://git-scm.com/).  Much of that code is
 written in [Python](http://www.python.org/) and [NodeJS](http://www.nodejs.org).
 
-Our many thanks to the wonderful [Nick Meharry](https://github.com/nickmeharry/dotfiles/),
+Our many thanks to the wonderful [Cassie Meharry](https://github.com/cassiemeharry/dotfiles/),
 whose original dotfiles was a guide.
 
 * [chocolatey](chocolatey.md)
