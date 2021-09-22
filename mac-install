@@ -13,6 +13,8 @@ function go {
   chmod 0750 .vim
   chmod 0750 .zsh.d
   chmod 0750 .ipython
+  chmod 0755 /usr/local/share/zsh
+  chmod 0755 /usr/local/share/zsh/site-functions
     if [[ -f ${dotfiles_dir}/zsh/$USER.zsh_aliases ]] ; then
       rm -f ~/.zsh_aliases
       cp ${dotfiles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
