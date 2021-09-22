@@ -55,18 +55,10 @@ typeset -ga chpwd_functions
 chpwd_functions+='chpwd_auto_venv'
 
 # Prompt
-if which lsb_release >/dev/null ; then
-    export platform=$(lsb_release -i -s)
+if which python >/dev/null; then
+    export platform=$(python -m platform)
 elif which python3 >/dev/null; then
     export platform=$(python3 -m platform)
-elif which python >/dev/null; then
-    export platform=$(python -m platform)
-elif which python3.8 >/dev/null; then
-    export platform=$(python3.8 -m platform)
-elif which python3.7 >/dev/null; then
-    export platform=$(python3.7 -m platform)
-elif which python3.6 >/dev/null; then
-    export platform=$(python3.6 -m platform)
 fi ;
 if [ -f /etc/docker.conf ] ; then
     export docker_image=$(cat /etc/docker.conf) ;
