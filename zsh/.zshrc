@@ -55,7 +55,9 @@ typeset -ga chpwd_functions
 chpwd_functions+='chpwd_auto_venv'
 
 # Prompt
-if which python >/dev/null; then
+if [[ -f /proc/version ]] ; then
+    export platform="$(cat /proc/version)"
+elif which python >/dev/null; then
     export platform=$(python -m platform)
 elif which python3 >/dev/null; then
     export platform=$(python3 -m platform)
