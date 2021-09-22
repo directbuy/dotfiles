@@ -49,7 +49,7 @@ else
                border_color="%{\e[35m%}";
                cygwin=true;
            else
-               if [[ "${platform}" =~ darwin ]] ; then
+               if [[ "${platform}" =~ (darwin|macos) ]] ; then
                    stupid_mac=true
                    prefix="mac"
                fi
