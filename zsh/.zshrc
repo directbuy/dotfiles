@@ -82,9 +82,11 @@ which dircolors >/dev/null
 if [ -f $HOME/.dircolors ] && [ $? ]; then
     eval $(dircolors -b ~/.dircolors) ;
 fi
-alias ls='ls --color=auto'
-alias ll='ls -lFH'
-alias la='ls -lAhS'
+if [[ ! $platform =~ 'macOS*' ]] && [[ ! $platform =~ 'Darwin*' ]] ; then
+    alias ls='ls --color=auto'
+    alias ll='ls -lFH'
+    alias la='ls -lAhS'
+fi
 alias grep='grep --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
