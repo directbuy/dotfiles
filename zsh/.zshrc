@@ -78,14 +78,15 @@ PS2='$(prompt2)'
 RPROMPT='$(rprompt)'
 TZ=CST6CDT
 # Aliases
-which dircolors >/dev/null
-if [ -f $HOME/.dircolors ] && [ $? ]; then
-    eval $(dircolors -b ~/.dircolors) ;
-fi
-if [[ ! $platform =~ 'macOS*' ]] && [[ ! $platform =~ 'Darwin*' ]] ; then
-    alias ls='ls --color=auto'
-    alias ll='ls -lFH'
-    alias la='ls -lAhS'
+if whence dircolors >/dev/null; then
+  eval "$(dircolors -b)"
+  zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+  alias ls='ls --color=auto'
+  alias ll='ls -lFH'
+  alias la='ls -lAhS'
+else
+  export CLICOLOR=1
+  zstyle ':completion:*:default' list-colors ''
 fi
 alias grep='grep --color=auto'
 alias nano='nano -w'
