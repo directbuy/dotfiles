@@ -16,6 +16,7 @@ local -aU first_row_functions second_row_functions aux_functions
 local perceived_width_of_dash=1
 local remote=false;
 local wsl=false;
+local wsl2=false ;
 local cygwin=false;
 local docker=false;
 local prefix="";
@@ -28,6 +29,10 @@ if [[ "${platform}" =~ microsoft ]] ; then
     wsl=true ;
     prefix="wsl"
     border_color="%{\e[0m%}";
+    if [[ "${platform}" =~ wsl2 ]] ; then
+        wsl2=true ;
+        prefix="wsl2"
+    fi
 else
    if [ -n "${docker_image}" ] ; then
        # echo "docker setting prefix to: [${docker_image}]" >> .logfile
@@ -58,7 +63,7 @@ promptTitle () {
         return
     fi
     if [[ -n $VIRTUAL_ENV ]]; then
-        print "\e]1;($(basename $VIRTUAL_ENV)) $(basename $(pwd))\a"
+        print "\e]1;($(basename $VIRTUAL_ENV)) $(basename "$(pwd)")\a"
     else
         print -P "\e]1;%~\a"
     fi
