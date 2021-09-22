@@ -10,6 +10,9 @@ function go {
   rsync -rltD "${dotfiles_dir}/git/" $home_dir
   rsync -rltd "${dotfiles_dir}/ipython/" $home_dir
   rsync -rltd "${dotfiles_dir}/screen/" $home_dir
+  chmod 0750 .vim
+  chmod 0750 .zsh.d
+  chmod 0750 .ipython
     if [[ -f ${dotfiles_dir}/zsh/$USER.zsh_aliases ]] ; then
       rm -f ~/.zsh_aliases
       cp ${dotfiles_dir}/zsh/dbuy.zsh_aliases ~/.zsh_aliases
