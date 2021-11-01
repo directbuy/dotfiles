@@ -268,6 +268,10 @@ function global:prompt {
     $z = $pieces1.Add(($dir, [ConsoleColor]::Gray))
     $length1 += 2 + $dir.Length
     if ($virtualenv -and ($virtualenv.Length -gt 0)) {
+        if ($virtualenv.endswith(".wenv")) {
+            $virtualenv = Split-Path $virtualenv -Parent
+        }
+        
         $virtualenv = Split-Path $virtualenv -Leaf
         $z = $pieces1.Add(("($virtualenv)", [ConsoleColor]::DarkCyan))
         $length1 += 6 + $virtualenv.Length
@@ -382,8 +386,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzCkYmkUUPV2SLvN9zfI82K6Z
-# azSgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUdswXvOdt133Y7m3IPA7hDwHz
+# RU+gghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -478,11 +482,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUaaE/Bjd/mR/HDt/yT3MBNdNW/YUwDQYJKoZIhvcNAQEBBQAE
-# ggEAjK5m+Awfsb3cc5r90LzQ/pu5o2encqj8I/xy6RE61IW1GrtnkNVs5ee1b9O7
-# d/CqDKtXL8wFmTK4c6108/KPOMfEcRh6SbL2nKapZLjPKM5Iuihq3mZ2O4rUXDlY
-# R7uW62YTKB71+Byhq1MHsoUbv7W7Q+GVvC48xh2+Dj9y9yAyAUVKa6ThysHr7eRU
-# EH+hUxIKxJsALj2BVIRyX7aGR+/w9NJk3qLUNiLc9aXHTIUEUv9No1dyJfiLez5C
-# ftk4Wpf8nRWimISna1+fDzjLHQyEHoX9c70GOeZvExmxBTIniCkqDVTrGooTjmHI
-# tNOeFvat4tbl8SBlcIP5y1sP1w==
+# hkiG9w0BCQQxFgQUn3L3wbtsUh7amgBBIBRH8TAMaUcwDQYJKoZIhvcNAQEBBQAE
+# ggEAMc8C/kQ++L/foCEn6QWZy/5/mRPWAuaWsf8V/TFjUbhnSzqCzg815WP+FwUS
+# gxX97Be6EjTmmzrwNJJvDkOBkFXqs+D1ft4a4QDbCMZkJ5Px+0bBeHqZaeq++Tpy
+# uRhJVkuZ04hnJ5/zqboAk0i4MHzdcLcaPElo5narbhudMo2O7PvuP0bsM3A3sl67
+# Of4cQ0MK9hrM3IbeNfjKykrZMHn4gqrMQLODqi811HpaxWfV+xTL5MgRfnj2M49Y
+# VGufFXMLtiDvcdoO7bHiT1HYJ3i+2kYkWKn4bFf4b+6734URmNWk64kb2SK1G0sM
+# oQJjiadJofmsRzQraYBnd2msxQ==
 # SIG # End signature block
