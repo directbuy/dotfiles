@@ -170,12 +170,13 @@ function setup_dircolors() {
 function venv($name="") {
     if (!(Test-Path ".wenv")) {
         $installed_python = $null
-        $pythons = @{
+        $pythons = [ordered]@{
+            "39" = "c:\python39\python.exe";
             "38" = "c:\python38\python.exe";
             "37" = "c:\python37\python.exe";
             "36" = "c:\python36\python.exe" }
-        foreach ($x in $pythons.keys) {
-            $python = $pythons[$x]
+        foreach ($i in $pythons.getEnumerator()) {
+            $python = $i.value
             if (Test-Path $python) {
                 &$python -m venv .wenv
                 break
