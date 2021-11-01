@@ -120,13 +120,44 @@ function global:Format_WslArgument([string]$arg, [bool]$interactive) {
 }
 ###< I now have some bash. ###
 
-function connect($pshost) {
+function connect {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$pshost
+    )
     $credential = Get-Credential
     $options = New-PSSessionOption -SkipCACheck -SkipCNCheck
     $session = New-PSSession -Credential $cred $pshost -UseSSL -SessionOption $options -Authentication Default
-
+    copy_profile $session
     Enter-PSSession $session
 }
+
+function copy_profile() {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true, Position=0)]
+        [System.Management.Automation.Runspaces.PSSession]$session
+    )
+    if (!(Test-Path $profile)) {
+        return
+    }
+    $result = Invoke-Command -Session $session -ScriptBlock { 
+        cd ~ 
+        if (!(Test-Path "Documents\WindowsPowerShell")) {
+            mkdir "Documents\WindowsPowerShell" 
+        }
+        gl 
+    }
+    $home_dir = $result.path.trim()
+    copy-item -Path $profile -ToSession $session -Destination "$home_dir\Documents\WindowsPowerShell\profile.ps1"
+    Invoke-Command -Session $session -ScriptBlock { 
+        cd ~
+        $env:remote = "true"
+        . "Documents\WindowsPowerShell\profile.ps1"  
+    }
+}
+
 
 function setup_dircolors() {
     $dircolors = "C:\u\dotfiles\zsh\.dircolors"
@@ -205,7 +236,18 @@ function global:prompt {
     $dir = "$pwd".toLower().replace("\", "/");
     $virtualenv = $env:VIRTUAL_ENV
     $commit = $null
-    $output = git status --porcelain --branch 2>$null | Out-String
+    if ($env:remote) {
+        $main_color = [ConsoleColor]::Blue
+    }
+    else {
+        $main_color = [ConsoleColor]::DarkGreen
+    }
+    try {
+        $output = git status --porcelain --branch 2>$null | Out-String 
+    }
+    catch {
+        $output = ""
+    }
     $branch = $null
     $dirty = $false
     $commit = $null
@@ -225,12 +267,8 @@ function global:prompt {
     $length1 = 3
     $z = $pieces1.Add(($dir, [ConsoleColor]::Gray))
     $length1 += 2 + $dir.Length
-    if (($virtualenv) -and ($virtualenv.Length -gt 0)) {
-        $venv_name = Split-Path $virtualenv -Leaf
-        if ($venv_name -eq ".wenv") {
-            $venv_name = Split-path -Leaf (Split-Path $virtualenv -Parent)
-        }
-        $virtualenv = $venv_name
+    if ($virtualenv -and ($virtualenv.Length -gt 0)) {
+        $virtualenv = Split-Path $virtualenv -Leaf
         $z = $pieces1.Add(("($virtualenv)", [ConsoleColor]::DarkCyan))
         $length1 += 6 + $virtualenv.Length
     }
@@ -240,7 +278,7 @@ function global:prompt {
         $z = $pieces1.Add(($piece, [ConsoleColor]::DarkCyan))
         $length1 += 4 + $piece.Length
         # $line1 = "$line1━━ [$branch $commit] ";
-
+        
         if ($dirty) {
             $z = $pieces1.Add(("*", [ConsoleColor]::White))
             $length1 += 5
@@ -252,7 +290,16 @@ function global:prompt {
     $user = $env:USERNAME
     $pieces2 = New-Object System.Collections.ArrayList
     $length2 = 3
-    $z = $pieces2.Add(("posh", [ConsoleColor]::DarkGreen))
+    $environment_type = "posh"
+    if (!($env:remote)) {
+        if ($psversiontable.psversion.major -gt 5) {
+            $environment_type = "core"
+        }
+    }
+    else {
+        $environment_type = "winrm"
+    }
+    $z = $pieces2.Add(($environment_type, [ConsoleColor]::DarkRed))
     $length2 += 6
     $piece = "${user}@${computer}"
     $z = $pieces2.Add(($piece, [ConsoleColor]::Gray))
@@ -273,30 +320,36 @@ function global:prompt {
         }
     }
     Write-Host
-    Write-Host "┏" -ForegroundColor DarkGreen -NoNewline
+    Write-Host "┏" -ForegroundColor $main_color -NoNewline
     foreach ($x in $pieces1) {
         $st = $x[0];
         $color = $x[1];
-        Write-Host "━━" -ForegroundColor DarkGreen -NoNewline
+        Write-Host "━━" -ForegroundColor $main_color -NoNewline
         Write-Host " $st " -ForegroundColor $color -NoNewline
     }
     if ($padding1) {
-        Write-Host $padding1 -ForegroundColor DarkGreen -NoNewline
+        Write-Host $padding1 -ForegroundColor $main_color -NoNewline
     }
-    Write-Host "━┓" -ForegroundColor DarkGreen
-    Write-Host "┣" -ForegroundColor DarkGreen -NoNewline
+    Write-Host "━┓" -ForegroundColor $main_color
+    Write-Host "┣" -ForegroundColor $main_color -NoNewline
     foreach ($x in $pieces2) {
         $st = $x[0];
         $color = $x[1];
-        Write-Host "━━" -ForegroundColor DarkGreen -NoNewline
+        Write-Host "━━" -ForegroundColor $main_color -NoNewline
         Write-Host " $st " -ForegroundColor $color -NoNewline
     }
     if ($padding2) {
-        Write-Host $padding2 -ForegroundColor DarkGreen -NoNewline
+        Write-Host $padding2 -ForegroundColor $main_color -NoNewline
     }
-    Write-Host "━┛" -ForegroundColor DarkGreen
-    Write-Host "┗ " -nonewline -ForegroundColor DarkGreen
+    Write-Host "━┛" -ForegroundColor $main_color
+    Write-Host "┗ " -nonewline -ForegroundColor $main_color 
     Write-Host "➤" -foregroundcolor white -nonewline
+    if ($env:remote) {
+        $bad_prompt = get_fqdn
+        $bad_prompt_length = $bad_prompt.length + 4
+        $tail = ("`b" * $bad_prompt_length) + (" " * $bad_prompt_length) + ("`b" * $bad_prompt_length) + " "
+        return $tail
+    }
     return " "
 }
 
@@ -309,16 +362,28 @@ Set-Alias vi vim
 # Import-Module fleeting_fling
 
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-Import-Module DirColors
-ipmo DockerCompletion
-setup_dircolors
+
+try {
+    Import-Module DirColors -erroraction silentlycontinue
+    setup_dircolors
+}
+catch {
+    Write-Host "Please run Install-Module dircolors"
+}
+try {
+    ipmo DockerCompletion -erroraction silentlycontinue
+}
+catch {
+   Write-Host "Please run install-module dockercompletion"
+}
+
 Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 
 # SIG # Begin signature block
-# MIIOCgYJKoZIhvcNAQcCoIIN+zCCDfcCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
+# MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbTBFN+joz7b2LA5aAHRttFn6
-# YLmgggtBMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzCkYmkUUPV2SLvN9zfI82K6Z
+# azSgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -346,48 +411,78 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # JBXnofxY63ieigCatn31p1mw1lFPOTMDQGzmMGQO9krl2aiEkb8s2bV5LsGxEukX
 # nWXlRJc5BHbeI5u4M3Vmh+aR+8bzGyQAqLRWzEk5Xpt4Olvf2+IDj+sNfOwas2T6
 # C0QqwztM8O5XHufSjUWJWqfK46QRvIY8OelDOaWy6yd+8jyrTnsV7e5UA0VqQmPF
-# SfLmEsjeyQnAeHUBJTAwggX1MIID3aADAgECAhAdokgwb5smGNCC4JZ9M9NqMA0G
-# CSqGSIb3DQEBDAUAMIGIMQswCQYDVQQGEwJVUzETMBEGA1UECBMKTmV3IEplcnNl
-# eTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoTFVRoZSBVU0VSVFJVU1Qg
-# TmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0aW9uIEF1
-# dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMHwxCzAJBgNV
-# BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
-# bGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGln
-# byBSU0EgQ29kZSBTaWduaW5nIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
-# CgKCAQEAhiKNMoV6GJ9J8JYvYwgeLdx8nxTP4ya2JWYpQIZURnQxYsUQ7bKHJ6aZ
-# y5UwwFb1pHXGqQ5QYqVRkRBq4Etirv3w+Bisp//uLjMg+gwZiahse60Aw2Gh3Gll
-# bR9uJ5bXl1GGpvQn5Xxqi5UeW2DVftcWkpwAL2j3l+1qcr44O2Pej79uTEFdEiAI
-# Weg5zY/S1s8GtFcFtk6hPldrH5i8xGLWGwuNx2YbSp+dgcRyQLXiX+8LRf+jzhem
-# LVWwt7C8VGqdvI1WU8bwunlQSSz3A7n+L2U18iLqLAevRtn5RhzcjHxxKPP+p8YU
-# 3VWRbooRDd8GJJV9D6ehfDrahjVh0wIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-# U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFA7hOqhTOjHVir7Bu61nGgOF
-# rTQOMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQW
-# MBQGCCsGAQUFBwMDBggrBgEFBQcDCDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0f
-# BEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-# QUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUFBwEBBGowaDA/Bggr
-# BgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJTQUFk
-# ZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3Qu
-# Y29tMA0GCSqGSIb3DQEBDAUAA4ICAQBNY1DtRzRKYaTb3moqjJvxAAAeHWJ7Otcy
-# wvaz4GOz+2EAiJobbRAHBE++uOqJeCLrD0bs80ZeQEaJEvQLd1qcKkE6/Nb06+f3
-# FZUzw6GDKLfeL+SU94Uzgy1KQEi/msJPSrGPJPSzgTfTt2SwpiNqWWhSQl//BOvh
-# dGV5CPWpk95rcUCZlrp48bnI4sMIFrGrY1rIFYBtdF5KdX6luMNstc/fSnmHXMdA
-# TWM19jDTz7UKDgsEf6BLrrujpdCEAJM+U100pQA1aWy+nyAlEA0Z+1CQYb45j3qO
-# TfafDh7+B1ESZoMmGUiVzkrJwX/zOgWb+W/fiH/AI57SHkN6RTHBnE2p8FmyWRno
-# ao0pBAJ3fEtLzXC+OrJVWng+vLtvAxAldxU0ivk2zEOS5LpP8WKTKCVXKftRGceh
-# JUBqhFfGsp2xvBwK2nxnfn0u6ShMGH7EezFBcZpLKewLPVdQ0srd/Z4FUeVEeN0B
-# 3rF1mA1UJP3wTuPi+IO9crrLPTru8F4XkmhtyGH5pvEqCgulufSe7pgyBYWe6/mD
-# KdPGLH29OncuizdCoGqC7TtKqpQQpOEN+BfFtlp5MxiS47V1+KHpjgolHuQe8Z9a
-# hyP/n6RRnvs5gBHN27XEp6iAb+VT1ODjosLSWxr6MiYtaldwHDykWC6j81tLB9wy
-# WfOHpxptWDGCAjMwggIvAgEBMIGRMHwxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJH
-# cmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1Nl
-# Y3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5n
-# IENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIB
-# DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUJnUx3y6LdJQS
-# 8Uq9HLFybXEVdkQwDQYJKoZIhvcNAQEBBQAEggEAqI8zvp1P70RdM2VeRBZI0o1B
-# mmq6go0eK0U0+q4AMbKnhfPo9a124vI/qVmQPEma3hxlM+k2OMOti7+OFdzYB5pj
-# Reknb58YmlsZlz6hwozUvER8/Eb+1k64P/FILZA2BPHkhzvkKh8MJ3z+EQ3u+CLp
-# yGlLqOy1i2CfG1JCcwQeJuzoX3wWXzxegUF2QA06TLfvITyc8LiB+VanyzXw49ud
-# /yaT8j6mTGijnI8Yj+Y6XT7qCGZdRUeVvxG02yyP6cp6UxNzoYberMFt+Mv86O7r
-# OJyqe6+jCi+qUD0AhmakQDYPAfF/WXE727iwF7G7Ihy0ko1FrjMVW5fxLq69Cg==
+# SfLmEsjeyQnAeHUBJTAwggWBMIIEaaADAgECAhA5ckQ6+SK3UdfTbBDdMTWVMA0G
+# CSqGSIb3DQEBDAUAMHsxCzAJBgNVBAYTAkdCMRswGQYDVQQIDBJHcmVhdGVyIE1h
+# bmNoZXN0ZXIxEDAOBgNVBAcMB1NhbGZvcmQxGjAYBgNVBAoMEUNvbW9kbyBDQSBM
+# aW1pdGVkMSEwHwYDVQQDDBhBQUEgQ2VydGlmaWNhdGUgU2VydmljZXMwHhcNMTkw
+# MzEyMDAwMDAwWhcNMjgxMjMxMjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNV
+# BAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVU
+# aGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBSU0EgQ2Vy
+# dGlmaWNhdGlvbiBBdXRob3JpdHkwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIK
+# AoICAQCAEmUXNg7D2wiz0KxXDXbtzSfTTK1Qg2HiqiBNCS1kCdzOiZ/MPans9s/B
+# 3PHTsdZ7NygRK0faOca8Ohm0X6a9fZ2jY0K2dvKpOyuR+OJv0OwWIJAJPuLodMkY
+# tJHUYmTbf6MG8YgYapAiPLz+E/CHFHv25B+O1ORRxhFnRghRy4YUVD+8M/5+bJz/
+# Fp0YvVGONaanZshyZ9shZrHUm3gDwFA66Mzw3LyeTP6vBZY1H1dat//O+T23LLb2
+# VN3I5xI6Ta5MirdcmrS3ID3KfyI0rn47aGYBROcBTkZTmzNg95S+UzeQc0PzMsNT
+# 79uq/nROacdrjGCT3sTHDN/hMq7MkztReJVni+49Vv4M0GkPGw/zJSZrM233bkf6
+# c0Plfg6lZrEpfDKEY1WJxA3Bk1QwGROs0303p+tdOmw1XNtB1xLaqUkL39iAigmT
+# Yo61Zs8liM2EuLE/pDkP2QKe6xJMlXzzawWpXhaDzLhn4ugTncxbgtNMs+1b/97l
+# c6wjOy0AvzVVdAlJ2ElYGn+SNuZRkg7zJn0cTRe8yexDJtC/QV9AqURE9JnnV4ee
+# UB9XVKg+/XRjL7FQZQnmWEIuQxpMtPAlR1n6BB6T1CZGSlCBst6+eLf8ZxXhyVeE
+# Hg9j1uliutZfVS7qXMYoCAQlObgOK6nyTJccBz8NUvXt7y+CDwIDAQABo4HyMIHv
+# MB8GA1UdIwQYMBaAFKARCiM+lvEH7OKvKe+CpX/QMKS0MB0GA1UdDgQWBBRTeb9a
+# qitKz1SA4dibwJ3ysgNmyzAOBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB
+# /zARBgNVHSAECjAIMAYGBFUdIAAwQwYDVR0fBDwwOjA4oDagNIYyaHR0cDovL2Ny
+# bC5jb21vZG9jYS5jb20vQUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwNAYIKwYB
+# BQUHAQEEKDAmMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20w
+# DQYJKoZIhvcNAQEMBQADggEBABiHUdx0IT2ciuAntzPQLszs8ObLXhHeIm+bdY6e
+# cv7k1v6qH5yWLe8DSn6u9I1vcjxDO8A/67jfXKqpxq7y/Njuo3tD9oY2fBTgzfT3
+# P/7euLSK8JGW/v1DZH79zNIBoX19+BkZyUIrE79Yi7qkomYEdoiRTgyJFM6iTcky
+# s7roFBq8cfFb8EELmAAKIgMQ5Qyx+c2SNxntO/HkOrb5RRMmda+7qu8/e3c70sQC
+# kT0ZANMXXDnbP3sYDUXNk4WWL13fWRZPP1G91UUYP+1KjugGYXQjFrUNUHMnREd/
+# EF2JKmuFMRTE6KlqTIC8anjPuH+OdnKZDJ3+15EIFqGjX5UwggX1MIID3aADAgEC
+# AhAdokgwb5smGNCC4JZ9M9NqMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQGEwJV
+# UzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAc
+# BgNVBAoTFVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0
+# IFJTQSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0z
+# MDEyMzEyMzU5NTlaMHwxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1h
+# bmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGlt
+# aXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5nIENBMIIBIjAN
+# BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhiKNMoV6GJ9J8JYvYwgeLdx8nxTP
+# 4ya2JWYpQIZURnQxYsUQ7bKHJ6aZy5UwwFb1pHXGqQ5QYqVRkRBq4Etirv3w+Bis
+# p//uLjMg+gwZiahse60Aw2Gh3GllbR9uJ5bXl1GGpvQn5Xxqi5UeW2DVftcWkpwA
+# L2j3l+1qcr44O2Pej79uTEFdEiAIWeg5zY/S1s8GtFcFtk6hPldrH5i8xGLWGwuN
+# x2YbSp+dgcRyQLXiX+8LRf+jzhemLVWwt7C8VGqdvI1WU8bwunlQSSz3A7n+L2U1
+# 8iLqLAevRtn5RhzcjHxxKPP+p8YU3VWRbooRDd8GJJV9D6ehfDrahjVh0wIDAQAB
+# o4IBZDCCAWAwHwYDVR0jBBgwFoAUU3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0O
+# BBYEFA7hOqhTOjHVir7Bu61nGgOFrTQOMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMB
+# Af8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMDBggrBgEFBQcDCDARBgNV
+# HSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+# dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3Js
+# MHYGCCsGAQUFBwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1
+# c3QuY29tL1VTRVJUcnVzdFJTQUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlo
+# dHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0GCSqGSIb3DQEBDAUAA4ICAQBNY1Dt
+# RzRKYaTb3moqjJvxAAAeHWJ7Otcywvaz4GOz+2EAiJobbRAHBE++uOqJeCLrD0bs
+# 80ZeQEaJEvQLd1qcKkE6/Nb06+f3FZUzw6GDKLfeL+SU94Uzgy1KQEi/msJPSrGP
+# JPSzgTfTt2SwpiNqWWhSQl//BOvhdGV5CPWpk95rcUCZlrp48bnI4sMIFrGrY1rI
+# FYBtdF5KdX6luMNstc/fSnmHXMdATWM19jDTz7UKDgsEf6BLrrujpdCEAJM+U100
+# pQA1aWy+nyAlEA0Z+1CQYb45j3qOTfafDh7+B1ESZoMmGUiVzkrJwX/zOgWb+W/f
+# iH/AI57SHkN6RTHBnE2p8FmyWRnoao0pBAJ3fEtLzXC+OrJVWng+vLtvAxAldxU0
+# ivk2zEOS5LpP8WKTKCVXKftRGcehJUBqhFfGsp2xvBwK2nxnfn0u6ShMGH7EezFB
+# cZpLKewLPVdQ0srd/Z4FUeVEeN0B3rF1mA1UJP3wTuPi+IO9crrLPTru8F4Xkmht
+# yGH5pvEqCgulufSe7pgyBYWe6/mDKdPGLH29OncuizdCoGqC7TtKqpQQpOEN+BfF
+# tlp5MxiS47V1+KHpjgolHuQe8Z9ahyP/n6RRnvs5gBHN27XEp6iAb+VT1ODjosLS
+# Wxr6MiYtaldwHDykWC6j81tLB9wyWfOHpxptWDGCAjMwggIvAgEBMIGRMHwxCzAJ
+# BgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcT
+# B1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2Vj
+# dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
+# DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
+# DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
+# hkiG9w0BCQQxFgQUaaE/Bjd/mR/HDt/yT3MBNdNW/YUwDQYJKoZIhvcNAQEBBQAE
+# ggEAjK5m+Awfsb3cc5r90LzQ/pu5o2encqj8I/xy6RE61IW1GrtnkNVs5ee1b9O7
+# d/CqDKtXL8wFmTK4c6108/KPOMfEcRh6SbL2nKapZLjPKM5Iuihq3mZ2O4rUXDlY
+# R7uW62YTKB71+Byhq1MHsoUbv7W7Q+GVvC48xh2+Dj9y9yAyAUVKa6ThysHr7eRU
+# EH+hUxIKxJsALj2BVIRyX7aGR+/w9NJk3qLUNiLc9aXHTIUEUv9No1dyJfiLez5C
+# ftk4Wpf8nRWimISna1+fDzjLHQyEHoX9c70GOeZvExmxBTIniCkqDVTrGooTjmHI
+# tNOeFvat4tbl8SBlcIP5y1sP1w==
 # SIG # End signature block
