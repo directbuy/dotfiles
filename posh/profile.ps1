@@ -144,10 +144,10 @@ function copy_profile() {
     }
     $result = Invoke-Command -Session $session -ScriptBlock { 
         cd ~ 
+        gl 
         if (!(Test-Path "Documents\WindowsPowerShell")) {
             mkdir "Documents\WindowsPowerShell" 
         }
-        gl 
     }
     $home_dir = $result.path.trim()
     copy-item -Path $profile -ToSession $session -Destination "$home_dir\Documents\WindowsPowerShell\profile.ps1"
@@ -305,7 +305,7 @@ function global:prompt {
         $environment_type = "winrm"
     }
     $z = $pieces2.Add(($environment_type, [ConsoleColor]::DarkRed))
-    $length2 += 6
+    $length2 += $environment_type.length + 2
     $piece = "${user}@${computer}"
     $z = $pieces2.Add(($piece, [ConsoleColor]::Gray))
     $length2 += 4 + $piece.Length
