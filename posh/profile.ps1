@@ -358,6 +358,11 @@ function global:prompt {
     return " "
 }
 
+function connect_exchange {
+    Import-Module exchangeonlinemanagement
+    Connect-ExchangeOnline -ShowProgress:$true 
+}
+
 Set-Alias vi vim
 
 # uncomment line for fleeting_fling if you have copied fleeting_fling.psm1 module into path:
