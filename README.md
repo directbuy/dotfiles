@@ -16,7 +16,33 @@ whose original dotfiles was a guide.
 
 * [chocolatey](chocolatey.md)
 
+## WSL installation
+
 To install dotfiles clone the repository and run ./wsl-install
+
+```bash
+cd /u
+git clone https://github.com/directbuy/dotfiles
+/bin/bash ./wsl-install
+```
+
+## posh installation on local
+
+to install dotfiles, clone the repository and run ./install_posh.ps1
+
+```posh
+set-executionpolicy -force -executionpolicy allsigned -scope process
+install_posh.ps1
+install_vim.ps1
+```
+
+when etting up a server, install much the same way, but use the global flag so that 
+dotfiles are made available to all users
+
+```
+install_posh.ps1 -global
+install_vim.ps1
+```
 
 ## Update as of 6/6/2020
 2ps has made some speed improvements please be sure to grab most recent commit of dotfiles.
