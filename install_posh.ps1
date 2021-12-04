@@ -2,13 +2,29 @@
 param(
     [parameter()][switch]$global
 )
+
+function install_package_provider {
+    [cmdletbinding()]
+    param(
+        [string]$name
+    )
+    $packages = get-packageprovider
+    $installed = $false
+    foreach ($package in $packages) {
+        if ($package.name -eq $name) {
+            $installed = $true
+        }
+    }
+    if (-not $installed) {
+        Install-PackageProvider -force -Name $name -Confirm:$false -ErrorAction silentlycontinue
+    }
+}
+
+
 $os_version = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
-Install-PackageProvider -Name NuGet -Confirm:$false -ErrorAction silentlycontinue
-install-packageprovider -name powershellget -confirm:$false -erroraction silentlycontinue
-install-module packagemanagement -confirm:$false
+install_package_provider NuGet
+install-packageprovider -force -name powershellget -confirm:$false -erroraction silentlycontinue
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted 
-# Install-Module posh-git
-# Install-Module oh-my-posh
 install-module -force dircolors
 $dir = split-path -parent $myinvocation.mycommand.path
 $p = "${dir}\posh\profile.ps1"
@@ -23,8 +39,8 @@ else {
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUplK7k9Xp7nr641Zo0HzGzeu1
-# xkSgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBXRNf40Iv6owEMUne3wBiEGi
+# 0zagghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -119,11 +135,11 @@ else {
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUm7WqKQM1BP3+Y1Eidut2dborrGQwDQYJKoZIhvcNAQEBBQAE
-# ggEAgWXnelzUFfGrJtwVOgaASEWnLvL7v0pHXPf4Hn7fE4tYzmXFLyG9C2vL8VnL
-# KbMSdnbiZ7GLtI5wx8iXbV6H7bL5lsyzLnGq4JhlpJtCPm8exO4u4wMaUImivTvb
-# 9RWIEHfo5jqp04FOKflkQHVZWkTbaTZZmNJK0k1Fnus7cbXL9PMccgArtczAlXmD
-# 9pWOv+c/0EQ0zrJQaGwNU5BkjJtrD/gABZaPUhoWHU2OAGmq/THLuqIitrOvLhP9
-# PVRZzzqUrqkih5Boh0DYeImKw3D/w5vg0PECBhLMR3XCVhYbD24m7awS1ohKjZoJ
-# zVUDfLEPocPmhzQ5p+wgKs63SA==
+# hkiG9w0BCQQxFgQUjWYXf7+nUpjiRW67h+Broc/5SdEwDQYJKoZIhvcNAQEBBQAE
+# ggEAETgVR7JjHxxKvZ8gMnen3MkaVF+AytRIl5j4TvLyB5QotJ+wWb42gLKx9P3E
+# 5ALCUb6VH2N5x73o8AUPugpMcNvm3laubMP8fKp48PIEG3naTFODsK4NGaA/Bnsv
+# Yc6H7hM8qje7l3gjLKJ/ZbH3Bszdpc2pz4wTBn1B8JnF3im4Y4TZ3KZsnCUIK7OD
+# mj9I2BZc3aD50eOC0zIiMuMtxd/TDKn0uBHsJ7JXBFII+FesTvarJzzIWwrilOER
+# ZKPyZ1qpkSp6UvPZ7ZBlww8LP3thY0yMMgrxPeUEfJpzc+hyCzUxhY51L9WtVds0
+# VntsNrHM0Qdx+UK+XczVtI2c3g==
 # SIG # End signature block
