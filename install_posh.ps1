@@ -5,6 +5,7 @@ param(
 $os_version = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
 Install-PackageProvider -Name NuGet -Force -Confirm:$false -ErrorAction silentlycontinue
 install-packageprovider -name powershellget -force -confirm:$false -erroraction silentlycontinue
+install-module packagemanagement -force -confirm:$false
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted 
 # Install-Module posh-git
 # Install-Module oh-my-posh
@@ -21,8 +22,8 @@ else {
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpqxrCFtMTUOZk5wIjUjiU+G4
-# uiygghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJXvIbklr8JVRry1VPcN6aBYi
+# qEWgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -117,11 +118,11 @@ else {
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUMq3hRcMDsT7lJY8U5X+D/OLDuuEwDQYJKoZIhvcNAQEBBQAE
-# ggEAb/ZjRR3b+zWH1GnhwCv6b+hEj24QeaWvwYKgCPmByIGj2ICjkO1YQeCbv+V/
-# x+5GEKEvbXSHGwpGcQaR6JGl/ymhmHrBBfiicNDM/coSDwbgxuVQRdh2rXW6MXiU
-# VR1K7g4gs5IGfgxPv71lyMlGGT2Ye5w0oxJrr7delBmI8jMAkyMb066vW4+/kPSN
-# Zsh4n0KE+WfYgOEMDDPj8zuffexUKGOQkseWrcNuGuv+XPty7b25YDPMYvMpnmEk
-# tqWNQq3jreYD2N4W4jsCCpttOzp78g7HO4j3HV3Yb4srN4MWAaD7VECOtcP0SeQm
-# aC3yd4Lnod5uxjPguLm3pz1UwA==
+# hkiG9w0BCQQxFgQUMY5oNxrurTEzYE1bnUvc9bRGA3swDQYJKoZIhvcNAQEBBQAE
+# ggEAZQliK4Y1e2tzoH+CZ8jrwjSPQk4e1+po0acuUH82i53ytQBR6WCM/hoRObd8
+# bcGEhWBDM1eqq9FX8uwe44TUdJsnklidT++hkRTaPCAIy54hKV7XXJtKhnQrsybV
+# rauDXSvqxqC7Yvql03EE37ubA+ouVQlqCgRaq8uIYPN/h/7XacUtmStavJ5AxyEk
+# Qnp8ZcS3GNtit+Jqv8PpWpNHt/kzhIoNHwSBTQCYImaGq6xu+svuQWAM3UKZr9aQ
+# I5A/BnJJxiVI3iZFuiQJGylIEdaw/OSJsQj6BmO4gPcQ69pk+lnAAJhmIbv5UP7N
+# 5AZTz0XsMJ6qt1JdF1vUBYGI+w==
 # SIG # End signature block
