@@ -2,8 +2,10 @@
 param(
     [parameter()][switch]$global
 )
-Install-PackageProvider -Name NuGet -Force -Confirm:$false
-Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -Force
+$os_version = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
+Install-PackageProvider -Name NuGet -Force -Confirm:$false -ErrorAction silentlycontinue
+install-packageprovider -name powershellget -force -confirm:$false -erroraction silentlycontinue
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted 
 # Install-Module posh-git
 # Install-Module oh-my-posh
 install-module -force dircolors
