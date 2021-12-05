@@ -1,3 +1,4 @@
+set runtimepath+=~/.vim
 set number
 set t_u7=
 colorscheme japanesque
