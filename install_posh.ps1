@@ -20,7 +20,7 @@ function install_package_provider {
     }
 }
 
-
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $os_version = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
 install_package_provider NuGet
 install-packageprovider -force -name powershellget -confirm:$false -erroraction silentlycontinue
@@ -39,8 +39,8 @@ else {
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBXRNf40Iv6owEMUne3wBiEGi
-# 0zagghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUeC2soOjMT+hHZ4SJpmY+HVK+
+# OrigghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -135,11 +135,11 @@ else {
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUjWYXf7+nUpjiRW67h+Broc/5SdEwDQYJKoZIhvcNAQEBBQAE
-# ggEAETgVR7JjHxxKvZ8gMnen3MkaVF+AytRIl5j4TvLyB5QotJ+wWb42gLKx9P3E
-# 5ALCUb6VH2N5x73o8AUPugpMcNvm3laubMP8fKp48PIEG3naTFODsK4NGaA/Bnsv
-# Yc6H7hM8qje7l3gjLKJ/ZbH3Bszdpc2pz4wTBn1B8JnF3im4Y4TZ3KZsnCUIK7OD
-# mj9I2BZc3aD50eOC0zIiMuMtxd/TDKn0uBHsJ7JXBFII+FesTvarJzzIWwrilOER
-# ZKPyZ1qpkSp6UvPZ7ZBlww8LP3thY0yMMgrxPeUEfJpzc+hyCzUxhY51L9WtVds0
-# VntsNrHM0Qdx+UK+XczVtI2c3g==
+# hkiG9w0BCQQxFgQUiBhk5iaA+F0lblITDI7tEtyZ2NQwDQYJKoZIhvcNAQEBBQAE
+# ggEAq9+PSAOv6IDHJ8mXw7HOfffKEj3g3jzCWttywxJ+VBE9pBqJtG0BSg8Ycf7T
+# hwnUfi86jvXj69cSfqhds6IIzwBaCZDIZgWZ26RdReEGlGt0cyv+6C8PS/fKmNcs
+# UV/s+4CxaHxeoqhHs1aFOKURJyBYM+Nk9zVhMh/UCpvdehQ5jp1/Wg75FjJMwcZB
+# ioFx0r6voVLmfLSIFYbPQd6NbMsHRd58x98nxXrdCq1MORPPwSe6zUkVd46IoJU8
+# rH2qe04tJDOHx1EDfi+phGuJVg1bwfSccBm6i1o6KxbBc3RHxKe7HGha86CYLtdf
+# VK7EEx1f6hfa+0s/cWRa0UKhwA==
 # SIG # End signature block
