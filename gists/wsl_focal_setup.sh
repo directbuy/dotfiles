@@ -35,9 +35,10 @@ apt-get install -qq libxml2-dev libxslt1-dev libyaml-dev rlwrap >/dev/null
 echo "installing postgres client and dev libraries"
 apt-get install -qq libpq-dev postgresql-client >/dev/null
 echo "install mysql"
+mkdir -p /u/downloads
 cd /u/downloads
-wget  https://dev.mysql.com/get/mysql-apt-config_0.8.17-1_all.deb
-dpkg /u/downloads/mysql-apt-config_0.8.17-1_all.deb
+wget  https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
+dpkg -i /u/downloads/mysql-apt-config_0.8.22-1_all.deb
 apt-get -y update
 apt-get install -y mysql-shell mysql-client libmysqlclient-dev
 echo "installing snakes"
