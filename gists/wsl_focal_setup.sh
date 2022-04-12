@@ -33,7 +33,7 @@ apt-get install -qq libc6-dev git-crypt traceroute dnsutils net-tools >/dev/null
 echo "installing xml and yaml"
 apt-get install -qq libxml2-dev libxslt1-dev libyaml-dev rlwrap >/dev/null
 echo "installing postgres client and dev libraries"
-apt-get install -qq libpq-dev postgresql-client >/dev/null
+apt-get install -qq libpq-dev postgresql-client wslu >/dev/null
 echo "install mysql"
 mkdir -p /u/downloads
 cd /u/downloads
