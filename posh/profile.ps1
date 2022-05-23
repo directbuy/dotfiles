@@ -1,114 +1,115 @@
-﻿
-###> I like Bash. Give me more bash ###
-$bashCommands = "awk", "emacs", "grep", "head", "less", "ls", "man", "sed", "seq", "ssh", "tail", "touch"
+﻿if (Test-Path "c:\windows\system32\wsl.exe") {
+    ###> I like Bash. Give me more bash ###
+    $bashCommands = "awk", "emacs", "grep", "head", "less", "ls", "man", "sed", "seq", "ssh", "tail", "touch"
 
-$bashCommands | ForEach-Object { Invoke-Expression @"
-Remove-Item Alias:$_ -Force -ErrorAction:Ignore
-function global:$_() {
-    for (`$i = 0; `$i -lt `$args.Count; `$i++) {
+    $bashCommands | ForEach-Object { Invoke-Expression @"
+    Remove-Item Alias:$_ -Force -ErrorAction:Ignore
+    function global:$_() {
+        for (`$i = 0; `$i -lt `$args.Count; `$i++) {
 
-        if (Split-Path `$args[`$i] -IsAbsolute -ErrorAction Ignore) {
-            `$args[`$i] = Format_WslArgument (wsl.exe wslpath (`$args[`$i] -replace "\\", "/"))
+            if (Split-Path `$args[`$i] -IsAbsolute -ErrorAction Ignore) {
+                `$args[`$i] = Format_WslArgument (wsl.exe wslpath (`$args[`$i] -replace "\\", "/"))
 
-        } elseif (Test-Path `$args[`$i] -ErrorAction Ignore) {
-            `$args[`$i] = Format_WslArgument (`$args[`$i] -replace "\\", "/")
-        }
-    }
-
-    if (`$input.MoveNext()) {
-        `$input.Reset()
-        `$input | wsl.exe $_ (`$args -split ' ')
-    } else {
-        wsl.exe $_ (`$args -split ' ')
-    }
-}
-"@
-}
-
-Register-ArgumentCompleter -CommandName $bashCommands -ScriptBlock {
-    param($wordToComplete, $commandAst, $cursorPosition)
-
-    $F = switch ($commandAst.CommandElements[0].Value) {
-        {$_ -in "awk", "grep", "head", "less", "ls", "sed", "seq", "tail"} {
-            "_longopt"
-            break
-        }
-
-        "man" {
-            "_man"
-            break
-        }
-
-        "ssh" {
-            "_ssh"
-            break
-        }
-
-        Default {
-            "_minimal"
-            break
-        }
-    }
-
-    $COMP_LINE = "`"$commandAst`""
-    $COMP_WORDS = "('$($commandAst.CommandElements.Extent.Text -join "' '")')" -replace "''", "'"
-    for ($i = 1; $i -lt $commandAst.CommandElements.Count; $i++) {
-        $extent = $commandAst.CommandElements[$i].Extent
-        if ($cursorPosition -lt $extent.EndColumnNumber) {
-            $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
-            $COMP_CWORD = $i
-            break
-        } elseif ($cursorPosition -eq $extent.EndColumnNumber) {
-            $previousWord = $extent.Text
-            $COMP_CWORD = $i + 1
-            break
-        } elseif ($cursorPosition -lt $extent.StartColumnNumber) {
-            $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
-            $COMP_CWORD = $i
-            break
-        } elseif ($i -eq $commandAst.CommandElements.Count - 1 -and $cursorPosition -gt $extent.EndColumnNumber) {
-            $previousWord = $extent.Text
-            $COMP_CWORD = $i + 1
-            break
-        }
-    }
-
-    $currentExtent = $commandAst.CommandElements[$COMP_CWORD].Extent
-    $previousExtent = $commandAst.CommandElements[$COMP_CWORD - 1].Extent
-    if ($currentExtent.Text -like "/*" -and $currentExtent.StartColumnNumber -eq $previousExtent.EndColumnNumber) {
-        $COMP_LINE = $COMP_LINE -replace "$($previousExtent.Text)$($currentExtent.Text)", $wordToComplete
-        $COMP_WORDS = $COMP_WORDS -replace "$($previousExtent.Text) '$($currentExtent.Text)'", $wordToComplete
-        $previousWord = $commandAst.CommandElements[$COMP_CWORD - 2].Extent.Text
-        $COMP_CWORD -= 1
-    }
-
-    $command = $commandAst.CommandElements[0].Value
-    $bashCompletion = ". /usr/share/bash-completion/bash_completion 2> /dev/null"
-    $commandCompletion = ". /usr/share/bash-completion/completions/$command 2> /dev/null"
-    $COMPINPUT = "COMP_LINE=$COMP_LINE; COMP_WORDS=$COMP_WORDS; COMP_CWORD=$COMP_CWORD; COMP_POINT=$cursorPosition"
-    $COMPGEN = "bind `"set completion-ignore-case on`" 2> /dev/null; $F `"$command`" `"$wordToComplete`" `"$previousWord`" 2> /dev/null"
-    $COMPREPLY = "IFS=`$'\n'; echo `"`${COMPREPLY[*]}`""
-    $commandLine = "$bashCompletion; $commandCompletion; $COMPINPUT; $COMPGEN; $COMPREPLY" -split ' '
-
-    $previousCompletionText = ""
-    (wsl.exe $commandLine) -split '\n' |
-            Sort-Object -Unique -CaseSensitive |
-            ForEach-Object {
-                if ($wordToComplete -match "(.*=).*") {
-                    $completionText = Format_WslArgument ($Matches[1] + $_) $true
-                    $listItemText = $_
-                } else {
-                    $completionText = Format_WslArgument $_ $true
-                    $listItemText = $completionText
-                }
-
-                if ($completionText -eq $previousCompletionText) {
-                    $listItemText += ' '
-                }
-
-                $previousCompletionText = $completionText
-                [System.Management.Automation.CompletionResult]::new($completionText, $listItemText, 'ParameterName', $completionText)
+            } elseif (Test-Path `$args[`$i] -ErrorAction Ignore) {
+                `$args[`$i] = Format_WslArgument (`$args[`$i] -replace "\\", "/")
             }
+        }
+
+        if (`$input.MoveNext()) {
+            `$input.Reset()
+            `$input | wsl.exe $_ (`$args -split ' ')
+        } else {
+            wsl.exe $_ (`$args -split ' ')
+        }
+    }
+"@
+    }
+
+    Register-ArgumentCompleter -CommandName $bashCommands -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+
+        $F = switch ($commandAst.CommandElements[0].Value) {
+            {$_ -in "awk", "grep", "head", "less", "ls", "sed", "seq", "tail"} {
+                "_longopt"
+                break
+            }
+
+            "man" {
+                "_man"
+                break
+            }
+
+            "ssh" {
+                "_ssh"
+                break
+            }
+
+            Default {
+                "_minimal"
+                break
+            }
+        }
+
+        $COMP_LINE = "`"$commandAst`""
+        $COMP_WORDS = "('$($commandAst.CommandElements.Extent.Text -join "' '")')" -replace "''", "'"
+        for ($i = 1; $i -lt $commandAst.CommandElements.Count; $i++) {
+            $extent = $commandAst.CommandElements[$i].Extent
+            if ($cursorPosition -lt $extent.EndColumnNumber) {
+                $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
+                $COMP_CWORD = $i
+                break
+            } elseif ($cursorPosition -eq $extent.EndColumnNumber) {
+                $previousWord = $extent.Text
+                $COMP_CWORD = $i + 1
+                break
+            } elseif ($cursorPosition -lt $extent.StartColumnNumber) {
+                $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
+                $COMP_CWORD = $i
+                break
+            } elseif ($i -eq $commandAst.CommandElements.Count - 1 -and $cursorPosition -gt $extent.EndColumnNumber) {
+                $previousWord = $extent.Text
+                $COMP_CWORD = $i + 1
+                break
+            }
+        }
+
+        $currentExtent = $commandAst.CommandElements[$COMP_CWORD].Extent
+        $previousExtent = $commandAst.CommandElements[$COMP_CWORD - 1].Extent
+        if ($currentExtent.Text -like "/*" -and $currentExtent.StartColumnNumber -eq $previousExtent.EndColumnNumber) {
+            $COMP_LINE = $COMP_LINE -replace "$($previousExtent.Text)$($currentExtent.Text)", $wordToComplete
+            $COMP_WORDS = $COMP_WORDS -replace "$($previousExtent.Text) '$($currentExtent.Text)'", $wordToComplete
+            $previousWord = $commandAst.CommandElements[$COMP_CWORD - 2].Extent.Text
+            $COMP_CWORD -= 1
+        }
+
+        $command = $commandAst.CommandElements[0].Value
+        $bashCompletion = ". /usr/share/bash-completion/bash_completion 2> /dev/null"
+        $commandCompletion = ". /usr/share/bash-completion/completions/$command 2> /dev/null"
+        $COMPINPUT = "COMP_LINE=$COMP_LINE; COMP_WORDS=$COMP_WORDS; COMP_CWORD=$COMP_CWORD; COMP_POINT=$cursorPosition"
+        $COMPGEN = "bind `"set completion-ignore-case on`" 2> /dev/null; $F `"$command`" `"$wordToComplete`" `"$previousWord`" 2> /dev/null"
+        $COMPREPLY = "IFS=`$'\n'; echo `"`${COMPREPLY[*]}`""
+        $commandLine = "$bashCompletion; $commandCompletion; $COMPINPUT; $COMPGEN; $COMPREPLY" -split ' '
+
+        $previousCompletionText = ""
+        (wsl.exe $commandLine) -split '\n' |
+                Sort-Object -Unique -CaseSensitive |
+                ForEach-Object {
+                    if ($wordToComplete -match "(.*=).*") {
+                        $completionText = Format_WslArgument ($Matches[1] + $_) $true
+                        $listItemText = $_
+                    } else {
+                        $completionText = Format_WslArgument $_ $true
+                        $listItemText = $completionText
+                    }
+
+                    if ($completionText -eq $previousCompletionText) {
+                        $listItemText += ' '
+                    }
+
+                    $previousCompletionText = $completionText
+                    [System.Management.Automation.CompletionResult]::new($completionText, $listItemText, 'ParameterName', $completionText)
+                }
+    }
 }
 
 function global:Format_WslArgument([string]$arg, [bool]$interactive) {
@@ -301,6 +302,9 @@ function global:prompt {
             $environment_type = "core"
         }
     }
+    elseif ($env:remote -eq "ssh") {
+        $environment_type = "ssh"
+    }
     else {
         $environment_type = "winrm"
     }
@@ -347,9 +351,9 @@ function global:prompt {
         Write-Host $padding2 -ForegroundColor $main_color -NoNewline
     }
     Write-Host "━┛" -ForegroundColor $main_color
-    Write-Host "┗ " -nonewline -ForegroundColor $main_color 
+    Write-Host "┗ " -nonewline -ForegroundColor $main_color
     Write-Host "➤" -foregroundcolor white -nonewline
-    if ($env:remote) {
+    if ($env:remote -and $env:remote -ne "ssh") {
         $bad_prompt = get_fqdn
         $bad_prompt_length = $bad_prompt.length + 4
         $tail = ("`b" * $bad_prompt_length) + (" " * $bad_prompt_length) + ("`b" * $bad_prompt_length) + " "
@@ -392,8 +396,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUdswXvOdt133Y7m3IPA7hDwHz
-# RU+gghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9qhY2kdWuqp4/RvaulK4wrdv
+# bXegghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -488,11 +492,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUn3L3wbtsUh7amgBBIBRH8TAMaUcwDQYJKoZIhvcNAQEBBQAE
-# ggEAMc8C/kQ++L/foCEn6QWZy/5/mRPWAuaWsf8V/TFjUbhnSzqCzg815WP+FwUS
-# gxX97Be6EjTmmzrwNJJvDkOBkFXqs+D1ft4a4QDbCMZkJ5Px+0bBeHqZaeq++Tpy
-# uRhJVkuZ04hnJ5/zqboAk0i4MHzdcLcaPElo5narbhudMo2O7PvuP0bsM3A3sl67
-# Of4cQ0MK9hrM3IbeNfjKykrZMHn4gqrMQLODqi811HpaxWfV+xTL5MgRfnj2M49Y
-# VGufFXMLtiDvcdoO7bHiT1HYJ3i+2kYkWKn4bFf4b+6734URmNWk64kb2SK1G0sM
-# oQJjiadJofmsRzQraYBnd2msxQ==
+# hkiG9w0BCQQxFgQUgKebElwp6NZvmFu9Q8ZFv6HpdZMwDQYJKoZIhvcNAQEBBQAE
+# ggEADf9kaqx8qcs2mP5HQxbdHkCkgBydWwQPwe4uDTJOhNz05ZNu0oqo1+MmXYmw
+# NMbCfyJ+cl0IrDxIftvrVNH2r2JiLTGHtNKMzFb7Ksrh1+Qc1vASNXUtwct2OrpJ
+# oHPpl55VHNTNlASwcf+vgJdcejLAXaBOCeRk1rW5dMStBreWVh9x+6ERddD6SbtB
+# FYuyxy2R/utjTgSOT0xPS0Feyy8SZcmOWVQIhGGNXLjvx3tZuca8oJbsEg/ZAcw0
+# XLo/ixjKn0GvcT0RO86mJTmGj24Rl8B4xZ5PBKCnJsSO6QX+BZWhPukeohAaZ3Xn
+# Ov1dMmZ8YiJmz1QQ2yUARnHhWQ==
 # SIG # End signature block

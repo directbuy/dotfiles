@@ -179,6 +179,9 @@ function global:prompt {
             $environment_type = "core"
         }
     }
+    elseif ($env:remote -eq "ssh") {
+        $environment_type = "ssh"
+    }
     else {
         $environment_type = "winrm"
     }
@@ -227,7 +230,7 @@ function global:prompt {
     Write-Host "━┛" -ForegroundColor $main_color
     Write-Host "┗ " -nonewline -ForegroundColor $main_color 
     Write-Host "➤" -foregroundcolor white -nonewline
-    if ($env:remote) {
+    if ($env:remote -and $env:remote -ne "ssh") {
         $bad_prompt = get_fqdn
         $bad_prompt_length = $bad_prompt.length + 4
         $tail = ("`b" * $bad_prompt_length) + (" " * $bad_prompt_length) + ("`b" * $bad_prompt_length) + " "
@@ -270,8 +273,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJPuBXzHydOL2fYiv7Fp+HSez
-# caWgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU261uXrlUIeYPTAjCGIBKb5A7
+# 2KagghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -366,11 +369,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQU1D9LJjzT5T5U6187FD6wnwpyVM8wDQYJKoZIhvcNAQEBBQAE
-# ggEAelNg/cVrlpvwHK/tCMCOpxss/ZrIZaL3SRXVB2RARdPQjjNTrY5yGvcsaGCM
-# 6r/p6vDkgVhAw263EvqYz9jHJyq2EbDmKllK5tjgkXex5WU74nIBI3QXT4uKul1h
-# ++2E2OZuEEyBvL8M4kJSExl+AL27ZSlNqCt5rlmEX6gt06Cwwz6TT+/kL1AQ8q1c
-# 1PK1GnWevZQEbfyEiRqAhgf9+b4l6iw+Z7F+o1JCVriiSUIXgQiyzzenbNXbs38N
-# eGOKclqnRkPqxuFDLRNwXnzJCc1in122U9d1//BvOwJP3ISGGMlQKpCI6xF+fj4+
-# vRvAWwsRDJzxAI7ZUdsjAzseUw==
+# hkiG9w0BCQQxFgQU6rxVTAK763blUgniisiSbSJP1kAwDQYJKoZIhvcNAQEBBQAE
+# ggEAFoMadmScxtkXbURlvGA6nnWfMZuZwNUWqWe89Bt6KxwRDluH7N1ha+MJHjdT
+# ds95/zMphQCaXP23lDp0SPzJADP5SD/3wA08BfA0oXetPb+1X0C+R4oZrOYhA1UV
+# VVkrmfvGLJJQx2KuciwW5LAqo6QKf1j2cX6bKs3WW1Pcc+LE+BrGlLAu67HYl1OW
+# jC4aMNuKHIXfH2x7y21ay8COdBGmpWxDPmKU0ZWXFODjn8QAY++dch8fKrvW9hCb
+# MyxYe6aqrlb3lSQ0Y+HP5zhYEC/stDwxQ6J5VlMwntuncxYOrM/G5T6azh+BV1PT
+# MQrEh8SJIU3cC3QzQ3GhEWvLnQ==
 # SIG # End signature block
