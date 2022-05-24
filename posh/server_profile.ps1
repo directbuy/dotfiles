@@ -263,7 +263,9 @@ function global:prompt {
     }
     $dt = Get-Date -UFormat "%Y.%m.%d %I:%M %p"
     $computer = $env:COMPUTERNAME
+    $computer = $computer.tolower()
     $user = $env:USERNAME
+    $user = $user.tolower()
     $pieces2 = New-Object System.Collections.ArrayList
     $length2 = 3
     $environment_type = "posh"
@@ -360,8 +362,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFIN8FIBpOcXMdPlVIfk8/Rz/
-# ccOgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUDvpEO6Lud0n0QQjNVBO0NHBb
+# rrygghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -456,11 +458,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUw3EQkuN5FbcVHb3ajLHK7FltMfgwDQYJKoZIhvcNAQEBBQAE
-# ggEAdaAk8QAacpkrW6Hj+b6S26iyHaRtHKVVZxjUpUMtmvBpMNjvEAXMG4z2Fi6E
-# qMKSN3Lixg3yxFCO7GQuitYsV+WcUP7XXrM3UJrC94KGFoZWwbLP5RYiATuwOWy3
-# 8uAoHF6N0VPfAv4wn5lSfvLA5ydXAwYRANNFzdj6XwFrZkZzZnpsQwtajoOmFX0e
-# BE+tzhVCZVOoRgAjn8zujIMVFLQAnBcxOZD1XRJrH7TtFBCy6lo19dKDMcA4rN1f
-# bUUn0sSRk+ChIpHEfYmsec5D3ViWSSzFDz1RjcxPFB2iRl/0mfJxNLDjOFhkD3XN
-# PQxPx+YicX7AFgUxrNHW1Fh88Q==
+# hkiG9w0BCQQxFgQUQQAaWxVKSY9U+VEMkBe71igTmTcwDQYJKoZIhvcNAQEBBQAE
+# ggEAipHy1hoEzSBL13ywB+fba//tgoP88V7zPmCmwdq2F/X2bJTuyssW+wHC7hhX
+# TR2eBtVCiWXETGW+muaWtTMWF5sv0AvRIC7rn6bT+F1r7NSbbnsA94Yxfm27NWxs
+# zvk0LPUN6bTSaA/fu8xTzIAO/I6Tmf5QEiu5W8RxjPW81l+Qf/Z+7KiVup0MVH6X
+# /xe2uvELsyasLtRDOwBPjnGafMxn0w2LIE6PG47fM/R3sLQsOPURh0VxYOC0UPM3
+# dl/S7TsuIjtq+BvQeZYggjS4cC2JOuqTOocOvEWgvWe3JJfKRsrW2cPUkol9UMc2
+# QfLAIozjo5XIZVp22sWFpDJX2g==
 # SIG # End signature block

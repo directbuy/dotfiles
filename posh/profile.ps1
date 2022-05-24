@@ -404,8 +404,8 @@ function global:prompt {
         }
     }
     $dt = Get-Date -UFormat "%Y.%m.%d %I:%M %p"
-    $computer = $env:COMPUTERNAME
-    $user = $env:USERNAME
+    $computer = $env:COMPUTERNAME.tolower()
+    $user = $env:USERNAME.tolower()
     $pieces2 = New-Object System.Collections.ArrayList
     $length2 = 3
     $environment_type = "posh"
@@ -513,8 +513,8 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULOVTQAzknY06sBKsq4zK2KJt
-# 8vegghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUH3OtZIs8NcO+iVM3IGAmEqK8
+# sXqgghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -609,11 +609,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUJ/aIuI6S0Ajt7mcJxEWnhTiEEgcwDQYJKoZIhvcNAQEBBQAE
-# ggEAPKqFzZ4KAJoO2vJ3k2FyOLY7nC2nIpVwA40BDf5fuOlplyCqe7gCsBm+8OlO
-# Je6e7Uz2ya4AG8ZFRbUnppsKrefzOp6P9vdVsPF+FwgOPTv9GC8sXwoAELih/Od0
-# dLaoqFkg0sdMVK5dCPj8av18AI/30iqRoFr0zbvL1v78tCX8X056NJ396bBzyu+F
-# nXFmGUq7rA8rcRxTqDxNot7fsQJ3nVFObmpiGQfhhZxOW4uDeZ0h5hlxJtxMWNC2
-# 2ur6jxm6KGH9hvGYyLz6khNSZyAc91iMHGKeUx1h1olPXgXV/MFA7k0CNKD2wiM+
-# EdCEG/BFkFvSf9rwzdTkpDJrdg==
+# hkiG9w0BCQQxFgQU7crsYkV+rP+boxxTJq/P8x5Qxb0wDQYJKoZIhvcNAQEBBQAE
+# ggEAnM48nmBODL1DDKETWX8IBV1d3CxWamVEOevCbw9OJ+uW3rxIyyglV8bW1zcQ
+# Y+P7UaeeN0e+unkdLN575umPKFc5i6TxTv9Qy36ViTSPWz4nmrCR4Sz37MySwZEC
+# y8DxOBZCHM55pHTCH/vhCnPdoVHdiExbBj6h214D5p3xYJRmwgCEstyC8wnNejNR
+# PNNchQHprOb5TV0sgDbsfXknnmbZsAdOD8MN1hUDjwvwvsHD4sNkg4Y0rZI4Te+z
+# 97k4OYhW4nHfb/+Od1M2Q29b2wR0pltI5I2IQNo4aW0kkz18BE7es+/R+Sm/6crc
+# Ko57k5Jg6ypJH4thCPTaULwyuQ==
 # SIG # End signature block
