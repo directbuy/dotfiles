@@ -1,99 +1,114 @@
-﻿if (Test-Path "c:\windows\system32\wsl.exe") {
-    ###> I like Bash. Give me more bash ###
-    $bashCommands = "awk", "emacs", "grep", "head", "less", "ls", "man", "sed", "seq", "ssh", "tail", "touch"
+﻿<#
+    .synopsis
+    registers typical bash functions to run under the default wsl distro
+    if wsl is present on the system.
 
-    $bashCommands | ForEach-Object { Invoke-Expression @"
-    Remove-Item Alias:$_ -Force -ErrorAction:Ignore
-    function global:$_() {
-        for (`$i = 0; `$i -lt `$args.Count; `$i++) {
+    .description
+    registers awk, emacs, grep, head, less, ls, man, sed, seq, ssh, tail, and touch
+    to run via wsl.exe instead of running via cygwin or from the default
+    powershell aliases (e.g., powershell aliases ls as dir).  The motivation
+    behind this is that it can often be confusing in powershell when you use
+    `ls -la` only to have the command fail because `-la` is not a recognized
+    parameter on `Get-Item` / `dir`
 
-            if (Split-Path `$args[`$i] -IsAbsolute -ErrorAction Ignore) {
-                `$args[`$i] = Format_WslArgument (wsl.exe wslpath (`$args[`$i] -replace "\\", "/"))
+#>
+function bash_commands_via_wsl {
+    if (Test-Path "c:\windows\system32\wsl.exe") {
+        ###> I like Bash. Give me more bash ###
+        $bashCommands = "awk", "emacs", "grep", "head", "less", "ls", "man", "sed", "seq", "ssh", "tail", "touch"
 
-            } elseif (Test-Path `$args[`$i] -ErrorAction Ignore) {
-                `$args[`$i] = Format_WslArgument (`$args[`$i] -replace "\\", "/")
-            }
-        }
+        $bashCommands | ForEach-Object { Invoke-Expression @"
+Remove-Item Alias:$_ -Force -ErrorAction:Ignore
+function global:$_() {
+    for (`$i = 0; `$i -lt `$args.Count; `$i++) {
 
-        if (`$input.MoveNext()) {
-            `$input.Reset()
-            `$input | wsl.exe $_ (`$args -split ' ')
-        } else {
-            wsl.exe $_ (`$args -split ' ')
+        if (Split-Path `$args[`$i] -IsAbsolute -ErrorAction Ignore) {
+            `$args[`$i] = Format_WslArgument (wsl.exe wslpath (`$args[`$i] -replace "\\", "/"))
+
+        } elseif (Test-Path `$args[`$i] -ErrorAction Ignore) {
+            `$args[`$i] = Format_WslArgument (`$args[`$i] -replace "\\", "/")
         }
     }
+
+    if (`$input.MoveNext()) {
+        `$input.Reset()
+        `$input | wsl.exe $_ (`$args -split ' ')
+    } else {
+        wsl.exe $_ (`$args -split ' ')
+    }
+}
 "@
-    }
-
-    Register-ArgumentCompleter -CommandName $bashCommands -ScriptBlock {
-        param($wordToComplete, $commandAst, $cursorPosition)
-
-        $F = switch ($commandAst.CommandElements[0].Value) {
-            {$_ -in "awk", "grep", "head", "less", "ls", "sed", "seq", "tail"} {
-                "_longopt"
-                break
-            }
-
-            "man" {
-                "_man"
-                break
-            }
-
-            "ssh" {
-                "_ssh"
-                break
-            }
-
-            Default {
-                "_minimal"
-                break
-            }
         }
 
-        $COMP_LINE = "`"$commandAst`""
-        $COMP_WORDS = "('$($commandAst.CommandElements.Extent.Text -join "' '")')" -replace "''", "'"
-        for ($i = 1; $i -lt $commandAst.CommandElements.Count; $i++) {
-            $extent = $commandAst.CommandElements[$i].Extent
-            if ($cursorPosition -lt $extent.EndColumnNumber) {
-                $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
-                $COMP_CWORD = $i
-                break
-            } elseif ($cursorPosition -eq $extent.EndColumnNumber) {
-                $previousWord = $extent.Text
-                $COMP_CWORD = $i + 1
-                break
-            } elseif ($cursorPosition -lt $extent.StartColumnNumber) {
-                $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
-                $COMP_CWORD = $i
-                break
-            } elseif ($i -eq $commandAst.CommandElements.Count - 1 -and $cursorPosition -gt $extent.EndColumnNumber) {
-                $previousWord = $extent.Text
-                $COMP_CWORD = $i + 1
-                break
+        Register-ArgumentCompleter -CommandName $bashCommands -ScriptBlock {
+            param($wordToComplete, $commandAst, $cursorPosition)
+
+            $F = switch ($commandAst.CommandElements[0].Value) {
+                {$_ -in "awk", "grep", "head", "less", "ls", "sed", "seq", "tail"} {
+                    "_longopt"
+                    break
+                }
+
+                "man" {
+                    "_man"
+                    break
+                }
+
+                "ssh" {
+                    "_ssh"
+                    break
+                }
+
+                Default {
+                    "_minimal"
+                    break
+                }
             }
-        }
 
-        $currentExtent = $commandAst.CommandElements[$COMP_CWORD].Extent
-        $previousExtent = $commandAst.CommandElements[$COMP_CWORD - 1].Extent
-        if ($currentExtent.Text -like "/*" -and $currentExtent.StartColumnNumber -eq $previousExtent.EndColumnNumber) {
-            $COMP_LINE = $COMP_LINE -replace "$($previousExtent.Text)$($currentExtent.Text)", $wordToComplete
-            $COMP_WORDS = $COMP_WORDS -replace "$($previousExtent.Text) '$($currentExtent.Text)'", $wordToComplete
-            $previousWord = $commandAst.CommandElements[$COMP_CWORD - 2].Extent.Text
-            $COMP_CWORD -= 1
-        }
+            $COMP_LINE = "`"$commandAst`""
+            $COMP_WORDS = "('$($commandAst.CommandElements.Extent.Text -join "' '")')" -replace "''", "'"
+            for ($i = 1; $i -lt $commandAst.CommandElements.Count; $i++) {
+                $extent = $commandAst.CommandElements[$i].Extent
+                if ($cursorPosition -lt $extent.EndColumnNumber) {
+                    $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
+                    $COMP_CWORD = $i
+                    break
+                } elseif ($cursorPosition -eq $extent.EndColumnNumber) {
+                    $previousWord = $extent.Text
+                    $COMP_CWORD = $i + 1
+                    break
+                } elseif ($cursorPosition -lt $extent.StartColumnNumber) {
+                    $previousWord = $commandAst.CommandElements[$i - 1].Extent.Text
+                    $COMP_CWORD = $i
+                    break
+                } elseif ($i -eq $commandAst.CommandElements.Count - 1 -and $cursorPosition -gt $extent.EndColumnNumber) {
+                    $previousWord = $extent.Text
+                    $COMP_CWORD = $i + 1
+                    break
+                }
+            }
 
-        $command = $commandAst.CommandElements[0].Value
-        $bashCompletion = ". /usr/share/bash-completion/bash_completion 2> /dev/null"
-        $commandCompletion = ". /usr/share/bash-completion/completions/$command 2> /dev/null"
-        $COMPINPUT = "COMP_LINE=$COMP_LINE; COMP_WORDS=$COMP_WORDS; COMP_CWORD=$COMP_CWORD; COMP_POINT=$cursorPosition"
-        $COMPGEN = "bind `"set completion-ignore-case on`" 2> /dev/null; $F `"$command`" `"$wordToComplete`" `"$previousWord`" 2> /dev/null"
-        $COMPREPLY = "IFS=`$'\n'; echo `"`${COMPREPLY[*]}`""
-        $commandLine = "$bashCompletion; $commandCompletion; $COMPINPUT; $COMPGEN; $COMPREPLY" -split ' '
+            $currentExtent = $commandAst.CommandElements[$COMP_CWORD].Extent
+            $previousExtent = $commandAst.CommandElements[$COMP_CWORD - 1].Extent
+            if ($currentExtent.Text -like "/*" -and $currentExtent.StartColumnNumber -eq $previousExtent.EndColumnNumber) {
+                $COMP_LINE = $COMP_LINE -replace "$($previousExtent.Text)$($currentExtent.Text)", $wordToComplete
+                $COMP_WORDS = $COMP_WORDS -replace "$($previousExtent.Text) '$($currentExtent.Text)'", $wordToComplete
+                $previousWord = $commandAst.CommandElements[$COMP_CWORD - 2].Extent.Text
+                $COMP_CWORD -= 1
+            }
 
-        $previousCompletionText = ""
-        (wsl.exe $commandLine) -split '\n' |
-                Sort-Object -Unique -CaseSensitive |
-                ForEach-Object {
+            $command = $commandAst.CommandElements[0].Value
+            $bashCompletion = ". /usr/share/bash-completion/bash_completion 2> /dev/null"
+            $commandCompletion = ". /usr/share/bash-completion/completions/$command 2> /dev/null"
+            $COMPINPUT = "COMP_LINE=$COMP_LINE; COMP_WORDS=$COMP_WORDS; COMP_CWORD=$COMP_CWORD; COMP_POINT=$cursorPosition"
+            $COMPGEN = "bind `"set completion-ignore-case on`" 2> /dev/null; $F `"$command`" `"$wordToComplete`" `"$previousWord`" 2> /dev/null"
+            $COMPREPLY = "IFS=`$'\n'; echo `"`${COMPREPLY[*]}`""
+            $commandLine = "$bashCompletion; $commandCompletion; $COMPINPUT; $COMPGEN; $COMPREPLY" -split ' '
+
+            $previousCompletionText = ""
+            (wsl.exe $commandLine) -split '\n' `
+                | Sort-Object -Unique -CaseSensitive `
+                | ForEach-Object {
                     if ($wordToComplete -match "(.*=).*") {
                         $completionText = Format_WslArgument ($Matches[1] + $_) $true
                         $listItemText = $_
@@ -109,8 +124,10 @@
                     $previousCompletionText = $completionText
                     [System.Management.Automation.CompletionResult]::new($completionText, $listItemText, 'ParameterName', $completionText)
                 }
+        }
     }
 }
+
 
 function global:Format_WslArgument([string]$arg, [bool]$interactive) {
     if ($interactive -and $arg.Contains(" ")) {
@@ -119,21 +136,50 @@ function global:Format_WslArgument([string]$arg, [bool]$interactive) {
         return ($arg -replace " ", "\ ") -replace "([()|])", ('\$1', '`$1')[$interactive]
     }
 }
-###< I now have some bash. ###
 
+
+<#
+    .synopsis
+    the connect cmdlet allows a user to connect to a remote windows system
+    using the winrm protocol
+
+    .parameter pshost
+    the fqdn or the ip address of the remote windows server
+
+    .parameter copy_profile
+    if specified, this switch will copy your local profile to the remote server
+    so that you have a consistent set of modules available on all servers
+
+#>
 function connect {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [string]$pshost
+        [string]$pshost,
+        [switch]$copy_profile
     )
     $credential = Get-Credential
     $options = New-PSSessionOption -SkipCACheck -SkipCNCheck
     $session = New-PSSession -Credential $cred $pshost -UseSSL -SessionOption $options -Authentication Default
-    copy_profile $session
+    if ($copy_profile) {
+        copy_profile $session
+    }
     Enter-PSSession $session
 }
 
+
+<#
+    .synopsis
+    copies a local profile to a remote powershell session.
+
+    .description
+    used by the connect cmdlet so that you can connect to a system
+    and  copy your local profile up to the server all in one go
+
+    .example
+    PS> $session = Get-PsSession -Id 1
+    PS> copy_profile $session
+#>
 function copy_profile() {
     [CmdletBinding()]
     param(
@@ -154,12 +200,21 @@ function copy_profile() {
     copy-item -Path $profile -ToSession $session -Destination "$home_dir\Documents\WindowsPowerShell\profile.ps1"
     Invoke-Command -Session $session -ScriptBlock { 
         cd ~
-        $env:remote = "true"
+        $env:remote = "winrm"
         . "Documents\WindowsPowerShell\profile.ps1"  
     }
 }
 
 
+<#
+    .synopsis
+    dircolors is a powershell module available in psgallery.  It is used to
+    add color-coding to the output of the `dir` command.
+
+    .description
+    this cmdlet is not meant to be called stand-alone.  we define it to
+    help modularize the startup of the profile.
+#>
 function setup_dircolors() {
     $dircolors = "C:\u\dotfiles\zsh\.dircolors"
     if ((Test-Path $dircolors) -and (!(Test-Path "${env:HOMEDRIVE}${env:HOMEPATH}\.dircolors"))) {
@@ -168,14 +223,29 @@ function setup_dircolors() {
     }
 }
 
-function venv($name="") {
+
+<#
+    .synopsis
+    venv is a cmdlet that is used to setup a virtual environment for a
+    python project.  e.g., if you clone upholstery and then wanted to
+    setup the virtual environment, you could use this cmdlet to do the
+    setup of the virtual environment.
+
+    .description
+    this cmdlet favors later pythons over older pythons.  If a specific
+    python is needed, do not use this cmdlet.  this cmdlet will
+    install any dependencies noted in the `requirements.txt` file as well
+    as running the setup.py file.  this cmdlet also installs setuptools
+    and wheel by default.
+#>
+function venv {
     if (!(Test-Path ".wenv")) {
-        $installed_python = $null
         $pythons = [ordered]@{
             "39" = "c:\python39\python.exe";
             "38" = "c:\python38\python.exe";
             "37" = "c:\python37\python.exe";
-            "36" = "c:\python36\python.exe" }
+            "36" = "c:\python36\python.exe"
+        }
         foreach ($i in $pythons.getEnumerator()) {
             $python = $i.value
             if (Test-Path $python) {
@@ -203,6 +273,19 @@ function venv($name="") {
 }
 
 
+<#
+    .synopsis
+    if you are in a directory for a python project and want to
+    activate the virtual environment, use this cmdlet as a quick alias
+    to activate the venv.
+
+    .description
+    this cmdlet favors later pythons over older pythons.  If a specific
+    python is needed, do not use this cmdlet.  this cmdlet will
+    install any dependencies noted in the `requirements.txt` file as well
+    as running the setup.py file.  this cmdlet also installs setuptools
+    and wheel by default.
+#>
 function djact() {
     if ((Test-Path ".wenv") -and (Test-Path ".\.wenv\scripts\activate.ps1")) {
         . ".\.wenv\scripts\activate.ps1" 
@@ -213,6 +296,11 @@ function djact() {
     }
 }
 
+
+<#
+    .synopsis
+    alias to manage.py, useful for running django commands
+#>
 function dj() {
     if (!(Test-Path .\manage.py)) {
         Write-Host "no django found here"
@@ -221,11 +309,35 @@ function dj() {
     &python manage.py @args
 }
 
+
+<#
+    .synopsis
+    alias to start up shell_plus in django
+#>
 function djsp() {
     dj shell_plus --quiet-load
 }
 
-function weather($city="Chicago") {
+
+<#
+    .synopsis
+    shows us the weather in a nice ascii format using wttr.in
+
+    .parameter city
+    the name of the city for which to show the weather.  defaults to
+    chicago.
+
+    .example
+    PS> weather -city cleveland
+
+    .example
+    PS> weather -city "merrillville, in"
+
+#>
+function weather {
+    params(
+        [string]$city="Chicago"
+    )
     $weather = (Invoke-WebRequest "https://wttr.in/${city}" -UserAgent "curl").content
     $weather = $weather -split "`n"
     for ($x = 0; $x -lt 17; ++$x) {
@@ -362,6 +474,11 @@ function global:prompt {
     return " "
 }
 
+
+<#
+    .synopsis
+    simple cmdlet that connects you to exchange 365 to run cmdlets
+#>
 function connect_exchange {
     Import-Module exchangeonlinemanagement
     Connect-ExchangeOnline -ShowProgress:$true 
@@ -390,14 +507,14 @@ try {
 catch {
    Write-Host "Please run install-module dockercompletion"
 }
-
+bash_commands_via_wsl
 Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9qhY2kdWuqp4/RvaulK4wrdv
-# bXegghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULOVTQAzknY06sBKsq4zK2KJt
+# 8vegghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
 # AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
 # cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
 # IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
@@ -492,11 +609,11 @@ Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 # dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
 # DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
 # DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUgKebElwp6NZvmFu9Q8ZFv6HpdZMwDQYJKoZIhvcNAQEBBQAE
-# ggEADf9kaqx8qcs2mP5HQxbdHkCkgBydWwQPwe4uDTJOhNz05ZNu0oqo1+MmXYmw
-# NMbCfyJ+cl0IrDxIftvrVNH2r2JiLTGHtNKMzFb7Ksrh1+Qc1vASNXUtwct2OrpJ
-# oHPpl55VHNTNlASwcf+vgJdcejLAXaBOCeRk1rW5dMStBreWVh9x+6ERddD6SbtB
-# FYuyxy2R/utjTgSOT0xPS0Feyy8SZcmOWVQIhGGNXLjvx3tZuca8oJbsEg/ZAcw0
-# XLo/ixjKn0GvcT0RO86mJTmGj24Rl8B4xZ5PBKCnJsSO6QX+BZWhPukeohAaZ3Xn
-# Ov1dMmZ8YiJmz1QQ2yUARnHhWQ==
+# hkiG9w0BCQQxFgQUJ/aIuI6S0Ajt7mcJxEWnhTiEEgcwDQYJKoZIhvcNAQEBBQAE
+# ggEAPKqFzZ4KAJoO2vJ3k2FyOLY7nC2nIpVwA40BDf5fuOlplyCqe7gCsBm+8OlO
+# Je6e7Uz2ya4AG8ZFRbUnppsKrefzOp6P9vdVsPF+FwgOPTv9GC8sXwoAELih/Od0
+# dLaoqFkg0sdMVK5dCPj8av18AI/30iqRoFr0zbvL1v78tCX8X056NJ396bBzyu+F
+# nXFmGUq7rA8rcRxTqDxNot7fsQJ3nVFObmpiGQfhhZxOW4uDeZ0h5hlxJtxMWNC2
+# 2ur6jxm6KGH9hvGYyLz6khNSZyAc91iMHGKeUx1h1olPXgXV/MFA7k0CNKD2wiM+
+# EdCEG/BFkFvSf9rwzdTkpDJrdg==
 # SIG # End signature block
