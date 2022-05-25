@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2021-12-04 17:31:41" build="210912">
+		<key name=".Vanilla" modified="2022-05-25 02:35:32" build="220418">
 			<value name="Language" type="string" data="en"/>
 			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>
@@ -10,7 +10,7 @@
 			<value name="StartFarFolders" type="hex" data="00"/>
 			<value name="StartFarEditors" type="hex" data="00"/>
 			<value name="StartCreateDelay" type="ulong" data="100"/>
-			<value name="ColorTable00" type="dword" data="0045242a"/>
+			<value name="ColorTable00" type="dword" data="00311016"/>
 			<value name="ColorTable01" type="dword" data="00d1a891"/>
 			<value name="ColorTable02" type="dword" data="00749800"/>
 			<value name="ColorTable03" type="dword" data="009b87b0"/>
@@ -154,11 +154,11 @@
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd X" type="long" data="-938"/>
-			<value name="ConWnd Y" type="long" data="-178"/>
-			<value name="LastMonitor" type="string" data="0,0,0,0"/>
+			<value name="ConWnd X" type="long" data="90"/>
+			<value name="ConWnd Y" type="long" data="83"/>
+			<value name="LastMonitor" type="string" data="0,0,1920,1030"/>
 			<value name="ConWnd Width" type="dword" data="00000068"/>
-			<value name="ConWnd Height" type="dword" data="0000002f"/>
+			<value name="ConWnd Height" type="dword" data="00000027"/>
 			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="QuakeStyle" type="hex" data="00"/>
 			<value name="Restore2ActiveMon" type="hex" data="00"/>
@@ -409,7 +409,7 @@
 			<value name="Update.DownloadPath" type="string" data="%TEMP%\ConEmu"/>
 			<value name="Update.LeavePackages" type="hex" data="00"/>
 			<value name="Update.PostUpdateCmd" type="string" data="echo Last successful update&gt;ConEmuUpdate.info &amp;&amp; date /t&gt;&gt;ConEmuUpdate.info &amp;&amp; time /t&gt;&gt;ConEmuUpdate.info"/>
-			<key name="HotKeys" modified="2021-12-04 17:31:41" build="210912">
+			<key name="HotKeys" modified="2022-05-25 02:35:32" build="220418">
 				<value name="KeyMacroVersion" type="hex" data="02"/>
 				<value name="Multi.Modifier" type="dword" data="00000011"/>
 				<value name="Multi.ArrowsModifier" type="dword" data="000000a2"/>
@@ -608,9 +608,9 @@
 				<value name="DndRKey" type="hex" data="A2"/>
 				<value name="WndDragKey" type="dword" data="00121101"/>
 			</key>
-			<key name="Tasks" modified="2021-12-04 17:31:41" build="210912">
+			<key name="Tasks" modified="2022-05-25 02:35:32" build="220418">
 				<value name="Count" type="long" data="7"/>
-				<key name="Task1" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task1" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{cmdadmin}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="0012114f"/>
@@ -619,7 +619,7 @@
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data='cmd.exe /k "%ConEmuBaseDir%\CmdInit.cmd" -new_console:a'/>
 				</key>
-				<key name="Task2" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task2" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{poshadmin}"/>
 					<value name="Flags" type="dword" data="00000007"/>
 					<value name="Hotkey" type="dword" data="00121150"/>
@@ -628,7 +628,7 @@
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data="powershell.exe -new_console:a"/>
 				</key>
-				<key name="Task3" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task3" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{git}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00121147"/>
@@ -637,7 +637,7 @@
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data='"%ConEmuDir%\..\Git\git-cmd.exe" --no-cd --command=usr/bin/bash.exe -l -i'/>
 				</key>
-				<key name="Task4" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task4" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{cygwin}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -646,7 +646,7 @@
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data='set CHERE_INVOKING=1 &amp; set "PATH=%ConEmuDrive%\cygwin64\bin;%PATH%" &amp; %ConEmuBaseDirShort%\conemu-cyg-64.exe -new_console:p %ConEmuDrive%\cygwin64\bin\bash.exe --login -i -new_console:C:"%ConEmuDrive%\cygwin64\Cygwin.ico"'/>
 				</key>
-				<key name="Task5" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task5" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{posh7}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00121137"/>
@@ -655,7 +655,7 @@
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data="pwsh.exe -new_console:a"/>
 				</key>
-				<key name="Task6" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task6" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{Helper::Show ANSI colors}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -664,7 +664,7 @@
 					<value name="Count" type="long" data="1"/>
 					<value name="Cmd1" type="string" data='cmd.exe /k type "%ConEmuBaseDir%\Addons\AnsiColors16t.ans" -cur_console:n'/>
 				</key>
-				<key name="Task7" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Task7" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="{Tools::Chocolatey (Admin)}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -674,12 +674,12 @@
 					<value name="Cmd1" type="string" data='*cmd.exe /k Title Chocolatey &amp; "%ConEmuBaseDir%\Addons\ChocolateyAbout.cmd"'/>
 				</key>
 			</key>
-			<key name="Apps" modified="2021-12-04 17:31:41" build="210912">
+			<key name="Apps" modified="2022-05-25 02:35:32" build="220418">
 				<value name="Count" type="long" data="0"/>
 			</key>
-			<key name="Colors" modified="2021-12-04 17:31:41" build="210912">
+			<key name="Colors" modified="2022-05-25 02:35:32" build="220418">
 				<value name="Count" type="long" data="5"/>
-				<key name="Palette1" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Palette1" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="2ps"/>
 					<value name="TextColorIdx" type="hex" data="10"/>
 					<value name="BackColorIdx" type="hex" data="10"/>
@@ -702,7 +702,7 @@
 					<value name="ColorTable14" type="dword" data="00b6ffff"/>
 					<value name="ColorTable15" type="dword" data="00eeeeee"/>
 				</key>
-				<key name="Palette2" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Palette2" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="2ps-pantone"/>
 					<value name="TextColorIdx" type="hex" data="10"/>
 					<value name="BackColorIdx" type="hex" data="10"/>
@@ -725,7 +725,7 @@
 					<value name="ColorTable14" type="dword" data="00b6ebff"/>
 					<value name="ColorTable15" type="dword" data="00eeeeee"/>
 				</key>
-				<key name="Palette3" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Palette3" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="2ps-play"/>
 					<value name="TextColorIdx" type="hex" data="10"/>
 					<value name="BackColorIdx" type="hex" data="10"/>
@@ -748,7 +748,7 @@
 					<value name="ColorTable14" type="dword" data="00b6ffff"/>
 					<value name="ColorTable15" type="dword" data="00eeeeee"/>
 				</key>
-				<key name="Palette4" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Palette4" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="2ps-tango"/>
 					<value name="TextColorIdx" type="hex" data="10"/>
 					<value name="BackColorIdx" type="hex" data="10"/>
@@ -771,7 +771,7 @@
 					<value name="ColorTable14" type="dword" data="00b6ffff"/>
 					<value name="ColorTable15" type="dword" data="00eeeeee"/>
 				</key>
-				<key name="Palette5" modified="2021-12-04 17:31:41" build="210912">
+				<key name="Palette5" modified="2022-05-25 02:35:32" build="220418">
 					<value name="Name" type="string" data="away colors"/>
 					<value name="TextColorIdx" type="hex" data="10"/>
 					<value name="BackColorIdx" type="hex" data="10"/>
