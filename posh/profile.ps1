@@ -510,6 +510,1619 @@ catch {
 bash_commands_via_wsl
 Set-PSReadlineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
 
+
+#PLEASE READ and follow steps below
+#1. ENTER YOUR EMAIL ADDRESS HERE:
+$myemailaddress = "johndoe@contoso.com"
+#2. COPY ALL THE SCRIPTS TO YOUR EXISTING PROFILE
+#3. Reload your Posh and run myo365tools function
+#4. Enter 1 in the menu and press enter to Connect to Services ( you must have global admin role to connect to all 3 services, msol,exchangeonline,sharepoint(spo) )
+#5 once connected. run myo365tools function again to start using the tool
+
+###START MYO365TOOLS###
+function myo365tools()
+{
+cls
+
+Write-Host "MY O365 TOOLS Menu" -ForegroundColor Yellow
+Write-Host "1  - Connect to MSOL $global:statusmsol,EXOPS $global:statusmsol and SPO $global:statusspo" -ForegroundColor Green
+Write-Host "2  - User Search and License Management Tool" -ForegroundColor Green
+Write-Host "3  - Mailbox Permissions" -ForegroundColor Green
+Write-Host "4  - Distribution Group Management" -ForegroundColor Green
+Write-Host "5  - OneDrive Access Management Tool" -ForegroundColor Green
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to exit: " -NoNewline
+
+$choice = Read-Host
+    switch  ($choice)
+    {
+
+     'quit' {
+        cls
+        return
+
+            }
+     '1' {
+        cls
+        Write-Host "Connecting to MSOL Service..."
+        Connect-MsolService
+        $global:mytenantnamefinal = $null;
+
+        $mytenantinfo = (Get-MsolDomain | Where-Object {$_.isInitial}).name
+        $mytenantname = $mytenantinfo.split('.');
+        $global:mytenantnamefinal = $mytenantname[0]
+        connect_exchange_online
+        connect_spo
+        check_connections_status
+
+         }
+     '2' {
+        cls
+        msol_management
+          }
+     '3' {
+        cls
+        exchange_management
+         }
+
+     '4' {
+        cls
+        exchange_group_management
+         }
+
+     '5' {
+        cls
+        onedrive_management_tool
+         }
+
+     }
+}
+
+#start exchange group management#
+function exchange_group_management()
+{
+cls
+Write-Host "*****EXCHANGE GROUP MANAGEMENT TOOL*****" -ForegroundColor Green
+Write-Host "1  - Search Group Name " -ForegroundColor Green
+Write-Host "2  - Add Member to Online Group " -ForegroundColor Green
+Write-Host "3  - Remove Member from Online Group" -ForegroundColor Green
+Write-Host "4  - View Members of a Group" -ForegroundColor Green
+
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+
+$exchange_choice = Read-Host
+    switch  ($exchange_choice)
+    {
+
+     'quit' {
+
+        return myo365tools
+
+            }
+     '1' {
+
+        cls
+        exchange_group_finder
+
+
+         }
+     '2' {
+        cls
+        add_to_exchange_group
+
+          }
+     '3' {
+        cls
+        remove_from_exchange_group
+         }
+
+     '4' {
+        cls
+        view_distro_group_members
+         }
+
+
+     }
+}
+
+function exchange_group_finder()
+{
+Write-Host "*****EXCHANGE GROUP FINDER*****" -ForegroundColor Green
+Write-Host "Enter name or part of the group name or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu : " -NoNewline
+
+    $mailgroupsearch = Read-Host
+    if ($mailgroupsearch -eq 'quit' -or $mailgroupsearch -eq '')
+    {
+    return exchange_group_management
+    }
+
+   if (!(Get-Group -Anr $mailgroupsearch | select Name))
+   {
+   Write-Host "No group found with that name. Please try again." -ForegroundColor Red
+   exchange_group_finder
+   }
+   else
+   {
+   Get-Group -Anr $mailgroupsearch | select Name,WindowsEmailAddress |  Format-Table
+
+   exchange_group_finder
+   }
+}
+
+function add_to_exchange_group()
+{
+Write-Host "*****ADD MEMBER TO ONLINE GROUP*****" -ForegroundColor Green
+Write-Host "Enter the employee email address or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu : " -NoNewline
+
+    $emailaddress = Read-Host
+    if ($emailaddress -eq 'quit' -or $emailaddress -eq '')
+    {
+    return exchange_group_management
+    }
+
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $emailaddress -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+
+        return add_to_exchange_group
+        }
+    Write-Host "***USER INFORMATION*** :" -ForegroundColor Yellow
+    Get-MsolUser -UserPrincipalName $emailaddress | Select DisplayName,UserPrincipalName | Format-Table
+
+    Write-Host "Enter the distribution group email address you want this user to be added to or type" -NoNewline
+    Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+    Write-Host "to cancel: " -NoNewline
+    $exchange_groupname = Read-Host
+
+    if ($exchange_groupname -eq 'quit' -or $exchange_groupname -eq '')
+    {
+    cls
+    return add_to_exchange_group
+    }
+
+
+    if (!(Get-DistributionGroup -identity $exchange_groupname -ErrorAction 0))
+    {
+    Write-Host "No distribution group found with that name. Please try again." -ForegroundColor Red
+    Read-Host -Prompt "Press Enter to continue"
+    cls
+    add_to_exchange_group
+    }
+    Write-Host "***DISTRIBUTION GROUP INFORMATION***" -ForegroundColor Yellow
+    Get-DistributionGroup -identity $exchange_groupname | Format-Table
+
+    Write-Host "Add" $emailaddress "to group" $exchange_groupname"? Y/N: " -ForegroundColor Red -NoNewline
+    $addconfirm= Read-Host
+        if ($addconfirm-eq 'Y')
+        {
+        Add-DistributionGroupMember -identity $exchange_groupname -Member $emailaddress
+        Write-Host "***$exchange_groupname GROUP MEMBERS***" -ForegroundColor Yellow
+        Get-DistributionGroupMember -identity $exchange_groupname | Select Name,PrimarySMTPAddress | Format-Table
+        Write-Host "Completed!"
+        Read-Host -Prompt "Press Enter to continue"
+        cls
+        add_to_exchange_group
+        }
+        else
+        {
+        cls
+        return add_to_exchange_group
+        }
+  }
+}
+
+function remove_from_exchange_group()
+{
+Write-Host "*****REMOVE MEMBER FROM ONLINE GROUP*****" -ForegroundColor Green
+Write-Host "Enter the group email address or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu : " -NoNewline
+
+
+    $exchange_groupname = Read-Host
+
+    if ($exchange_groupname -eq 'quit' -or $exchange_groupname -eq '')
+    {
+
+    return exchange_group_management
+    }
+
+
+    if (!(Get-DistributionGroup -identity $exchange_groupname -ErrorAction 0))
+    {
+    Write-Host "No distribution group found with that name. Please try again." -ForegroundColor Red
+    Read-Host -Prompt "Press Enter to continue"
+    cls
+    return remove_from_exchange_group
+    }
+    Write-Host "***DISTRIBUTION GROUP MEMBERS***:" -ForegroundColor Yellow
+    Write-Host "for Account : $exchange_groupname" -ForegroundColor Yellow
+
+    Get-DistributionGroupMember -identity $exchange_groupname | Select Name,PrimarySMTPAddress | Format-Table
+
+
+    Write-Host "Enter the email address you want to remove or type" -NoNewline
+    Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+    Write-Host "to cancel: " -NoNewline
+
+
+    $emailaddress = Read-Host
+    if ($emailaddress -eq 'quit' -or $emailaddress -eq '')
+    {
+    cls
+    return exchange_group_management
+    }
+
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $emailaddress -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Email not found. Please verify email and start over."
+
+        return remove_from_exchange_group
+        }
+
+
+    Write-Host "***USER INFORMATION***" -ForegroundColor Yellow
+    Get-MsolUser -UserPrincipalName $emailaddress | Select DisplayName,UserPrincipalName | Format-Table
+
+
+    Write-Host "REMOVE" $emailaddress "from group" $exchange_groupname"? Y/N: " -ForegroundColor Red -NoNewline
+    $removeconfirm= Read-Host
+        if ($removeconfirm-eq 'Y')
+        {
+        Remove-DistributionGroupMember -identity $exchange_groupname -Member $emailaddress -confirm:$false
+        Write-Host "***DISTRIBUTION GROUP MEMBERS***:" -ForegroundColor Yellow
+        Write-Host "for Account : $exchange_groupname" -ForegroundColor Yellow
+        Get-DistributionGroupMember -identity $exchange_groupname | Select Name,PrimarySMTPAddress | Format-Table
+        Write-Host "Done!"
+        Read-Host -Prompt "Press Enter to continue"
+        cls
+        remove_from_exchange_group
+        }
+        else
+        {
+        return remove_from_exchange_group
+        }
+  }
+}
+
+function view_distro_group_members()
+{
+Write-Host "*****VIEW GROUP MEMBERS*****" -ForegroundColor Green
+Write-Host "Enter email address of the group or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu : " -NoNewline
+
+    $mailgroupsearch = Read-Host
+    if ($mailgroupsearch -eq 'quit' -or $mailgroupsearch -eq '')
+    {
+    return exchange_group_management
+    }
+
+   if (!(Get-DistributionGroup -identity $mailgroupsearch -ErrorAction 0 ))
+   {
+   Write-Host "No group found with that name. Please try again." -ForegroundColor Red
+   view_distro_group_members
+   }
+   else
+   {
+   Write-Host "***DISTRIBUTION GROUP MEMBERS*** " -ForegroundColor Yellow
+   Get-DistributionGroupMember -identity $mailgroupsearch | select Name,PrimarySMTPAddress |  Format-Table
+
+   view_distro_group_members
+   }
+}
+#end of exchange group management#
+
+function msol_management()
+{
+cls
+Write-Host "*****User Search and License Management Tool*****" -ForegroundColor Yellow
+Write-Host "1  - Search User" -ForegroundColor Green
+Write-Host "2  - List SKU Licenses" -ForegroundColor Green
+Write-Host "3  - Manage User licenses" -ForegroundColor Green
+Write-Host "4  - MFA Management" -ForegroundColor Green
+
+
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+
+$msol_choice = Read-Host
+    switch  ($msol_choice)
+    {
+
+     'quit' {
+
+        return myo365tools
+
+            }
+     '1' {
+
+        cls
+        search_msol_user
+
+
+         }
+     '2' {
+        cls
+        msol_sku
+
+          }
+     '3' {
+        cls
+        license_management
+         }
+     '4' {
+        cls
+        mfa_management
+         }
+     }
+}
+
+#start exchange management
+function exchange_management()
+{
+
+cls
+Write-Host "*****MAILBOX PERMISSIONS TOOL*****" -ForegroundColor Green
+Write-Host "1  - View Mailbox permissions" -ForegroundColor Green
+Write-Host "2  - Add Mailbox permissions " -ForegroundColor Green
+Write-Host "3  - Remove Mailbox permissions" -ForegroundColor Green
+
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+
+$exchange_choice = Read-Host
+    switch  ($exchange_choice)
+    {
+
+     'quit' {
+
+        return myo365tools
+
+            }
+     '1' {
+
+        cls
+        view_mailboxpermission
+
+         }
+
+     '2' {
+        cls
+        add_fullaccess
+         }
+
+     '3' {
+        cls
+        remove_fullaccess
+         }
+     }
+}
+#end exchange_management
+
+
+function license_management()
+{
+
+cls
+Write-Host "*****USER LICENSE MANAGEMENT TOOL*****" -ForegroundColor Green
+Write-Host "1  - Add License " -ForegroundColor Green
+Write-Host "2  - Remove License " -ForegroundColor Green
+Write-Host "3  - Upgrade/Change License " -ForegroundColor Green
+
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+
+$license_choice = Read-Host
+    switch  ($license_choice)
+    {
+
+     'quit' {
+
+        return msol_management
+
+            }
+     '1' {
+
+        cls
+        assign_license
+
+         }
+
+     '2' {
+        cls
+        remove_license
+         }
+
+     '3' {
+        cls
+        replace_license
+         }
+
+     }
+}
+
+function assign_license()
+{
+Write-Host "*****O365 LICENSE ASSIGNMENT TOOL*****" -ForegroundColor Green
+Write-Host "Enter email address or userprincipalname or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+$uname = Read-Host
+    if ($uname -eq 'quit' -or $uname -eq '')
+    {
+    return license_management
+    }
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+
+        return assign_license
+        }
+        else
+        {
+        Write-Host "*** LICENSES ***" -ForegroundColor Yellow
+        Get-MsolAccountSku | Format-Table AccountSkuID,ActiveUnits,ConsumedUnits
+        Write-Host "*** USER INFO ***" -ForegroundColor Yellow
+        Get-MsolUser -userprincipalname $uname |  Fl DisplayName,Licenses
+        Write-Host "Enter the license pack to ASSIGN this user or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to cancel, ex " $global:mytenantnamefinal":ENTERPRISEPACK: " -NoNewline
+        $licensepack = Read-Host
+            if ($licensepack -eq 'quit' -or $licensepack -eq '')
+            {
+            #add script here to check if license exists in pool otherwise throw an error?
+            return license_management
+            }
+
+            Write-Host "Do you want to ASSIGN $licensepack to $uname ?" -ForegroundColor Green
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmAssign = Read-Host
+                if ($confirmAssign -eq 'Y')
+                {
+                enable_mfa $uname
+                Set-MsolUserLicense -userprincipalname $uname -addlicenses "$licensepack"
+                Get-MsolUser -userprincipalname $uname |  Fl DisplayName,Licenses
+                Write-Host "Completed!"
+                Write-Host "Please allow 5 mins to create the mailbox."
+                Read-Host -Prompt "Press Enter to continue"
+
+                }
+        }
+    }
+cls
+return assign_license
+}
+
+#upgrade/replace license start
+function replace_license()
+{
+Write-Host "*****O365 LICENSE REPLACEMENT TOOL*****" -ForegroundColor Green
+Write-Host "Enter email address or userprincipalname or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+$uname = Read-Host
+    if ($uname -eq 'quit' -or $uname -eq '')
+    {
+    return license_management
+    }
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+
+        return replace_license
+        }
+        else
+        {
+
+        Write-Host "*** USER INFO ***" -ForegroundColor Yellow
+        Get-MsolUser -userprincipalname $uname |  Fl UserprincipalName,DisplayName,Licenses
+        Write-Host "Enter the OLD license pack to REMOVE from this user or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to cancel, ex " $global:mytenantnamefinal":STANDARDPACK: " -NoNewline
+        $oldlicensepack = Read-Host
+            if ($oldlicensepack -eq 'quit' -or $oldlicensepack -eq '')
+            {
+
+            return replace_license
+            }
+        Write-Host "*** LICENSES ***" -ForegroundColor Yellow
+        Get-MsolAccountSku | Format-Table AccountSkuID,ActiveUnits,ConsumedUnits
+        Write-Host "Enter the NEW license pack to ASSIGN this user or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to cancel, ex " $global:mytenantnamefinal":ENTERPRISEPACK: " -NoNewline
+        $newlicensepack = Read-Host
+            if ($newlicensepack -eq 'quit' -or $newlicensepack -eq '')
+            {
+
+            return replace_license
+            }
+
+            Write-Host "Are you sure you want to REMOVE $oldlicensepack from $uname and REPLACE with $newlicensepack ?" -ForegroundColor Red
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmReplace = Read-Host
+                if ($confirmReplace -eq 'Y')
+                {
+                Set-MsolUserLicense -Userprincipalname $uname -RemoveLicenses "$oldlicensepack"
+                Set-MsolUserLicense -userprincipalname $uname -Addlicenses "$newlicensepack"
+                Get-MsolUser -userprincipalname $uname |  Fl DisplayName,Licenses
+                Write-Host "Completed!"
+                Read-Host -Prompt "Press Enter to continue"
+
+                }
+        }
+    }
+cls
+return replace_license
+
+}
+#upgrade/replace license end
+
+
+function enable_mfa($email)
+{
+ $mfastate = Get-MsolUser -UserPrincipalName $email | select @{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+
+    if ($mfastate -like '@{MFA State=}') #with Disabled status
+    {
+    Write-Host "MFA CHECK : MFA is not enabled for this account." -ForegroundColor Red
+    Write-Host "Do you want to enable MFA for this account?"-ForegroundColor Green
+    Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+        $confirmMFA = Read-Host
+        if ($confirmMFA -eq 'Y')
+        {
+
+        $st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
+        $st.RelyingParty = "*"
+        $st.State = “Enabled”
+        $sta = @($st)
+        Set-MsolUser -UserPrincipalName $email -UsageLocation US -StrongAuthenticationRequirements $sta
+        Write-Host "MFA STATUS : ENABLED" -ForegroundColor Green
+        }
+
+    }
+    else
+    {
+    Write-Host "MFA STATUS : ALREADY ENABLED" -ForegroundColor Green
+    }
+}
+
+#START activate mfa
+function verify_activate_mfa()
+{
+cls
+Write-Host "*****MFA Activation Tool*****" -ForegroundColor Green
+Write-Host "Enter email address or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+$uname = Read-Host
+    if ($uname -eq 'quit' -or $uname -eq '')
+    {
+    return mfa_management
+    }
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+        Read-Host -Prompt "Press Enter to continue"
+
+        return verify_activate_mfa
+        }
+        else
+        {
+
+        $mfastate = Get-MsolUser -UserPrincipalName $uname | select @{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+
+           if ($mfastate -like '@{MFA State=}') #with Disabled status
+           {
+           Write-Host "***ACCOUNT HOLDER INFORMATION***" -ForegroundColor Yellow
+           Get-MsolUser -userprincipalname $uname |  Fl DisplayName,UserprincipalName,@{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+
+           Write-Host "MFA CHECK : MFA is not enabled for this account." -ForegroundColor Red
+           Write-Host "Do you want to enable MFA for this account?"-ForegroundColor Green
+           Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+             $confirmMFA = Read-Host
+                if ($confirmMFA -eq 'Y')
+                {
+                $st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
+                $st.RelyingParty = "*"
+                $st.State = “Enabled”
+                $sta = @($st)
+                Set-MsolUser -UserPrincipalName $uname -UsageLocation US -StrongAuthenticationRequirements $sta
+                Write-Host "MFA ENABLED!" -ForegroundColor Green
+                Read-Host -Prompt "Press Enter to continue"
+                }
+                else
+                {
+                return verify_activate_mfa
+                }
+
+           }
+           else
+           {
+           Write-Host "***ACCOUNT HOLDER INFORMATION***" -ForegroundColor Yellow
+           Get-MsolUser -userprincipalname $uname |  Fl DisplayName,UserprincipalName,@{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+           Write-Host "MFA STATUS : ALREADY ENABLED." -ForegroundColor Green
+           Read-Host -Prompt "Press Enter to continue"
+           }
+        #
+        }
+    }
+
+return verify_activate_mfa
+}
+#END activate mfa
+
+#reset mfa start
+function reset_mfa()
+{
+
+cls
+Write-Host "*****MFA RESET TOOL*****" -ForegroundColor Green
+Write-Host "Enter email address or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+$uname = Read-Host
+    if ($uname -eq 'quit' -or $uname -eq '')
+    {
+    return mfa_management
+    }
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+        Read-Host -Prompt "Press Enter to continue"
+
+        return reset_mfa
+        }
+        else
+        {
+
+        $mfastate = Get-MsolUser -UserPrincipalName $uname | select @{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+
+           if ($mfastate -notlike '@{MFA State=}') #with Disabled status
+           {
+           Write-Host "***ACCOUNT HOLDER INFORMATION***" -ForegroundColor Yellow
+           Get-MsolUser -userprincipalname $uname |  Fl DisplayName,UserprincipalName,@{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+
+           Write-Host "Do you really want to RESET MFA for this account?"-ForegroundColor Red
+           Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+             $confirmMFA = Read-Host
+                if ($confirmMFA -eq 'Y')
+                {
+                Reset-MsolStrongAuthenticationMethodByUpn -UserPrincipalName $uname
+                Write-Host "MFA has been RESET!" -ForegroundColor Green
+                Read-Host -Prompt "Press Enter to continue"
+                }
+                else
+                {
+                return reset_mfa
+                }
+              }
+           else
+           {
+           Write-Host "***ACCOUNT HOLDER INFORMATION***" -ForegroundColor Yellow
+           Get-MsolUser -userprincipalname $uname |  Fl DisplayName,UserprincipalName,@{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+           Write-Host "MFA STATUS : NOT ENABLED" -ForegroundColor DarkYellow
+           Write-host "Reset cannot be done. Please enable MFA for this account." -ForegroundColor Red
+
+           Read-Host -Prompt "Press Enter to continue"
+           }
+
+        }
+    }
+
+return reset_mfa
+
+}
+#reset mfa end
+
+function mfa_management()
+{
+
+cls
+Write-Host "*****MFA MANAGEMENT TOOL*****" -ForegroundColor Green
+Write-Host "1  - Enable MFA " -ForegroundColor Green
+Write-Host "2  - Reset MFA " -ForegroundColor Green
+
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+
+$mfa_choice = Read-Host
+    switch  ($mfa_choice)
+    {
+
+     'quit' {
+
+        return msol_management
+
+            }
+     '1' {
+
+        cls
+        verify_activate_mfa
+
+         }
+
+     '2' {
+        cls
+        reset_mfa
+         }
+
+     }
+
+}
+
+function remove_license()
+{
+Write-Host "*****O365 LICENSE REMOVAL TOOL*****" -ForegroundColor Green
+
+Write-Host "Enter email address or userprincipalname or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+$uname = Read-Host
+    if ($uname -eq 'quit' -or $uname -eq '')
+    {
+    return license_management
+    }
+    else
+    {
+
+    $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+
+        return remove_license
+        }
+        else
+        {
+        Write-Host "*** USER INFO ***" -ForegroundColor Yellow
+        Get-MsolUser -userprincipalname $uname |  Fl UserprincipalName,DisplayName,Licenses
+        Write-Host "Enter the license pack to remove from this user or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to cancel, ex " $global:mytenantnamefinal":ENTERPRISEPACK: " -NoNewline
+        $licensepack = Read-Host
+            if ($licensepack -eq 'quit' -or $licensepack -eq '')
+            {
+
+            return license_management
+            }
+
+            Write-Host "Are you sure you want to remove $licensepack from $uname ?" -ForegroundColor Red
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmRemove = Read-Host
+                if ($confirmRemove -eq 'Y')
+                {
+                Set-MsolUserLicense -Userprincipalname $uname -RemoveLicenses "$licensepack"
+                Get-MsolUser -userprincipalname $uname |  Fl DisplayName,Licenses
+                Write-Host "Completed!"
+                Read-Host -Prompt "Press Enter to continue"
+
+                }
+
+        }
+    }
+cls
+return remove_license
+}
+
+function search_msol_user()
+{
+cls
+Write-Host "*****MSOL USER MANAGEMENT TOOL*****" -ForegroundColor Green
+Write-Host "1  - Search by name " -ForegroundColor Green
+Write-Host "2  - Search by userprincipalname and view details " -ForegroundColor Green
+
+Write-Host "Enter the choice number or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu: " -NoNewline
+
+$search_msol_group_choice = Read-Host
+    switch  ($search_msol_group_choice)
+    {
+
+     'quit' {
+
+        return msol_management
+
+            }
+     '1' {
+
+        cls
+        search_msol_byname
+
+         }
+
+     '2' {
+        cls
+        search_msol_byuserprincipal
+         }
+
+     '3' {
+        cls
+
+         }
+
+
+     }
+}
+
+function search_msol_byname()
+{
+Write-host "*****MSOLUSER SEARCH TOOL*****" -ForegroundColor Green
+Write-Host "Enter name or part of it or email address " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to exit search: " -NoNewline
+$name = Read-Host
+    if ($name -eq 'quit' -or $name -eq '')
+    {
+    return search_msol_user
+    }
+    else
+    {
+
+    Write-Host "SEARCH RESULT" -ForegroundColor Yellow
+    $result = Get-MsolUser -SearchString $name -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+
+        return search_msol_byname
+        }
+        else
+        {
+
+        Get-MsolUser -SearchString $name |  Fl DisplayName,UserprincipalName
+        search_msol_byname
+        }
+    }
+
+ }
+
+function search_msol_byuserprincipal()
+{
+Write-host "*****MSOLUSER SEARCH TOOL*****" -ForegroundColor Green
+Write-Host "Enter email address or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to exit search: " -NoNewline
+$emailadd = Read-Host
+    if ($emailadd -eq 'quit' -or $emailadd -eq '')
+    {
+    return search_msol_user
+    }
+    else
+    {
+    Write-Host "SEARCH RESULT" -ForegroundColor Yellow
+    $result = Get-MsolUser -userprincipalname $emailadd -ErrorAction 0
+        if (!$result)
+        {
+        Write-Host "Nothing found. Please try again."
+
+        return search_msol_byuserprincipal
+        }
+        else
+        {
+
+        Get-MsolUser -userprincipalname $emailadd |  Fl DisplayName,UserprincipalName,ProxyAddresses,LastPasswordChangeTimestamp,Licenses,@{N='MFA State';E={($_.StrongAuthenticationRequirements.State)}}
+        search_msol_byuserprincipal
+        }
+    }
+
+ }
+
+function msol_sku()
+{
+Write-Host "*****User Search and License Management Tool*****" -ForegroundColor Green
+
+Write-Host "LICENSES"
+Get-MsolAccountSku | Format-Table AccountSkuID,ActiveUnits,ConsumedUnits
+Read-Host -Prompt "Press Enter to continue"
+cls
+msol_management
+}
+
+#used for adding/removing mailbox delegation for a user#
+function add_fullaccess()
+{
+Write-Host "*****ADD FULL ACCESS TO MAILBOX*****" -ForegroundColor Green
+Write-Host "Enter mailbox name or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex ithelp@$global:mytenantnamefinal.com: " -NoNewline
+$mailboxname = Read-Host
+    if ($mailboxname -eq 'quit' -or $mailboxname -eq '')
+    {
+    return exchange_management
+    }
+    else
+    {
+        $mresult = Get-Mailbox -identity $mailboxname -ErrorAction 0
+
+        if (!$mresult)
+        {
+        Write-Host "MAILBOX NOT FOUND. Please verify or try another name. If you just assigned a license please give it 5 mins and try again."
+
+        return add_fullaccess
+        }
+        else
+        {
+        Write-Host "Enter email address of the user you want to give the access to or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to exit: " -NoNewline
+        $uname = Read-Host
+            if ($uname -eq 'quit' -or $uname -eq '')
+            {
+            cls
+            return add_fullaccess
+            }
+
+             $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+             if (!$result)
+              {
+                Write-Host "EMAIL ACCOUNT NOT FOUND. Please verify name and start over."
+
+                return add_fullaccess
+              }
+
+             else
+             {
+            Write-Host "**MAILBOX DELEGATION STATUS**" -ForegroundColor Yellow
+            Write-Host "for Account: $mailboxname" -ForegroundColor Yellow
+            Get-MailboxPermission -identity $mailboxname | Format-Table
+            Get-RecipientPermission -identity $mailboxname | Format-Table
+            Write-Host "---------- ADD TRUSTEE:----------"
+            Write-Host "**USER INFORMATION**" -ForegroundColor Yellow
+
+            Get-MsolUser -UserPrincipalName $uname | select Displayname,UserprincipalName | Format-Table
+
+            Write-Host "ASSIGN $uname FULL ACCESS to $mailboxname mailbox?" -ForegroundColor Green
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmAssign = Read-Host
+                if ($confirmAssign -eq 'Y')
+                {
+
+                Add-MailboxPermission -Identity $mailboxname -User $uname -AccessRights FullAccess -InheritanceType All
+
+                #start
+                Write-Host "ASSIGN $uname SEND AS access to $mailboxname mailbox?" -ForegroundColor Green
+                Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+                    $confirmAssignSend = Read-Host
+                        if ($confirmAssignSend -eq 'Y')
+                        {
+                        Add-RecipientPermission -Identity $mailboxname -Trustee $uname -AccessRights SendAs -Confirm:$false
+                        }
+                #end
+                Write-Host "**MAILBOX DELEGATION STATUS**" -ForegroundColor Yellow
+                Write-Host "for Account: $mailboxname" -ForegroundColor Yellow
+                Get-MailboxPermission -identity $mailboxname | Format-Table
+                Write-Host "----------"
+
+                Write-Host "Completed!"
+
+                Read-Host -Prompt "Press Enter to continue"
+
+                }
+             }
+        }
+    }
+cls
+return add_fullaccess
+}
+
+#use this to remove mailbox delegation
+function remove_fullaccess()
+{
+Write-Host "*****REMOVE FULL ACCESS FROM MAILBOX*****" -ForegroundColor Green
+Write-Host "Enter mailbox name or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex ithelp@$global:mytenantnamefinal.com: " -NoNewline
+$mailboxname = Read-Host
+    if ($mailboxname -eq 'quit' -or $mailboxname -eq '')
+    {
+    return exchange_management
+    }
+    else
+    {
+        $mresult = Get-Mailbox -identity $mailboxname -ErrorAction 0
+
+        if (!$mresult)
+        {
+        Write-Host "MAILBOX NOT FOUND. Please verify or try another name. If you just assigned a license please give it 5 mins and try again."
+
+        return remove_fullaccess
+        }
+        else
+        {
+        Write-Host "**MAILBOX DELEGATION STATUS**" -ForegroundColor Yellow
+        Write-Host "for Account: $mailboxname" -ForegroundColor Yellow
+        Get-MailboxPermission -Identity $mailboxname | Select User,AccessRights | Format-Table
+        Write-Host "----------"
+        Write-Host "Enter email address you want to REMOVE access from or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to cancel: " -NoNewline
+        $uname = Read-Host
+            if ($uname -eq 'quit' -or $uname -eq '')
+            {
+            cls
+            return remove_fullaccess
+            }
+
+             $result = Get-MsolUser -userprincipalname $uname -ErrorAction 0
+             if (!$result)
+              {
+                Write-Host "EMAIL ACCOUNT NOT FOUND. Please verify name and start over."
+
+                return remove_fullaccess
+              }
+
+             else
+             {
+
+            Write-Host "----------REMOVE TRUSTEE:----------"
+            Write-Host "**USER INFORMATION**" -ForegroundColor Yellow
+            Get-MsolUser -UserPrincipalName $uname | select Displayname,UserprincipalName | Format-Table
+
+            Write-Host "REMOVE $uname ACCESS from $mailboxname mailbox?" -ForegroundColor Green
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmAssign = Read-Host
+                if ($confirmAssign -eq 'Y')
+                {
+                Write-Host "**REMOVING FULL PERMISSION..." -ForegroundColor Yellow
+                Remove-MailboxPermission -Identity $mailboxname -User $uname -AccessRights FullAccess -InheritanceType All -Confirm:$false
+                Write-Host "**REMOVING SEND PERMISSION..." -ForegroundColor Yellow
+                Remove-RecipientPermission -Identity $mailboxname -Trustee $uname -AccessRights SendAs -Confirm:$false
+                Write-Host "**MAILBOX DELEGATION STATUS**" -ForegroundColor Yellow
+                Write-Host "for Account: $mailboxname" -ForegroundColor Yellow
+                Get-MailboxPermission -identity $mailboxname | Format-Table
+                Get-RecipientPermission -identity $mailboxname | Format-Table
+                Write-Host "----------"
+
+                Write-Host "Completed!"
+
+                Read-Host -Prompt "Press Enter to continue"
+
+                }
+             }
+        }
+    }
+cls
+
+return remove_fullaccess
+}
+
+#use this to view mailbox delegation
+function view_mailboxpermission()
+{
+Write-Host "*****VIEW MAILBOX PERMISSIONS*****" -ForegroundColor Green
+Write-Host "Enter mailbox name or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex ithelp@$global:mytenantnamefinal.com: " -NoNewline
+$mailboxname = Read-Host
+    if ($mailboxname -eq 'quit' -or $mailboxname -eq '')
+    {
+    return exchange_management
+    }
+    else
+    {
+        $mresult = Get-Mailbox -identity $mailboxname -ErrorAction 0
+
+        if (!$mresult)
+        {
+        Write-Host "MAILBOX NOT FOUND. Please verify or try another name. If you just assigned a license please give it 5 mins and try again."
+
+        return view_mailboxpermission
+        }
+        else
+        {
+            Write-Host "**MAILBOX DELEGATION STATUS**" -ForegroundColor Yellow
+            Write-Host "$mailboxname" -ForegroundColor Yellow
+            Write-host "----------FULL ACCESS----------" -ForegroundColor Yellow
+            Get-MailboxPermission -identity $mailboxname | Select User | Format-Table
+            Write-host "----------SEND AS ACCESS----------" -ForegroundColor Yellow
+            Get-RecipientPermission -Identity $mailboxname | Select Trustee | Format-Table
+            Write-Host "----------"
+            Read-Host -Prompt "Press Enter to continue"
+        }
+    }
+cls
+
+return view_mailboxpermission
+}
+
+#updated to use name connect_exchange_online as connect_exchange function is already present in profile.ps1
+function connect_exchange_online() {
+
+    Import-Module exchangeonlinemanagement
+    Write-Host "Connecting to Exchange Online..."
+    Connect-ExchangeOnline -UserPrincipalName $myemailaddress -ShowProgress:$true
+}
+
+function check_connections_status()
+{
+$global:statuseop = $null;
+$global:statusmsol = $null;
+$global:statusspo = $null;
+
+Write-Host "CONNECTION STATUS " -ForegroundColor Yellow
+
+#EOP
+$checktoverifyeop = Get-Mailbox -ResultSize 1 -WarningAction 0
+
+if (!$checktoverifyeop)
+    {
+    $global:statuseop = "(connected)"
+    Write-Host "Exchange : $global:statuseop"
+    }
+    else
+    {
+    $global:statuseop = "(connected)"
+    Write-Host "Exchange : $global:statuseop"
+    }
+
+#MSOL
+$checktoverifymsol = (Get-MsolDomain | Where-Object {$_.isInitial}).name
+if (!$checktoverifymsol)
+    {
+    $global:statusmsol = "(not connected)"
+    Write-Host "MSOL : $global:statusmsol"
+    }
+    else
+    {
+    $global:statusmsol = "(connected)"
+    Write-Host "MSOL : $global:statusmsol"
+    }
+
+#SPO
+$checktoverifyspo = Get-SPOSite -Limit 1 -WarningAction 0
+if (!$checktoverifyspo)
+    {
+    $global:statusspo = "(not connected)"
+    Write-Host "SPO : $global:statusspo"
+    }
+    else
+    {
+    $global:statusspo = "(connected)"
+    Write-Host "SPO : $global:statusspo"
+    }
+
+Write-Host "Please run myo365tools again to start using the tools."
+
+}
+
+#start spo scripts
+function add_temp_admin_access($spoaccount)
+{
+$temp_admin = $myemailaddress
+If ($spoaccount -ne $temp_admin){
+Set-SPOUser -Site https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoaccount -LoginName $temp_admin -IsSiteCollectionAdmin $True | Out-Null
+}
+#if statement is used to not add self as admin to own account
+}
+
+function remove_temp_admin_access($spoaccount)
+{
+$temp_admin = $myemailaddress
+If ($spoaccount -ne $temp_admin){
+Set-SPOUser -Site https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoaccount -LoginName $temp_admin -IsSiteCollectionAdmin $False | Out-Null
+}
+ #if statement is to make sure you do not remove yourself as owner of your own OneDrive account
+}
+
+
+function connect_spo()
+{
+
+Write-Host "Connecting to Sharepoint Online..."
+Connect-SPOService -Url https://$global:mytenantnamefinal-admin.sharepoint.com #-Credential $cred
+
+}
+
+function disconnect_spo()
+{
+Disconnect-SPOService
+
+}
+
+
+function view_spo_account()
+{
+Write-host "*****SHAREPOINT/ONEDRIVE ACCOUNT VIEWER*****" -ForegroundColor Green
+Write-Host "Enter email address of the onedrive account holder or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex user@$global:mytenantnamefinal.com: " -NoNewline
+
+
+$spoemailaddress = Read-Host
+
+  if ($spoemailaddress -eq 'quit' -or $spoemailaddress -eq '')
+  {
+  cls
+  return onedrive_management_tool
+  }
+
+
+$spoprofilename = $spoemailaddress.Replace(".","_").Replace("@","_")
+
+$checktoverify = Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename" | Select-Object -ExpandProperty Status
+if ($checktoverify -eq "Active")
+    {
+
+    #give me temp admin access
+    add_temp_admin_access $spoprofilename
+    Write-Host "Giving self temp admin access to view ownership info..."
+    #Read-Host -Prompt "Press Enter to continue"
+    Start-Sleep 2
+    cls
+    Write-host "*****SHAREPOINT/ONEDRIVE ACCOUNT VIEWER*****" -ForegroundColor Green
+    Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+    write-host "ACCOUNT NAME : $spoemailaddress" -ForegroundColor Yellow
+    Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Select Title,Status,SharingCapability,Url | Format-List
+    Write-Host "----------USERS WITH ACCESS TO THIS ONEDRIVE ACCOUNT----------" -ForegroundColor Yellow
+    Write-Host "TRUSTEES:" -ForegroundColor Yellow
+    Write-host "Note: Your account was added and listed here as temp trustee in order to view this information. Temp access was removed" -ForegroundColor DarkYellow
+    Get-SPOUser -Site "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename" -Limit All | Select LoginName, IsSiteAdmin | ? { $_.ISSiteAdmin } | Format-Table
+    #removes my temp admin access
+
+    remove_temp_admin_access $spoprofilename
+
+    view_spo_account
+    }
+    else
+    {
+    Write-Host "ACCOUNT NOT FOUND. Please try again"
+
+    return view_spo_account
+    }
+}
+
+##grant user access to another person's onedrive
+#start
+function add_access_to_spo()
+{
+Write-Host "*****ADD FULL ACCESS TO ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+Write-Host "Enter email address of the onedrive account holder or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex user@$global:mytenantnamefinal.com: " -NoNewline
+$spoemailaddress = Read-Host
+    if ($spoemailaddress -eq 'quit' -or $spoemailaddress -eq '')
+    {
+    cls
+    return onedrive_management_tool
+    }
+    else
+    {
+        $spoprofilename = $spoemailaddress.Replace(".","_").Replace("@","_")
+        $mresult = Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"
+
+        if (!$mresult)
+        {
+        Write-Host "ACCOUNT NOT FOUND. Please check the email address and try again."
+
+        return add_access_to_spo
+        }
+        else
+        {
+        Write-Host "Enter email address of the user you want to give the access to or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to exit: " -NoNewline
+        $trustee = Read-Host
+            if ($trustee -eq 'quit' -or $trustee -eq '')
+            {
+            cls
+            return add_access_to_spo
+            }
+
+             $result = Get-MsolUser -userprincipalname $trustee | Select DisplayName
+             if (!$result)
+              {
+                Write-Host "EMAIL ACCOUNT NOT FOUND. Please check email address and try again."
+
+                return add_access_to_spo
+              }
+
+             else
+             {
+            cls
+            Write-Host "*****ADD FULL ACCESS TO ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+            Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+            write-host "ACCOUNT NAME : $spoemailaddress" -ForegroundColor Yellow
+            Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Format-List Title,Status,SharingCapability,Url
+
+            Write-Host "----------TRUSTEE----------"
+            Write-Host "**USER INFORMATION**" -ForegroundColor Yellow
+            Get-MsolUser -UserPrincipalName $trustee | select Displayname,UserprincipalName | Format-Table
+
+            Write-Host "ASSIGN $trustee FULL ACCESS to $spoemailaddress OneDrive?" -ForegroundColor Green
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmAssign = Read-Host
+                if ($confirmAssign -eq 'Y')
+                {
+                add_temp_admin_access $spoprofilename
+
+                Set-SPOUser -Site https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename -LoginName $trustee -IsSiteCollectionAdmin $True | Out-Null
+                cls
+                Write-Host "*****ADD FULL ACCESS TO ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+                Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+                write-host "ACCOUNT NAME : $spoemailaddress" -ForegroundColor Yellow
+                Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Format-List Title,Status,SharingCapability,Url
+
+
+                Write-Host "----------USERS WITH ACCESS TO THIS ONEDRIVE ACCOUNT----------" -ForegroundColor Yellow
+                Write-Host "TRUSTEES:" -ForegroundColor Yellow
+                Write-host "Note: Your account was added and listed here as temp trustee in order to view this information. Temp access will be removed on exit" -ForegroundColor DarkYellow
+                Get-SPOUser -Site "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename" -Limit All | Select LoginName, IsSiteAdmin | ? { $_.ISSiteAdmin } | Format-Table
+
+                Write-Host "Completed!"
+                Write-Host "Note: You can copy the URL above and provide it to the TRUSTEE." -ForegroundColor Yellow
+                Write-Host "----------"
+                remove_temp_admin_access $spoprofilename
+
+                Read-Host -Prompt "Press Enter to continue"
+
+                }
+
+             }
+        }
+    }
+cls
+return add_access_to_spo
+
+}
+##end
+
+#removes spo access for a user
+function remove_access_to_spo()
+{
+Write-Host "*****REMOVE USER ACCESS FROM ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+Write-Host "Enter email address of the onedrive account holder or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex user@$global:mytenantnamefinal.com: " -NoNewline
+$spoemailaddress = Read-Host
+    if ($spoemailaddress -eq 'quit' -or $spoemailaddress -eq '')
+    {
+    cls
+    return onedrive_management_tool
+    }
+    else
+    {
+        $spoprofilename = $spoemailaddress.Replace(".","_").Replace("@","_")
+        $mresult = Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"
+
+        if (!$mresult)
+        {
+        Write-Host "ACCOUNT NOT FOUND. Please check the email address and try again."
+
+        return remove_access_to_spo
+        }
+        else
+        {
+        add_temp_admin_access $spoprofilename
+        cls
+        Write-Host "*****REMOVE USER ACCESS FROM ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+        Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+        Write-host "ACCOUNT NAME : $spoemailaddress" -ForegroundColor Yellow
+
+        Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Select Title,Status,SharingCapability,Url | Format-List
+        Write-Host "----------USERS WITH ACCESS TO THIS ONEDRIVE ACCOUNT----------" -ForegroundColor Yellow
+        Write-Host "TRUSTEES:" -ForegroundColor Yellow
+        Write-host "Note: Your account was added and listed here as temp trustee in order to view this information. Temp access will be removed on exit" -ForegroundColor DarkYellow
+        Get-SPOUser -Site "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename" -Limit All | Select LoginName, IsSiteAdmin | ? { $_.ISSiteAdmin } | Format-Table
+
+        Write-Host "Enter the email address that you want the access removed from or type" -NoNewline
+        Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+        Write-Host "to exit: " -NoNewline
+        $trustee = Read-Host
+            if ($trustee -eq 'quit' -or $trustee -eq '')
+            {
+            cls
+            remove_temp_admin_access $spoprofilename
+            return remove_access_to_spo
+            }
+
+             $result = Get-MsolUser -userprincipalname $trustee | Select DisplayName
+             if (!$result)
+              {
+                Write-Host "EMAIL ACCOUNT NOT FOUND. Please check email address and try again."
+                remove_temp_admin_access $spoprofilename
+                return remove_access_to_spo
+              }
+
+             else
+             {
+            cls
+            Write-Host "*****REMOVE USER ACCESS FROM ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+            Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+            write-host "ACCOUNT NAME : $spoemailaddress" -ForegroundColor Yellow
+
+            Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Format-List Title,Status,SharingCapability,Url
+
+            Write-Host "----------TRUSTEE----------"
+            Write-Host "**USER INFORMATION**" -ForegroundColor Yellow
+            Get-MsolUser -UserPrincipalName $trustee | select Displayname,UserprincipalName | Format-Table
+
+            Write-Host "REMOVE $trustee FULL ACCESS from $spoemailaddress OneDrive?" -ForegroundColor Red
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmAssign = Read-Host
+                if ($confirmAssign -eq 'Y')
+                {
+                Set-SPOUser -Site https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename -LoginName $trustee -IsSiteCollectionAdmin $False | Out-Null
+                cls
+                Write-Host "*****REMOVE USER ACCESS FROM ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+                Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+                Write-host "for email account $spoemailaddress" -ForegroundColor Yellow
+                Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Format-List Title,Status,SharingCapability,Url
+
+
+                Write-Host "----------USERS WITH ACCESS TO THIS ONEDRIVE ACCOUNT----------" -ForegroundColor Yellow
+                Write-Host "TRUSTEES:" -ForegroundColor Yellow
+                Write-host "Note: Your account was added and listed here as temp trustee in order to view this information. Temp access will be removed on exit" -ForegroundColor DarkYellow
+                Get-SPOUser -Site "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename" -Limit All | Select LoginName, IsSiteAdmin | ? { $_.ISSiteAdmin } | Format-Table
+
+                Write-Host "Completed!" -ForegroundColor DarkYellow
+                Write-Host "----------"
+                remove_temp_admin_access $spoprofilename
+
+                Read-Host -Prompt "Press Enter to continue"
+                }
+                else
+                {
+                remove_temp_admin_access $spoprofilename
+                }
+             }
+        }
+    }
+cls
+
+return remove_access_to_spo
+}
+#end remove spo access for a user
+
+#start give self access
+function add_self_access_to_spo()
+{
+Write-Host "*****ASSIGN SELF TEMPORARY FULL ACCESS TO ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+Write-Host "Enter email address of the onedrive account holder or type" -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to go back to previous menu, ex user@$global:mytenantnamefinal.com: " -NoNewline
+$spoemailaddress = Read-Host
+    if ($spoemailaddress -eq 'quit' -or $spoemailaddress -eq '')
+    {
+    cls
+    return onedrive_management_tool
+    }
+    else
+    {
+        $spoprofilename = $spoemailaddress.Replace(".","_").Replace("@","_")
+        $mresult = Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"
+
+        if (!$mresult)
+        {
+        Write-Host "ACCOUNT NOT FOUND. Please check the email address and try again."
+
+        return add_self_access_to_spo
+        }
+        else
+        {
+
+            Write-Host "ASSIGN YOURSELF FULL ACCESS to $spoemailaddress OneDrive?" -ForegroundColor Green
+            Write-Host "Enter Y / N : " -ForegroundColor Yellow -NoNewline
+            $confirmAssign = Read-Host
+                if ($confirmAssign -eq 'Y')
+                {
+                add_temp_admin_access $spoprofilename
+
+                cls
+                Write-Host "*****ADD SELF TEMPORARY FULL ACCESS TO ONEDRIVE ACCOUNT*****" -ForegroundColor Green
+                Write-Host "----------ONEDRIVE ACCOUNT HOLDER INFORMATION---------- " -ForegroundColor Yellow
+                write-host "ACCOUNT NAME : $spoemailaddress" -ForegroundColor Yellow
+                Get-SPOSite -Identity "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename"  | Format-List Title,Status,SharingCapability,Url
+
+
+                Write-Host "----------USERS WITH ACCESS TO THIS ONEDRIVE ACCOUNT----------" -ForegroundColor Yellow
+                Write-Host "TRUSTEES:" -ForegroundColor Yellow
+                Write-host "Note: Your account was added as temp trustee. Temp access will be removed on exit" -ForegroundColor DarkYellow
+                Get-SPOUser -Site "https://$global:mytenantnamefinal-my.sharepoint.com/personal/$spoprofilename" -Limit All | Select LoginName, IsSiteAdmin | ? { $_.ISSiteAdmin } | Format-Table
+
+                Write-Host "Completed!"
+                Write-Host "You can access the files using the URL above" -ForegroundColor DarkYellow
+                Write-Host "----------"
+
+                Read-Host -Prompt "Press Enter when you are ready to close and remove your temp access."
+                remove_temp_admin_access $spoprofilename
+
+                }
+
+        }
+    }
+cls
+return add_self_access_to_spo
+}
+#end give self access to user onedrive
+
+#spo menu start
+function onedrive_management_tool()
+{
+cls
+
+Write-Host "*****ONEDRIVE ACCESS MANAGEMENT TOOL*****" -ForegroundColor Green
+Write-Host "1  - View User OneDrive information" -ForegroundColor Green
+Write-Host "2  - Add Access to user OneDrive" -ForegroundColor Green
+Write-Host "3  - Grant self access to user OneDrive" -ForegroundColor Green
+Write-Host "4  - Remove Access from user OneDrive" -ForegroundColor Green
+Write-Host "Enter the choice number or or type " -NoNewline
+Write-Host " [quit] " -ForegroundColor Yellow -NoNewline
+Write-Host "to exit: " -NoNewline
+
+$spo_group_choice = Read-Host
+    switch  ($spo_group_choice)
+    {
+
+     'quit' {
+
+        return myo365tools
+
+            }
+     '1' {
+
+        cls
+        view_spo_account
+
+
+         }
+     '2' {
+        cls
+        add_access_to_spo
+
+          }
+     '3' {
+        cls
+        add_self_access_to_spo
+         }
+
+     '4' {
+        cls
+        remove_access_to_spo
+         }
+
+     }
+}
+#spo menu end
+#end spo scripts
+###END MYO365TOOLS###
+
 # SIG # Begin signature block
 # MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
