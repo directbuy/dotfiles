@@ -73,7 +73,7 @@ RPROMPT='$(rprompt)'
 TZ=CST6CDT
 # Aliases
 if whence dircolors >/dev/null; then
-  eval "$(dircolors -b)"
+  eval "$(dircolors ~/.dircolors)"
   zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
   alias ls='ls --color=auto'
   alias ll='ls -lFH'
