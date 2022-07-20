@@ -238,3 +238,9 @@ function fix_resolv_conf() {
 if [ "$(uname 2> /dev/null)" = "Darwin" ]; then
     export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 fi
+# x11 forwarding secret sauce
+if [[ "${platform}" =~ wsl2 ]]; then
+    export DISPLAY=$(grep -m 1 nameserver /etc/resolv.conf | awk '{print $2}'):0.0
+fi
+# start us in our wsl home directory
+cd ~
