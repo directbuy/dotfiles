@@ -1,3 +1,15 @@
+[CmdletBinding()]
+param(
+  [Parameter()][boolean]$install=$false
+)
+if ($install) {
+    Write-Host "installing"
+    $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+    Register-ScheduledJob -Trigger $trigger -FilePath C:\u\dotfiles\posh\wsl2_ip_address.ps1 -Name set_wsl2_ip_address
+}
+
+wsl -d focal --shutdown
+Stop-Process -Name pycharm64
 import-module -Name c:\u\dotfiles\posh\hcn
 
 $network = @"
