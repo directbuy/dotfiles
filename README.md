@@ -23,6 +23,7 @@ To install dotfiles clone the repository and run ./wsl-install
 ```bash
 cd /u
 git clone https://github.com/directbuy/dotfiles
+cd dotfiles
 /bin/bash ./wsl-install
 ```
 
