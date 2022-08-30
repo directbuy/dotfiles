@@ -335,7 +335,7 @@ function djsp() {
 
 #>
 function weather {
-    params(
+    param(
         [string]$city="Chicago"
     )
     $weather = (Invoke-WebRequest "https://wttr.in/${city}" -UserAgent "curl").content
@@ -343,6 +343,20 @@ function weather {
     for ($x = 0; $x -lt 17; ++$x) {
         Write-Host $weather[$x]
     }
+}
+
+<#
+    .cdm / .cdo
+    change to our working code in U directory
+#>
+function cu {
+    param([string]$subdir="m")
+    $dirName = "Maintenance"
+    if ($subdir -eq "o")
+    { $dirName = "OAKAPI" }
+    if ($subdir -eq "t")
+    { $dirName = "TMS" }
+    cd c:/u/$dirName
 }
 
 $env:virtual_env_disable_prompt=1
