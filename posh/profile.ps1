@@ -359,6 +359,19 @@ function cu {
     cd c:/u/$dirName
 }
 
+function nodeclean {
+    $nodeModulesDir = "C:/u/Maintenance/node_modules"
+    $bundlesDir = "C:/u/Maintenance/wwwroot/js/bundles"
+
+    if (test-path $nodeModulesDir) {
+        Remove-Item -LiteralPath "C:/u/Maintenance/node_modules" -Force -Recurse 
+    }
+    if (test-path $bundlesDir) {
+        Remove-Item -LiteralPath "C:/u/Maintenance/wwwroot/js/bundles" -Force -Recurse
+    }
+    cd "c:/u/Maintenance" && npm install && npm run build
+}
+
 $env:virtual_env_disable_prompt=1
 function global:prompt {
     $dir = "$pwd".toLower().replace("\", "/");
