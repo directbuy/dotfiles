@@ -359,6 +359,15 @@ function cu {
     cd c:/u/$dirName
 }
 
+function dashboard {
+    $devenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe"
+    $maintenancePath = "C:\u\Maintenance\Maintenance.sln"
+    $oakapiPath = "C:\u\OAKApi\OAKApi.sln"
+
+    & $devenvPath $maintenancePath
+    & $devenvPath $oakapiPath
+}
+
 function nodeclean {
     $nodeModulesDir = "C:/u/Maintenance/node_modules"
     $bundlesDir = "C:/u/Maintenance/wwwroot/js/bundles"
