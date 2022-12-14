@@ -381,6 +381,25 @@ function nodeclean {
     cd "c:/u/Maintenance" && npm install && npm run build
 }
 
+function oakapi_sqlscripts {
+    $server = "USASQL01\TSTEST"
+    $username = "dashboard"
+    $password = "dashboard"
+
+    Write-Output "RUNNING SQL FILES FOR OAKTS_TEST"
+    $files = Get-ChildItem "C:\u\OAKApi\API\sql_scripts\OAKTS scripts" -Filter *.sql 
+    foreach ($file in $files) {
+        Write-Output "File: " $file.FullName
+        invoke-sqlcmd -InputFile $file.FullName -ServerInstance $server -username $username -Password $password -Database "OAKTS_TEST"   
+    }
+    Write-Output "RUNNING SQL FILES FOR OAKTS_DOCS"
+    $files = Get-ChildItem "C:\u\OAKApi\API\sql_scripts\OAKTS_DOCS" -Filter *.sql
+    foreach ($file in $files) {
+        Write-Output "File: " $file.FullName
+        invoke-sqlcmd -InputFile $file.FullName -ServerInstance $server -username $username -Password $password -Database "OAKTS_DOCS"
+    }
+}
+
 $env:virtual_env_disable_prompt=1
 function global:prompt {
     $dir = "$pwd".toLower().replace("\", "/");
