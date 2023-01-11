@@ -9,7 +9,6 @@ def main():
     data.setdefault('credHelpers', {})
     helpers = data['credHelpers']
     helpers.setdefault('public.ecr.aws', 'ecr-login')
-    helpers.setdefault('804927176937.dkr.ecr.us-east-2.amazonaws.com', 'ecr-login')
     st = json.dumps(data, indent=4)
     with open(conf, 'w') as f:
         json.dump(data, f, indent=4)
