@@ -381,6 +381,17 @@ function nodeclean {
     cd "c:/u/Maintenance" && npm install && npm run build
 }
 
+function restart_site() {
+    $userCredential = Get-Credential;
+    $serverName = Read-Host "Server name";
+    Invoke-Command -Computername $serverName -credential $userCredential -Scriptblock {
+        (Import-Module WebAdministration);
+        $websiteName = Read-Host "Website name";
+        Stop-Website -Name $websiteName;
+        Start-Website -Name $websiteName;
+    }
+}
+
 function oakapi_sqlscripts {
     $server = "USASQL01\TSTEST"
     $username = "dashboard"
