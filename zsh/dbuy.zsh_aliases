@@ -3,7 +3,7 @@ alias dj='djact && ./manage.py'
 alias djrs='dj runserver'
 alias ll='ls -lFH'
 alias la='ls -lAhS'
-alias grep='grep --color=auto'
+alias grep='grep --line-number --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias visudo='sudo -E visudo'
@@ -113,4 +113,3 @@ function git_made_easy(){
 alias gme='git_made_easy'
 alias sqlplus="rlwrap -i -f ~/.sqlplus_history -H ~/.sqlplus_history -s 30000 sqlplus"
 alias rman="rlwrap -i -f ~/.rman_history -H ~/.rman_history -s 30000 rman"
-alias grep="grep --line-number"

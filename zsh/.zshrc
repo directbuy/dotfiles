@@ -82,7 +82,7 @@ else
   export CLICOLOR=1
   zstyle ':completion:*:default' list-colors ''
 fi
-alias grep='grep --color=auto'
+alias grep='grep --line-number --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias edit='emacsclient -nw --alternate-editor="" -c'
