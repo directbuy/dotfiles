@@ -6,17 +6,17 @@
         {
             "command": 
             {
-                "action": "switchToTab",
-                "index": 6
+                "action": "openSettings"
             },
-            "keys": "ctrl+7"
+            "keys": "ctrl+comma"
         },
         {
             "command": 
             {
-                "action": "openSettings"
+                "action": "switchToTab",
+                "index": 6
             },
-            "keys": "ctrl+comma"
+            "keys": "ctrl+7"
         },
         {
             "command": 
@@ -52,7 +52,8 @@
         {
             "command": 
             {
-                "action": "newTab"
+                "action": "newTab",
+                "profile": "focal"
             },
             "keys": "ctrl+t"
         },
@@ -84,9 +85,17 @@
             "command": 
             {
                 "action": "newTab",
-                "profile": "powershell"
+                "profile": "posh"
             },
             "keys": "ctrl+alt+p"
+        },
+        {
+            "command": 
+            {
+                "action": "newTab",
+                "profile": "powershell_core"
+            },
+            "keys": "ctrl+alt+7"
         },
         {
             "command": 
@@ -162,7 +171,7 @@
         }
     ],
     "alwaysShowTabs": true,
-    "defaultProfile": "{30d7a151-32b7-51cd-9ebd-6bb6723c7a3f}",
+    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
     "launchMode": "maximized",
     "profiles": 
     {
@@ -183,15 +192,11 @@
                 "colorScheme": "team",
                 "cursorColor": "#FFFFFF",
                 "cursorShape": "bar",
-                "font": 
-                {
-                    "face": "Consolas",
-                    "size": 16.0
-                },
+                "elevate": true,
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "historySize": 9001,
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
-                "name": "powershell",
+                "name": "posh",
                 "opacity": 100,
                 "padding": "0, 0, 0, 0",
                 "snapOnInput": true,
@@ -205,11 +210,6 @@
                 "commandline": "wsl.exe -d Ubuntu-18.04",
                 "cursorColor": "#FFFFFF",
                 "cursorShape": "bar",
-                "font": 
-                {
-                    "face": "Consolas",
-                    "size": 15.0
-                },
                 "guid": "{c6eaf9f4-32a7-5fdc-b5cf-066e8a4b1e40}",
                 "hidden": false,
                 "historySize": 9001,
@@ -227,11 +227,6 @@
                 "colorScheme": "team",
                 "cursorColor": "#FFFFFF",
                 "cursorShape": "bar",
-                "font": 
-                {
-                    "face": "Consolas",
-                    "size": 13.0
-                },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "historySize": 9001,
                 "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
@@ -251,7 +246,7 @@
             {
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
                 "hidden": false,
-                "name": "PowerShell",
+                "name": "powershell_core",
                 "source": "Windows.Terminal.PowershellCore"
             },
             {
@@ -269,11 +264,6 @@
             {
                 "antialiasingMode": "cleartype",
                 "colorScheme": "team",
-                "font": 
-                {
-                    "face": "consolas",
-                    "size": 13.0
-                },
                 "guid": "{30d7a151-32b7-51cd-9ebd-6bb6723c7a3f}",
                 "hidden": false,
                 "historySize": 9801,
