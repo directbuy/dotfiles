@@ -359,6 +359,15 @@ function cu {
     cd c:/u/$dirName
 }
 
+function tms {
+    $devenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe"
+    $tmsPath = "C:\u\TMS\TMS.sln"
+    $tmsapiPath = "C:\u\TMSApi\TMSApi.sln"
+
+    & $devenvPath $tmsPath
+    & $devenvPath $tmsapiPath
+}
+
 function dashboard {
     $devenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe"
     $maintenancePath = "C:\u\Maintenance\Maintenance.sln"
