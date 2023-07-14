@@ -203,36 +203,13 @@ if [ ! -e ~/.sqlplus_history ] ; then
     touch ~/.sqlplus_history
 fi
 
-#previous behavior
-if [[ -f /mnt/c/Program\ Files/Docker/Docker/resources/docker.exe ]] ; then
-    export PATH=$PATH:/mnt/c/Program\ Files/Docker/Docker/resources
-    alias docker="/mnt/c/Program\\ Files/Docker/Docker/resources/docker.exe"
+if [[ -f /etc/environment ]] ; then
+    source /etc/environment
 fi
 
-if [[ -f /mnt/c/Program\ Files/Docker/Docker/resources/bin/docker-compose.exe ]] ; then
-    export PATH=$PATH:/mnt/c/Program\ Files/Docker/Docker/resources/bin
-    alias docker-compose="/mnt/c/Program\\ Files/Docker/Docker/resources/bin/docker-compose.exe"
+if [[ -f /etc/oracle_env ]] ; then
+    source /etc/oracle_env 
 fi
-
-#behavior as of 2020/10/05
-if [[ -f /c/Program\ Files/Docker/Docker/resources/docker.exe ]] ; then
-    export PATH=$PATH:/c/Program\ Files/Docker/Docker/resources
-    alias docker="/c/Program\\ Files/Docker/Docker/resources/docker.exe"
-fi
-
-if [[ -f /c/Program\ Files/Docker/Docker/resources/bin/docker-compose.exe ]] ; then
-    export PATH=$PATH:/c/Program\ Files/Docker/Docker/resources/bin
-    alias docker-compose="/c/Program\\ Files/Docker/Docker/resources/bin/docker-compose.exe"
-fi
-
-function __fix_resolv_conf() {
-    sed -i '/\[network]/anameserver 172.17.10.8\nnameserver 172.17.11.8\nnameserver 172.22.4.2\n' /etc/resolv.conf
-}
-
-function fix_resolv_conf() {
-    sudo zsh -c "$(functions __fix_resolv_conf); __fix_resolv_conf"
-}
-
 
 # Mac conditionals - required to run upholstery commands on mac
 if [ "$(uname 2> /dev/null)" = "Darwin" ]; then
