@@ -11,6 +11,7 @@ plugins=(aws django fabric git yum docker docker-compose docker-machine)
 source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh.d/functions/history-substring-search.zsh
 source ~/.zsh.d/functions/_convoke
+autoload bashcompinit && bashcompinit
 autoload -Uz compinit
 compinit
 
@@ -137,6 +138,9 @@ if [ -f /usr/bin/aws_zsh_completer.sh ] ; then
 fi
 if [ -f /usr/local/bin/aws_zsh_completer.sh ] ; then
     source /usr/local/bin/aws_zsh_completer.sh
+fi
+if [ -f /usr/local/bin/aws_zsh_completer ] ; then
+    complete -C '/usr/local/bin/aws_completer' aws
 fi
 export LESS='-i -R --silent'
 export MORE='-d'
