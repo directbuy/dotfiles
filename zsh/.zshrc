@@ -11,6 +11,7 @@ plugins=(aws django fabric git yum docker docker-compose docker-machine)
 source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh.d/functions/history-substring-search.zsh
 source ~/.zsh.d/functions/_convoke
+autoload bashcompinit && bashcompinit
 autoload -Uz compinit
 compinit
 
@@ -82,7 +83,7 @@ else
   export CLICOLOR=1
   zstyle ':completion:*:default' list-colors ''
 fi
-alias grep='grep --color=auto'
+alias grep='grep --line-number --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias edit='emacsclient -nw --alternate-editor="" -c'
@@ -137,6 +138,9 @@ if [ -f /usr/bin/aws_zsh_completer.sh ] ; then
 fi
 if [ -f /usr/local/bin/aws_zsh_completer.sh ] ; then
     source /usr/local/bin/aws_zsh_completer.sh
+fi
+if [ -f /usr/local/bin/aws_zsh_completer ] ; then
+    complete -C '/usr/local/bin/aws_completer' aws
 fi
 export LESS='-i -R --silent'
 export MORE='-d'
@@ -203,44 +207,16 @@ if [ ! -e ~/.sqlplus_history ] ; then
     touch ~/.sqlplus_history
 fi
 
-#previous behavior
-if [[ -f /mnt/c/Program\ Files/Docker/Docker/resources/docker.exe ]] ; then
-    export PATH=$PATH:/mnt/c/Program\ Files/Docker/Docker/resources
-    alias docker="/mnt/c/Program\\ Files/Docker/Docker/resources/docker.exe"
+if [[ -f /etc/environment ]] ; then
+    source /etc/environment
 fi
 
-if [[ -f /mnt/c/Program\ Files/Docker/Docker/resources/bin/docker-compose.exe ]] ; then
-    export PATH=$PATH:/mnt/c/Program\ Files/Docker/Docker/resources/bin
-    alias docker-compose="/mnt/c/Program\\ Files/Docker/Docker/resources/bin/docker-compose.exe"
+if [[ -f /etc/oracle_env ]] ; then
+    source /etc/oracle_env 
 fi
-
-#behavior as of 2020/10/05
-if [[ -f /c/Program\ Files/Docker/Docker/resources/docker.exe ]] ; then
-    export PATH=$PATH:/c/Program\ Files/Docker/Docker/resources
-    alias docker="/c/Program\\ Files/Docker/Docker/resources/docker.exe"
-fi
-
-if [[ -f /c/Program\ Files/Docker/Docker/resources/bin/docker-compose.exe ]] ; then
-    export PATH=$PATH:/c/Program\ Files/Docker/Docker/resources/bin
-    alias docker-compose="/c/Program\\ Files/Docker/Docker/resources/bin/docker-compose.exe"
-fi
-
-function __fix_resolv_conf() {
-    sed -i '/\[network]/anameserver 172.17.10.8\nnameserver 172.17.11.8\nnameserver 172.22.4.2\n' /etc/resolv.conf
-}
-
-function fix_resolv_conf() {
-    sudo zsh -c "$(functions __fix_resolv_conf); __fix_resolv_conf"
-}
-
 
 # Mac conditionals - required to run upholstery commands on mac
 if [ "$(uname 2> /dev/null)" = "Darwin" ]; then
     export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 fi
-# x11 forwarding secret sauce
-if [[ "${platform}" =~ wsl2 ]]; then
-    export DISPLAY=$(grep -m 1 nameserver /etc/resolv.conf | awk '{print $2}'):0.0
-fi
-# start us in our wsl home directory
 cd ~

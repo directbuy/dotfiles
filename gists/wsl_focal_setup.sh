@@ -34,6 +34,8 @@ echo "installing xml and yaml"
 apt-get install -qq libxml2-dev libxslt1-dev libyaml-dev rlwrap >/dev/null
 echo "installing postgres client and dev libraries"
 apt-get install -qq libpq-dev postgresql-client wslu >/dev/null
+echo "installing libcairo2-dev and libgirepository1.0-dev"
+apt-get install -qq libcairo2-dev libgirepository1.0-dev >/dev/null
 echo "install mysql"
 mkdir -p /u/downloads
 cd /u/downloads
@@ -52,6 +54,11 @@ python3.8 -m pip install -U -q raft awscli ipython
 apt-get install -qq python3.9 python3.9-dev python3.9-venv >/dev/null
 python3.9 -m pip install -U -q testresources pip wheel invoke setuptools
 python3.9 -m pip install -U -q raft awscli ipython
+apt-get install -qq python3.11 python3.11-dev python3.11-venv >/dev/null
+echo "updating python3.11 pip"
+curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+python3.11 -m pip install -U -q testresources pip wheel invoke setuptools
+python3.11 -m pip install -U -q raft awscli ipython
 #echo "grabbing dotfiles"
 #if [[ ! -e /u ]] && [[ -e /mnt/c/u ]]; then sudo ln -s /mnt/c/u / ; fi
 #mkdir -p /u/downloads
