@@ -1,6 +1,5 @@
 #!/bin/bash
 dotfiles_dir=`pwd -P`
-popd > /dev/null
 home_dir=/etc/skel
 echo "Installing dotfiles to ${home_dir}"
 pushd $home_dir > /dev/null
@@ -14,4 +13,5 @@ sudo find ${home_dir} -mindepth 1 -type d -\! -name '.cache' -prune -\! -name 'p
 if [[ -d ${home_dir}/.ssh ]] ; then
   sudo find ${home_dir}/.ssh -type f -exec chmod 0600 {} \;
 fi
+popd > /dev/null
 
