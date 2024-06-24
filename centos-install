@@ -7,8 +7,13 @@ home_dir=$(eval echo "~${user}")
 echo "Installing dotfiles for $user"
 pushd $home_dir > /dev/null
 sudo chsh -s `grep -i zsh /etc/shells | head -1` $user;
+pushd $dotfiles_dir
 for x in vim zsh ipython ; do
-    sudo -u $user rsync -rlvtD --no-p --chmod=D0700,F600 "${dotfiles_dir}/${x}/" $home_dir
+    pushd $x
+    sudo -u $user rsync -rlvtD --no-p "./" $home_dir
+    
+    find . -type f -exec sudo chmod 0600 "$home_dir/{}" \;
+    find . -type d -exec sudo chmod 0700 "$home_dir/{}" \;
 done
 if [[ -f ${dotfiles_dir}/zsh/$user.zsh_aliases ]]; then
   sudo -u $user cp ${dotfiles_dir}/zsh/$user.zsh_aliases $home_dir/.zsh_aliases  
