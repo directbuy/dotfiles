@@ -387,7 +387,7 @@ function nodeclean {
     if (test-path $bundlesDir) {
         Remove-Item -LiteralPath "C:/u/Maintenance/wwwroot/js/bundles" -Force -Recurse
     }
-    cd "c:/u/Maintenance" && npm install && npm run build
+    cd "c:/u/Maintenance" -and npm install -and npm run build
 }
 
 function restart_site() {
