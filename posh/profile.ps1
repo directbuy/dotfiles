@@ -368,6 +368,113 @@ function tms {
     & $devenvPath $tmsapiPath
 }
 
+
+
+function Export-DrawioDiagrams {
+    param (
+        [Parameter(Mandatory)]
+        [ValidateScript({ Test-Path $_ })]
+        [ValidateScript({$_ -like "*.drawio"})]
+        [Alias("File", "Path")]
+        [string]$FilePath,
+
+        [ValidateScript({ Test-Path $_ })]
+        [string]$Executable = "C:\Program Files\Draw.io\draw.io.exe",
+
+        [string]$ExportDirectory,
+
+        [string]$Format = "png",
+
+        [string[]]$IgnoreDiagrams
+    )
+    Write-Information "Exporting .drawio diagram..."
+    Write-Debug "File: $FilePath"
+    Write-Debug "Executable: $Executable"
+    Write-Debug "Export Directory: $ExportDirectory"
+    Write-Debug "Format: $Format"
+    Write-Debug "Ignoring Diagrams: $IgnoreDiagrams" 
+
+    # Parameter Validation
+    # If not defined. Exports to same directory as .drawio file
+    if (-not $ExportDirectory) {
+        $ExportDirectory = (Get-Item $FilePath).DirectoryName
+    }
+    if (!(Test-Path $ExportDirectory)) {
+        Write-Information "Creating output directory: $ExportDirectory"
+        New-Item -Path $ExportDirectory -Force -ItemType "directory"
+    }
+
+    $file_in = Get-Item -Path $FilePath -Include *.drawio
+
+    # Creating temp file
+    $xml_file_path = "$($file_in.DirectoryName)\$($file_in.BaseName).xml"
+    if ((Test-Path $xml_file_path)) {   # Purge old
+        Remove-Item -Path $xml_file_path -Force
+    }
+    & $Executable '-x' "$file_in" '-f' 'xml' '-o' "$xml_file_path"
+
+    # wait for XML file creation
+    $time_out = 0
+    while ($true) {
+        if (-not (Test-Path $xml_file_path)) {
+            Start-Sleep -Milliseconds 200
+            $time_out++
+        }
+        else {
+            break
+        }
+        if ($time_out -eq 50) {
+            throw "Failed to create temporary xml file: $xml_file_path"
+        }
+    }
+    
+    Write-Debug("XML File Created: $xml_file_path")
+    
+    # load to XML Document (cast text array to object)
+    $drawio_xml = [xml](Get-Content $xml_file_path)
+
+    # export
+    $i = 0;
+    $minus = 0;
+    $drawio_xml.mxfile.diagram | ForEach-Object {
+        if ($IgnoreDiagrams -contains $_.name) { 
+            $i++
+            $minus++
+            Continue 
+        }
+        # Export each diagram
+        $file_name = "$($file_in.BaseName)-$($_.name).$Format" -replace '\s'
+        $file_name = $file_name -replace '/',"_"
+        $file_out = "$($ExportDirectory)\$file_name"
+        Write-Debug("Exporting diagram... $file_out")
+        & $Executable '-x' "$file_in" '-f' $Format '-p' $i '-o' "$file_out" 
+        $i++
+    }
+
+    # wait for last file
+    $time_out = 0
+    while ($true) {
+        if (-not (Test-Path $file_out)) {
+            Start-Sleep -Milliseconds 200
+            $time_out++
+        }
+        else {
+            break
+        }
+        if ($time_out -eq 50) {
+            throw "Failed to create export: $file_out"
+        }
+    }
+
+    # remove/delete XML file
+    if ((Test-Path $xml_file_path)) {
+        
+        Remove-Item -Path $xml_file_path -Force
+    }
+    Write-Information("Diagrams Exported. Total: $($i-$minus)")   
+}
+
+
 function dashboard {
     $devenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe"
     $maintenancePath = "C:\u\Maintenance\Maintenance.sln"
