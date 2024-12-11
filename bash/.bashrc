@@ -1,7 +1,7 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
-if test -t 1; then exec zsh ; fi
+# if test -t 1; then exec zsh ; fi
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
@@ -100,5 +100,8 @@ fi
 #fi
 
 export TUNDRA_ENV=local_docker
+if [[ -f /etc/oracle_env ]] ; then
+    source /etc/oracle_env
+fi
 
-fix_resolv_conf
+

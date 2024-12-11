@@ -494,7 +494,7 @@ function nodeclean {
     if (test-path $bundlesDir) {
         Remove-Item -LiteralPath "C:/u/Maintenance/wwwroot/js/bundles" -Force -Recurse
     }
-    cd "c:/u/Maintenance" && npm install && npm run build
+    cd "c:/u/Maintenance" -and npm install -and npm run build
 }
 
 function restart_site() {
@@ -505,6 +505,16 @@ function restart_site() {
         $websiteName = Read-Host "Website name";
         Stop-Website -Name $websiteName;
         Start-Website -Name $websiteName;
+    }
+}
+
+function stop_site() {
+    $userCredential = Get-Credential;
+    $serverName = Read-Host "Server name";
+    Invoke-Command -Computername $serverName -credential $userCredential -Scriptblock {
+        (Import-Module WebAdministration)
+        $websiteName = Read-Host "website name";
+        Stop-Website -Name $websiteName;
     }
 }
 

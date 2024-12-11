@@ -12,168 +12,369 @@
 [CmdletBinding()]
 param(
   [Parameter()][switch]$install
+  , [Parameter()][switch]$force
 )
-$my_path = $myInvocation.myCommand.name
-$dir = split-path $dir -parent
-$hcn_path = join-path $dir "hcn"
-
+$my_path = $PSScriptRoot
+$dir = split-path $my_path -parent
+$log_file = [io.path]::GetFileNameWithoutExtension($my_path)
+$log_dir = "$($env:home)\logs"
+if (!(Test-Path $log_dir)) {
+    mkdir $log_dir
+}
+$log_file = join-path $log_dir $log_file
+function log($message) {
+    Write-Host $message
+    Add-Content -Path $log_file $message
+}
+log "dir: [$($dir)]"
+$hcn_path = join-path $dir "posh\hcn"
+$windows_version = (Get-WmiObject -class Win32_OperatingSystem).Caption
 if ($install) {
     $job_name = "set_wsl2_ip_address"
     $job = Get-ScheduledJob -Name $job_name -ErrorAction SilentlyContinue
     if ($job) {
         Write-Host "job has already been installed"
+        if ($force) {
+            Write-Host "removing scheduled job"
+            Unregister-ScheduledJob -Name $job_name
+        }
     }
     else {
         Write-Host "installing"
-        $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+        $trigger = New-JobTrigger -AtStartup
         Register-ScheduledJob -Trigger $trigger `
             -FilePath $my_path `
             -Name $job_name
     }
     return
 }
-wsl -d focal --shutdown
-Stop-Process -Name pycharm64 -ErrorAction silentlycontinue
-import-module -Name $hcn_path
-
-$network = @"
-{
-    "Name" : "WSL",
-    "Flags": 9,
-    "Type": "ICS",
-    "IPv6": false,
-    "IsolateSwitch": true,
-    "MaxConcurrentEndpoints": 1,
-    "Subnets" : [{
-        "ID" : "FC437E99-2063-4433-A1FA-F4D17BD55C92",
-        "ObjectType": 5,
-        "AddressPrefix" : "192.168.201.248/29",
-        "GatewayAddress" : "192.168.201.249",
-        "IpSubnets" : [
-            {
-                "ID" : "4D120505-4143-4CB2-8C53-DC0F70049696",
-                "Flags": 3,
-                "IpAddressPrefix": "192.168.201.248/29",
-                "ObjectType": 6
+function remove_health($data) {
+    if ($data.health) {
+        $data.psobject.properties.remove('health')
+    }
+    foreach ($subnet in $data.subnets) {
+        if ($subnet.health) {
+            $subnet.psobject.properties.remove('health')
+        }
+        foreach ($ip_subnet in $subnet.ipsubnets) {
+            if ($ip_subnet.health) {
+                $ip_subnet.psobject.properties.remove('health')
             }
-        ]
+
+        }
+    }
+    if ($data.resources.health) {
+        $data.resources.psobject.properties.remove('health')
+    }
+    foreach ($allocator in $data.resources.allocators) {
+        if ($allocator.health) {
+            $allocator.psobject.properties.remove('health')
+        }
+    }
+    return $data
+}
+
+function set_network_cidr($name, $desired_cidr, $gateway_ip) {
+    import-module -Name $hcn_path
+    import-module microsoft.powershell.utility
+    $wsl_network = Get-HnsNetworkEx | Where-Object { $_.Name -like "$($name)*" }
+    $first_ip = $desired_cidr.split("/")[0]
+    $network = $null
+    log "setting first ip to [$($first_ip)]"
+    if ($wsl_network) {
+        $name = $wsl_network.name
+        $id = $wsl_network.id
+        log "existing network found $($name) / $($id)"
+        $subnet = $wsl_network.subnets[0]
+        if ($subnet.addressprefix -eq $desired_cidr) {
+            log "network [$($name)] cidr is alread [$($desired_cidr)]"
+            return
+        }
+        if ($name -like 'WSL*') {
+            log "shutting down focal"
+            wsl -d focal --shutdown
+        }
+        log "removing existing network [$($name)]"
+        $wsl_network | Remove-HnsNetwork
+        $wsl_network = remove_health $wsl_network
+        if ($wsl_network.DNSServerList){
+            $wsl_network.DNSServerList = $gateway_ip
+        }
+        $subnet.addressprefix = $desired_cidr
+        $subnet.GatewayAddress = $gateway_ip
+        $subnet.ipsubnets[0].IpAddressPrefix = $desired_cidr
+        foreach ($allocator in $wsl_network.resources.allocators) {
+            if ($allocator.SubnetIPAddress) {
+                $allocator.SubnetIPAddress = $first_ip
+            }
+        }
+        $network = ConvertTo-Json -Depth 7 $wsl_network
+    }
+    else {
+        if ($name -like 'WSL*') {
+            $name = "WSL (Hyper-V firewall)"
+            $id = "790E58B4-7939-4434-9358-89AE7DDBE87E"
+            $network = @"
+{
+  "ActivityId":  "E2636C76-ACBD-4FBC-BACA-AA98B303B0F6",
+  "AdditionalParams":  {},
+  "CurrentEndpointCount":  1,
+  "DNSServerList":  "$($gateway_ip)",
+  "Extensions":  [{
+    "Id":  "E7C3B2F0-F3C5-48DF-AF2B-10FED6D72E7A",
+    "IsEnabled":  false,
+    "Name":  "Microsoft Windows Filtering Platform"
+  }, {
+    "Id":  "F74F241B-440F-4433-BB28-00F89EAD20D8",
+    "IsEnabled":  true,
+    "Name":  "Microsoft Azure VFP Switch Filter Extension"
+  }, {
+    "Id":  "430BDADD-BAB0-41AB-A369-94B67FA5BE0A",
+    "IsEnabled":  true,
+    "Name":  "Microsoft NDIS Capture"
+  }],
+  "Flags":  265,
+  "GatewayMac":  "00-15-5D-BF-C6-40",
+  "ID":  "$($id)",
+  "IPv6":  false,
+  "IsolateSwitch":  true,
+  "LayeredOn":  "BFEE2CBD-B935-461C-97FE-2DDDC2AD01A3",
+  "MacPools":  [{
+    "EndMacAddress":  "00-15-5D-BF-CF-FF",
+    "StartMacAddress":  "00-15-5D-BF-C0-00"
+  }],
+  "MaxConcurrentEndpoints":  1,
+  "Name":  "$($name)",
+  "NatName":  "ICS21D70693-A6F4-4D9A-A4FE-E0AD81B157FA",
+  "Policies":  [],
+  "State":  1,
+  "Subnets":  [{
+    "AdditionalParams":  {},
+    "AddressPrefix":  "$($desired_cidr)",
+    "Flags":  0,
+    "GatewayAddress":  "$($gateway_ip)",
+    "ID":  "6411C858-A454-41AC-A92A-3E97BD989397",
+    "IpSubnets":  [{
+      "AdditionalParams":  {},
+      "Flags":  0,
+      "ID":  "186DD165-E79E-447F-89B0-DD828D14A741",
+      "IpAddressPrefix":  "$($desired_cidr)",
+      "ObjectType":  6,
+      "Policies":  []
     }],
-    "MacPools":  [{
-        "EndMacAddress":  "00-15-5D-52-CF-FF",
-        "StartMacAddress":  "00-15-5D-52-C0-00"
+    "ObjectType":  5,
+    "Policies":  []
+  }],
+  "SwitchGuid":  "$($id)",
+  "TotalEndpoints":  1,
+  "Type":  "ICS",
+  "Version":  64424509440,
+  "Resources":  {
+    "AdditionalParams":  {},
+    "AllocationOrder":  2,
+    "Allocators":  [{
+      "AdapterNetCfgInstanceId":  "{21D70693-A6F4-4D9A-A4FE-E0AD81B157FA}",
+      "AdditionalParams":  {},
+      "AllocationOrder":  0,
+      "CompartmendId":  0,
+      "Connected":  true,
+      "DNSFirewallRules":  true,
+      "DeviceInstanceID":  "",
+      "DevicelessNic":  true,
+      "DhcpDisabled":  true,
+      "EndpointNicGuid":  "$($id)",
+      "EndpointPortGuid":  "$($id)",
+      "Flags":  0,
+      "ID":  "722637B6-3E8E-46F2-9E86-9EBFDF32B113",
+      "InterfaceGuid":  "21D70693-A6F4-4D9A-A4FE-E0AD81B157FA",
+      "IsPolicy":  false,
+      "IsolationId":  0,
+      "MacAddress":  "00-15-5D-B1-69-7B",
+      "ManagementPort":  true,
+      "NcfHidden":  false,
+      "NetworkId":  "$($id)",
+      "NicFriendlyName":  "$($name)",
+      "NlmHidden":  true,
+      "PortFriendlyNamePrefix":  "Host Vnic",
+      "PreferredPortFriendlyName":  "Host Vnic $($id)",
+      "State":  3,
+      "SwitchId":  "$($id)",
+      "Tag":  "Host Vnic",
+      "VmPort":  false,
+      "WaitForIpv6Interface":  false,
+      "nonPersistentPort":  false
+    }, {
+      "AdditionalParams":  {},
+      "AllocationOrder":  1,
+      "Dhcp":  false,
+      "DisableSharing":  false,
+      "Dns":  true,
+      "ExternalInterfaceConstraint":  0,
+      "Flags":  0,
+      "ICSDHCPFlags":  0,
+      "ICSFlags":  0,
+      "ID":  "64F71467-A8BB-4135-B71A-46A01B06F4D4",
+      "IsPolicy":  false,
+      "Prefix":  20,
+      "PrivateInterfaceGUID":  "21D70693-A6F4-4D9A-A4FE-E0AD81B157FA",
+      "SubnetIPAddress":  "$($first_ip)",
+      "Tag":  "ICS"
     }],
-    "DNSServerList" : "192.168.201.251, 192.168.201.252"
+    "CompartmentOperationTime":  0,
+    "Flags":  0,
+    "ID":  "E2636C76-ACBD-4FBC-BACA-AA98B303B0F6",
+    "PortOperationTime":  0,
+    "VfpOperationTime":  0,
+    "parentId":  "7725BD87-60F2-49DF-A6CD-718D2B1E686E"
+  }
 }
 "@
+        }
+        elif ($name -like 'default switch') {
+            $id = "C08CB7B8-9B3C-408E-8E30-5E16A3AEB444"
+            $network = @"
+{
+  "ActivityId": "4433905F-F5E1-4453-9B24-EC9C1C00B655",
+  "AdditionalParams": {},
+  "CurrentEndpointCount": 0,
+  "Extensions": [
+    {
+      "Id": "E7C3B2F0-F3C5-48DF-AF2B-10FED6D72E7A",
+      "IsEnabled": false,
+      "Name": "Microsoft Windows Filtering Platform"
+    },
+    {
+      "Id": "F74F241B-440F-4433-BB28-00F89EAD20D8",
+      "IsEnabled": false,
+      "Name": "Microsoft Azure VFP Switch Filter Extension"
+    },
+    {
+      "Id": "430BDADD-BAB0-41AB-A369-94B67FA5BE0A",
+      "IsEnabled": true,
+      "Name": "Microsoft NDIS Capture"
+    }
+  ],
+  "Flags": 11,
+  "GatewayMac": "00-15-5D-01-0F-00",
+  "ID": "$($id)",
+  "IPv6": false,
+  "LayeredOn": "D353C64C-4643-4318-8000-D36E21FDDE64",
+  "MacPools": [
+    {
+      "EndMacAddress": "00-15-5D-B5-3F-FF",
+      "StartMacAddress": "00-15-5D-B5-30-00"
+    }
+  ],
+  "MaxConcurrentEndpoints": 0,
+  "Name": "Default Switch",
+  "NatName": "ICSE54B75E2-8E56-443E-BA86-D3384E95F104",
+  "Policies": [],
+  "State": 1,
+  "Subnets": [
+    {
+      "AdditionalParams": {},
+      "AddressPrefix": "$($desired_cidr)",
+      "Flags": 0,
+      "GatewayAddress": "$($gateway_ip)",
+      "ID": "4269C06B-4075-49D0-91BE-680D498A0C7C",
+      "IpSubnets": [
+        {
+          "AdditionalParams": {},
+          "Flags": 3,
+          "Health": {
+            "LastErrorCode": 0,
+            "LastUpdateTime": 133569813606901578
+          },
+          "ID": "760FAA99-2563-4539-8CD8-57F89695FC7D",
+          "IpAddressPrefix": "$($desired_cidr)",
+          "ObjectType": 6,
+          "Policies": [],
+          "State": 0
+        }
+      ],
+      "ObjectType": 5,
+      "Policies": [],
+      "State": 0
+    }
+  ],
+  "SwitchGuid": "$($id)",
+  "SwitchName": "Default Switch",
+  "TotalEndpoints": 0,
+  "Type": "ICS",
+  "Version": 64424509440,
+  "Resources": {
+    "AdditionalParams": {},
+    "AllocationOrder": 2,
+    "Allocators": [
+      {
+        "AdapterNetCfgInstanceId": "{E54B75E2-8E56-443E-BA86-D3384E95F104}",
+        "AdditionalParams": {},
+        "AllocationOrder": 0,
+        "CompartmendId": 0,
+        "Connected": true,
+        "DNSFirewallRules": true,
+        "DeviceInstanceID": "",
+        "DevicelessNic": true,
+        "DhcpDisabled": true,
+        "EndpointNicGuid": "$($id)",
+        "EndpointPortGuid": "$($id)",
+        "Flags": 0,
+        "ID": "6561273D-023A-40A8-85BF-1CDCB5B5D206",
+        "InterfaceGuid": "E54B75E2-8E56-443E-BA86-D3384E95F104",
+        "IsPolicy": false,
+        "IsolationId": 0,
+        "MacAddress": "00-15-5D-0F-A0-3B",
+        "ManagementPort": true,
+        "NcfHidden": false,
+        "NetworkId": "$($id)",
+        "NicFriendlyName": "Default Switch",
+        "NlmHidden": true,
+        "PortFriendlyNamePrefix": "Host Vnic",
+        "PreferredPortFriendlyName": "Host Vnic $($id)",
+        "State": 3,
+        "SwitchId": "$($id)",
+        "Tag": "Host Vnic",
+        "VmPort": false,
+        "WaitForIpv6Interface": false,
+        "nonPersistentPort": false
+      },
+      {
+        "AdditionalParams": {},
+        "AllocationOrder": 1,
+        "Dhcp": true,
+        "DisableSharing": false,
+        "Dns": true,
+        "ExternalInterfaceConstraint": 0,
+        "Flags": 0,
+        "ICSDHCPFlags": 0,
+        "ICSFlags": 0,
+        "ID": "71660378-052A-4657-8BA1-B8B850C9091F",
+        "IsPolicy": false,
+        "Prefix": 20,
+        "PrivateInterfaceGUID": "E54B75E2-8E56-443E-BA86-D3384E95F104",
+        "State": 3,
+        "SubnetIPAddress": "172.31.80.0",
+        "Tag": "ICS"
+      }
+    ],
+    "CompartmentOperationTime": 0,
+    "Flags": 0,
+    "ID": "4433905F-F5E1-4453-9B24-EC9C1C00B655",
+    "PortOperationTime": 0,
+    "State": 1,
+    "SwitchOperationTime": 0,
+    "VfpOperationTime": 0,
+    "parentId": "FDDED980-D10D-442E-B41E-49D9EF46FF3B"
+  }
+}
+"@
+        }
+    }
+    if ($network) {
+        log "recreating network with id [$($id)]"
+        New-HnsNetworkEx -Id $id -JsonString $network
+    }
+}
 
-$rg = Get-HnsNetworkEx | Where-Object { $_.Name -Eq "WSL" } | Remove-HnsNetwork
-$id = "B95D0C5E-57D4-412B-B571-18A81A16E005"
-New-HnsNetworkEx -Id $id -JsonString $network
-
-# SIG # Begin signature block
-# MIITjwYJKoZIhvcNAQcCoIITgDCCE3wCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
-# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlYN3LU6N5XJH3G+wfuIv/mqC
-# ko6gghDGMIIFRDCCBCygAwIBAgIRAPObRmxze0JQ5eGP2ElORJ8wDQYJKoZIhvcN
-# AQELBQAwfDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3Rl
-# cjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMSQw
-# IgYDVQQDExtTZWN0aWdvIFJTQSBDb2RlIFNpZ25pbmcgQ0EwHhcNMTkxMjAyMDAw
-# MDAwWhcNMjIxMjAxMjM1OTU5WjCBtDELMAkGA1UEBhMCVVMxDjAMBgNVBBEMBTQ2
-# NDEwMRAwDgYDVQQIDAdJbmRpYW5hMRUwEwYDVQQHDAxNZXJyaWxsdmlsbGUxFjAU
-# BgNVBAkMDTg0NTAgQnJvYWR3YXkxKTAnBgNVBAoMIERpcmVjdGJ1eSBIb21lIElt
-# cHJvdmVtZW50LCBJbmMuMSkwJwYDVQQDDCBEaXJlY3RidXkgSG9tZSBJbXByb3Zl
-# bWVudCwgSW5jLjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJqKpxa
-# e2Zx7jKFSB+Bev1xV7o4u1Nghup8yVR7/AUvJr4IAMVYMc4P9OfnCexCRex1hAgw
-# NOYo9IzQxtHfGq7eQQUJA9EP8g5/3BiwrM6dJggbA6FZ6AsM4A+lac5LFgjrcISj
-# qgcJ1PlEGmRSJqF6XrTfxVwq5e3Bl2iTI+IlHqdNTAbplv9F1cxfQFno6Ym1oa6M
-# uvAJoYTb7Ma2Ljl9cg6y34ZQg19vJMZ8cOgkuhY3NuuFrYiQCbdqK3UDql6fKRR0
-# NvlBLj+KN1JfehfBNp6sUDBEALq1FeVCABQwuEchSRYzJZ23OGySXccV9hXrj4nJ
-# Yo7k6FSi19PX75UCAwEAAaOCAYYwggGCMB8GA1UdIwQYMBaAFA7hOqhTOjHVir7B
-# u61nGgOFrTQOMB0GA1UdDgQWBBRkJZWUpSBvVXUVZpdn5UTUXRd1yjAOBgNVHQ8B
-# Af8EBAMCB4AwDAYDVR0TAQH/BAIwADATBgNVHSUEDDAKBggrBgEFBQcDAzARBglg
-# hkgBhvhCAQEEBAMCBBAwQAYDVR0gBDkwNzA1BgwrBgEEAbIxAQIBAwIwJTAjBggr
-# BgEFBQcCARYXaHR0cHM6Ly9zZWN0aWdvLmNvbS9DUFMwQwYDVR0fBDwwOjA4oDag
-# NIYyaHR0cDovL2NybC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ29kZVNpZ25pbmdD
-# QS5jcmwwcwYIKwYBBQUHAQEEZzBlMD4GCCsGAQUFBzAChjJodHRwOi8vY3J0LnNl
-# Y3RpZ28uY29tL1NlY3RpZ29SU0FDb2RlU2lnbmluZ0NBLmNydDAjBggrBgEFBQcw
-# AYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wDQYJKoZIhvcNAQELBQADggEBAG+U
-# CFxgpbyU/37LEaqrGd4jc4oea7K6zyNt4sHBhONAfDY83NDso2/drgjBob2WmTym
-# D7N4dbHRhakTKLlEDDV2i84DWic5nutilsNfRzzKvMAoLM4izBx7BKwG81HY5BN8
-# JBXnofxY63ieigCatn31p1mw1lFPOTMDQGzmMGQO9krl2aiEkb8s2bV5LsGxEukX
-# nWXlRJc5BHbeI5u4M3Vmh+aR+8bzGyQAqLRWzEk5Xpt4Olvf2+IDj+sNfOwas2T6
-# C0QqwztM8O5XHufSjUWJWqfK46QRvIY8OelDOaWy6yd+8jyrTnsV7e5UA0VqQmPF
-# SfLmEsjeyQnAeHUBJTAwggWBMIIEaaADAgECAhA5ckQ6+SK3UdfTbBDdMTWVMA0G
-# CSqGSIb3DQEBDAUAMHsxCzAJBgNVBAYTAkdCMRswGQYDVQQIDBJHcmVhdGVyIE1h
-# bmNoZXN0ZXIxEDAOBgNVBAcMB1NhbGZvcmQxGjAYBgNVBAoMEUNvbW9kbyBDQSBM
-# aW1pdGVkMSEwHwYDVQQDDBhBQUEgQ2VydGlmaWNhdGUgU2VydmljZXMwHhcNMTkw
-# MzEyMDAwMDAwWhcNMjgxMjMxMjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNV
-# BAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVU
-# aGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBSU0EgQ2Vy
-# dGlmaWNhdGlvbiBBdXRob3JpdHkwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIK
-# AoICAQCAEmUXNg7D2wiz0KxXDXbtzSfTTK1Qg2HiqiBNCS1kCdzOiZ/MPans9s/B
-# 3PHTsdZ7NygRK0faOca8Ohm0X6a9fZ2jY0K2dvKpOyuR+OJv0OwWIJAJPuLodMkY
-# tJHUYmTbf6MG8YgYapAiPLz+E/CHFHv25B+O1ORRxhFnRghRy4YUVD+8M/5+bJz/
-# Fp0YvVGONaanZshyZ9shZrHUm3gDwFA66Mzw3LyeTP6vBZY1H1dat//O+T23LLb2
-# VN3I5xI6Ta5MirdcmrS3ID3KfyI0rn47aGYBROcBTkZTmzNg95S+UzeQc0PzMsNT
-# 79uq/nROacdrjGCT3sTHDN/hMq7MkztReJVni+49Vv4M0GkPGw/zJSZrM233bkf6
-# c0Plfg6lZrEpfDKEY1WJxA3Bk1QwGROs0303p+tdOmw1XNtB1xLaqUkL39iAigmT
-# Yo61Zs8liM2EuLE/pDkP2QKe6xJMlXzzawWpXhaDzLhn4ugTncxbgtNMs+1b/97l
-# c6wjOy0AvzVVdAlJ2ElYGn+SNuZRkg7zJn0cTRe8yexDJtC/QV9AqURE9JnnV4ee
-# UB9XVKg+/XRjL7FQZQnmWEIuQxpMtPAlR1n6BB6T1CZGSlCBst6+eLf8ZxXhyVeE
-# Hg9j1uliutZfVS7qXMYoCAQlObgOK6nyTJccBz8NUvXt7y+CDwIDAQABo4HyMIHv
-# MB8GA1UdIwQYMBaAFKARCiM+lvEH7OKvKe+CpX/QMKS0MB0GA1UdDgQWBBRTeb9a
-# qitKz1SA4dibwJ3ysgNmyzAOBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB
-# /zARBgNVHSAECjAIMAYGBFUdIAAwQwYDVR0fBDwwOjA4oDagNIYyaHR0cDovL2Ny
-# bC5jb21vZG9jYS5jb20vQUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwNAYIKwYB
-# BQUHAQEEKDAmMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20w
-# DQYJKoZIhvcNAQEMBQADggEBABiHUdx0IT2ciuAntzPQLszs8ObLXhHeIm+bdY6e
-# cv7k1v6qH5yWLe8DSn6u9I1vcjxDO8A/67jfXKqpxq7y/Njuo3tD9oY2fBTgzfT3
-# P/7euLSK8JGW/v1DZH79zNIBoX19+BkZyUIrE79Yi7qkomYEdoiRTgyJFM6iTcky
-# s7roFBq8cfFb8EELmAAKIgMQ5Qyx+c2SNxntO/HkOrb5RRMmda+7qu8/e3c70sQC
-# kT0ZANMXXDnbP3sYDUXNk4WWL13fWRZPP1G91UUYP+1KjugGYXQjFrUNUHMnREd/
-# EF2JKmuFMRTE6KlqTIC8anjPuH+OdnKZDJ3+15EIFqGjX5UwggX1MIID3aADAgEC
-# AhAdokgwb5smGNCC4JZ9M9NqMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQGEwJV
-# UzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAc
-# BgNVBAoTFVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0
-# IFJTQSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0z
-# MDEyMzEyMzU5NTlaMHwxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1h
-# bmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGlt
-# aXRlZDEkMCIGA1UEAxMbU2VjdGlnbyBSU0EgQ29kZSBTaWduaW5nIENBMIIBIjAN
-# BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhiKNMoV6GJ9J8JYvYwgeLdx8nxTP
-# 4ya2JWYpQIZURnQxYsUQ7bKHJ6aZy5UwwFb1pHXGqQ5QYqVRkRBq4Etirv3w+Bis
-# p//uLjMg+gwZiahse60Aw2Gh3GllbR9uJ5bXl1GGpvQn5Xxqi5UeW2DVftcWkpwA
-# L2j3l+1qcr44O2Pej79uTEFdEiAIWeg5zY/S1s8GtFcFtk6hPldrH5i8xGLWGwuN
-# x2YbSp+dgcRyQLXiX+8LRf+jzhemLVWwt7C8VGqdvI1WU8bwunlQSSz3A7n+L2U1
-# 8iLqLAevRtn5RhzcjHxxKPP+p8YU3VWRbooRDd8GJJV9D6ehfDrahjVh0wIDAQAB
-# o4IBZDCCAWAwHwYDVR0jBBgwFoAUU3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0O
-# BBYEFA7hOqhTOjHVir7Bu61nGgOFrTQOMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMB
-# Af8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMDBggrBgEFBQcDCDARBgNV
-# HSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-# dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3Js
-# MHYGCCsGAQUFBwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1
-# c3QuY29tL1VTRVJUcnVzdFJTQUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlo
-# dHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0GCSqGSIb3DQEBDAUAA4ICAQBNY1Dt
-# RzRKYaTb3moqjJvxAAAeHWJ7Otcywvaz4GOz+2EAiJobbRAHBE++uOqJeCLrD0bs
-# 80ZeQEaJEvQLd1qcKkE6/Nb06+f3FZUzw6GDKLfeL+SU94Uzgy1KQEi/msJPSrGP
-# JPSzgTfTt2SwpiNqWWhSQl//BOvhdGV5CPWpk95rcUCZlrp48bnI4sMIFrGrY1rI
-# FYBtdF5KdX6luMNstc/fSnmHXMdATWM19jDTz7UKDgsEf6BLrrujpdCEAJM+U100
-# pQA1aWy+nyAlEA0Z+1CQYb45j3qOTfafDh7+B1ESZoMmGUiVzkrJwX/zOgWb+W/f
-# iH/AI57SHkN6RTHBnE2p8FmyWRnoao0pBAJ3fEtLzXC+OrJVWng+vLtvAxAldxU0
-# ivk2zEOS5LpP8WKTKCVXKftRGcehJUBqhFfGsp2xvBwK2nxnfn0u6ShMGH7EezFB
-# cZpLKewLPVdQ0srd/Z4FUeVEeN0B3rF1mA1UJP3wTuPi+IO9crrLPTru8F4Xkmht
-# yGH5pvEqCgulufSe7pgyBYWe6/mDKdPGLH29OncuizdCoGqC7TtKqpQQpOEN+BfF
-# tlp5MxiS47V1+KHpjgolHuQe8Z9ahyP/n6RRnvs5gBHN27XEp6iAb+VT1ODjosLS
-# Wxr6MiYtaldwHDykWC6j81tLB9wyWfOHpxptWDGCAjMwggIvAgEBMIGRMHwxCzAJ
-# BgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcT
-# B1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDEkMCIGA1UEAxMbU2Vj
-# dGlnbyBSU0EgQ29kZSBTaWduaW5nIENBAhEA85tGbHN7QlDl4Y/YSU5EnzAJBgUr
-# DgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMx
-# DAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkq
-# hkiG9w0BCQQxFgQUzNkwHnVqSKoDHywPJ+JpDJKSZzUwDQYJKoZIhvcNAQEBBQAE
-# ggEAMyYhWyv8cT2KUwmlOsG5mPf+yHkwF5ze19bvlXrod1qgnmHI01NSWnsa8Po4
-# jVSeNyagFXc5SgMKquXjH91NNV5WD7nB5Al3nR9uASRVr3pMp2kKrYv3ib9fh0fx
-# xpF3C+PmC45S3bF5GrYcL/RBCEBXRwf4AfbRfO7CA7SP9UD/fMwpZyrfBGRPiUfu
-# Y0Twu+TMMscsqbeBCgLsF5RtV464i7L5/H1c01AagGnZvF/xXv3LklvQ7tR2HoGZ
-# 6O9zVQy+kKu1r45JKCFoBLGOCsbSG955Nrv8Kxz7rlLiK1EpdnAnAMHy71zVILEf
-# prAQ2K86DWw17Hm1vtBFl77oRQ==
-# SIG # End signature block
+set_network_cidr 'WSL' "192.168.201.248/29" "192.168.201.249"
+set_network_cidr 'Default Switch' "192.168.201.240/29" "192.169.201.241"

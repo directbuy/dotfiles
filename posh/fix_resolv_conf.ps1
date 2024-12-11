@@ -21,10 +21,10 @@
 #
 # 3. Schedule this script with Task Scheduler:
 #
-#      * Click Action –> Create Task…
+#      * Click Action ï¿½> Create Taskï¿½
 #      * Give your task a name in the General tab
-#      * Click on the Triggers tab and then click New…
-#      * In the "Begin the task" menu, choose “On an event.” Then, choose:
+#      * Click on the Triggers tab and then click Newï¿½
+#      * In the "Begin the task" menu, choose ï¿½On an event.ï¿½ Then, choose:
 #
 #          Log: Microsoft-Windows-NetworkProfile/Operational
 #          Source: NetworkProfile
@@ -44,7 +44,7 @@
 #
 #          Program/script: powershell.exe
 #          Arguments: -NoProfile -File "c:\where\you\stored\wsl-resolv-handler.ps1"
-#      
+#
 #      * Optionally add -WindowStyle Hidden to above Arguments.
 [CmdletBinding()]
 param(
@@ -79,7 +79,7 @@ if ($install) {
     register-scheduledtask fix_resolv_conf -InputObject $task
     exit
 }
-$distro = "Ubuntu-18.04"
+$distro = "focal"
 
 # Discover things and create an $Entries object.
 $NetworkInterfaces  = Get-NetIPInterface -AddressFamily IPv4 | Where-Object ConnectionState -EQ 'Connected' | Where-Object NlMtu -LT 9001
@@ -113,7 +113,7 @@ $dns_servers = [system.collections.arraylist]@()
 foreach ($entry in $entries) {
     foreach ($dns_server in $entry.DNSServerAddresses) {
         $dns_servers.add([string]::Format("nameserver {0}", $dns_Server))
-    }    
+    }
 }
 $nameservers = $dns_servers -join "\n"
 &wsl.exe -d $distro -u root --exec /bin/bash -c "printf '${CommentLine}\n${SearchLine}\n${nameservers}\n' | tee /etc/resolv.conf"

@@ -3,7 +3,7 @@ alias dj='djact && ./manage.py'
 alias djrs='dj runserver'
 alias ll='ls -lFH'
 alias la='ls -lAhS'
-alias grep='grep --color=auto'
+alias grep='grep --line-number --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias visudo='sudo -E visudo'
@@ -16,16 +16,12 @@ alias promote_staging='git checkout staging ; git pull ; git checkout master ; g
 alias start_celery='C_FORCE_ROOT=1 celery worker -A topenguins -l info -c 1'
 alias check_restore_status='sqlcmd -U sa -S localhost -Q "select command, percent_complete from sys.dm_exec_requests where command like '"'"'restore database%'"'"'"'
 alias kpyc="find . -name '*.pyc' -delete"
-alias tf='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TF.exe'
-alias tfs_build='/mnt/c/vs2017/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team\ Explorer/TFSBuild.exe'
-alias charm='/mnt/c/Program\ Files\ \(x86\)/JetBrains/PyCharm\ 2018.2/bin/pycharm64.exe'
 function find_mail_errors() {
   for x in `sudo tail -50000 /var/log/maillog | grep -Ei '(quota|perm|fail|error)' | cut -d':' -f4` ; do 
     sudo grep $x /var/log/maillog | grep -i from | sed -E 's,^(.{15}).*from=<(.*)>.*$,\1     \2,'; 
   done
 }
 alias djt='dj run_integration_tests -t'
-alias bonton_redshift='psql postgresql://awsuser@redshift-cluster-1.cdcvef269gao.us-east-2.redshift.amazonaws.com:5439/dev?sslmode=require'
 
 function git_made_easy(){
     local CURRENT_BRANCH
