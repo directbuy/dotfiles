@@ -1,4 +1,4 @@
-alias djact='source bin/activate'
+alias djact='[[ -f bin/activate ]] && source bin/activate || [[ -f .venv/bin/activate ]] && source .venv/bin/activate || [[ -f venv/bin/activate ]] && source venv/bin/activate'
 alias dj='djact && ./manage.py'
 alias djrs='dj runserver'
 alias ll='ls -lFH'
@@ -8,9 +8,8 @@ alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias visudo='sudo -E visudo'
 alias pycheck="python -m py_compile"
-alias djsp='python manage.py shell_plus --quiet-load'
+alias djsp='[[ -f manage.py ]] && python manage.py shell_plus --quiet-load || ipython'
 alias djmigrate='python manage.py migrate --merge --ignore-ghost-migrations'
-alias djact='. bin/activate'
 alias promote_dev='git checkout dev ; git pull ; git checkout staging ; git pull ; git merge origin/dev ; git push origin staging'
 alias promote_staging='git checkout staging ; git pull ; git checkout master ; git pull ; git merge origin/staging ; git push origin master'
 alias start_celery='C_FORCE_ROOT=1 celery worker -A topenguins -l info -c 1'
