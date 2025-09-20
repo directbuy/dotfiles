@@ -91,9 +91,9 @@ alias visudo='sudo -E visudo'
 
 alias pycheck="python -m py_compile"
 alias dj='python manage.py'
-alias djsp='python manage.py shell_plus --quiet-load'
+alias djsp='[[ -f manage.py ]] && python manage.py shell_plus --quiet-load || ipython'
 alias djmigrate='python manage.py migrate --merge --ignore-ghost-migrations'
-alias djact='. bin/activate'
+alias djact='for x in . .venv venv ; do if [[ -f $x/bin/activate ]] ; then source $x/bin/activate ; break ; fi ; done'
 # Global aliases, can be specified anywhere (not just the beginning of a command)
 alias -g swapouterr='3>&1 1>&2 2>&3 3>&-'
 if [ -e /opt/mssql-tools/bin ] ; then
@@ -219,4 +219,5 @@ fi
 if [ "$(uname 2> /dev/null)" = "Darwin" ]; then
     export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 fi
+export XAUTHORITY=$HOME/.Xauthority
 cd ~
